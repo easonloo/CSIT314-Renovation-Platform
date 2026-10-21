@@ -75,6 +75,20 @@ python manage.py test accounts
 python manage.py check
 ```
 
+## Automated checks (CI)
+
+The **Django CI** GitHub Actions workflow runs on pushes and pull requests into
+`main`. It installs `requirements.txt`, checks Django configuration, checks for
+missing migrations, and runs the complete test suite on Python 3.9.
+
+See the results in the repository's **Actions** tab or in a pull request's checks.
+You can also run it manually from **Actions → Django CI → Run workflow** once the
+workflow is on `main`. Django creates a temporary test database; your local
+database and administrator credentials are not used.
+
+This workflow checks the code. Deployment can be added separately when the group
+is ready for CD.
+
 ## Work with the group
 
 The repository owner invites teammates through GitHub repository **Settings →
