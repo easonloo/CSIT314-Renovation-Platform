@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Company Information{% endblock %}
+{% block page_name %}{{ action }} Company Information{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1 class="page-title">{{ action }} Company Information</h1><p class="page-subtitle">Keep your public company profile accurate and current.</p></div></div>
+<form method="post" class="card">{% csrf_token %}<div class="form-grid"><div class="form-group"><label>Company name</label><input class="input" name="name" value="{{ company.name|default:'' }}" required></div><div class="form-group"><label>Email</label><input class="input" type="email" name="email" value="{{ company.email|default:'' }}"></div><div class="form-group"><label>Phone</label><input class="input" name="phone" value="{{ company.phone|default:'' }}"></div><div class="form-group"><label>Website</label><input class="input" name="website" value="{{ company.website|default:'' }}"></div><div class="form-group" style="grid-column:1/-1;"><label>Address</label><input class="input" name="address" value="{{ company.address|default:'' }}"></div><div class="form-group" style="grid-column:1/-1;"><label>Description</label><textarea class="textarea" name="description">{{ company.description|default:'' }}</textarea></div></div><div class="form-actions"><button class="btn btn-primary">Save company information</button><a class="btn btn-light" href="{% url 'company_detail' %}">Cancel</a></div></form>
+{% endblock %}

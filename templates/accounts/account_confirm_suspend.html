@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Suspend User Account{% endblock %}
+{% block page_name %}Suspend User Account{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Suspend User Account</h1>
+  </div>
+</div>
+
+<div class="card">
+  <p>
+    Are you sure you want to suspend
+    <strong>{{ account.user.username }}</strong>?
+  </p>
+
+  <p>This account will no longer be able to log in.</p>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="form-actions">
+      <button class="btn btn-danger" type="submit">
+        Confirm suspension
+      </button>
+
+      <a
+        class="btn btn-light"
+        href="{% url 'account_detail' account.pk %}"
+      >
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

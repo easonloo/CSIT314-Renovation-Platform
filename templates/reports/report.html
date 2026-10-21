@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}{{ period|title }} Report{% endblock %}
+{% block page_name %}Platform Reports{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1 class="page-title">{{ period|title }} Report</h1><p class="page-subtitle">Monitor platform activity and performance.</p></div></div>
+<div class="report-tabs"><a class="{% if period == 'daily' %}active{% endif %}" href="{% url 'report' 'daily' %}">Daily</a><a class="{% if period == 'weekly' %}active{% endif %}" href="{% url 'report' 'weekly' %}">Weekly</a><a class="{% if period == 'monthly' %}active{% endif %}" href="{% url 'report' 'monthly' %}">Monthly</a></div>
+<div class="grid grid-4" style="margin-bottom:20px;"><div class="card"><div class="stat-label">New users</div><div class="stat-number">{{ report.new_users|default:0 }}</div></div><div class="card"><div class="stat-label">IDP views</div><div class="stat-number">{{ report.views|default:0 }}</div></div><div class="card"><div class="stat-label">Shortlists</div><div class="stat-number">{{ report.shortlists|default:0 }}</div></div><div class="card"><div class="stat-label">New projects</div><div class="stat-number">{{ report.new_projects|default:0 }}</div></div></div>
+<div class="card"><h3 style="margin-top:0;">Activity summary</h3><div class="table-wrap"><table><thead><tr><th>Metric</th><th>Value</th><th>Notes</th></tr></thead><tbody><tr><td>Active users</td><td>{{ report.active_users|default:0 }}</td><td>Users active during this reporting period.</td></tr><tr><td>Total IDPs</td><td>{{ report.total_projects|default:0 }}</td><td>Projects available on the platform.</td></tr><tr><td>Favourite saves</td><td>{{ report.shortlists|default:0 }}</td><td>Number of times customers saved an IDP.</td></tr></tbody></table></div></div>
+{% endblock %}

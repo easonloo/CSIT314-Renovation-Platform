@@ -5,3 +5,12 @@ db.sqlite3
 .vscode/
 .DS_Store
 .env
+.env.*
+!.env.example
+.django-secret-key
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+.pytest_cache/
+.coverage
+htmlcov/

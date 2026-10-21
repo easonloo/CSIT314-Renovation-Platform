@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Account Details{% endblock %}
+{% block page_name %}Account Details{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">{{ account.user.username }}</h1>
+    <p class="page-subtitle">
+      Review the selected user account.
+    </p>
+  </div>
+
+  <div class="form-actions">
+    <a
+      class="btn btn-primary"
+      href="{% url 'account_update' account.pk %}"
+    >
+      Update
+    </a>
+    {% if account.user.is_active %}
+      <a class="btn btn-warning" href="{% url 'account_suspend' account.pk %}">
+        Suspend
+      </a>
+    {% else %}
+      <a class="btn btn-primary" href="{% url 'account_reactivate' account.pk %}">
+        Reactivate
+      </a>
+    {% endif %}
+
+    <a class="btn btn-light" href="{% url 'account_list' %}">
+      Back to accounts
+    </a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="detail-list">
+    <div class="detail-label">Username</div>
+    <div class="detail-value">{{ account.user.username }}</div>
+
+    <div class="detail-label">Name</div>
+    <div class="detail-value">{{ account.user.get_full_name|default:'-' }}</div>
+
+    <div class="detail-label">Email</div>
+    <div class="detail-value">{{ account.user.email|default:'-' }}</div>
+
+    <div class="detail-label">Profile</div>
+    <div class="detail-value">{{ account.profile.name }}</div>
+
+    <div class="detail-label">Status</div>
+    <div class="detail-value">
+      {% if account.user.is_active %}
+        <span class="badge badge-success">Active</span>
+      {% else %}
+        <span class="badge badge-danger">Suspended</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

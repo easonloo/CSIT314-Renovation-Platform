@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action|default:'Create' }} User Account{% endblock %}
+{% block page_name %}{{ action|default:'Create' }} User Account{% endblock %}
+
+{% block content %}
+<h1>{{ action|default:'Create' }} User Account</h1>
+
+<form method="post" class="card">
+  {% csrf_token %}
+  {{ form.as_p }}
+
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">
+      Save account
+    </button>
+
+    {% if action == 'Update' %}
+      <a
+        class="btn btn-light"
+        href="{% url 'account_detail' account.pk %}"
+      >
+        Cancel
+      </a>
+    {% else %}
+      <a class="btn btn-light" href="{% url 'account_list' %}">
+        Cancel
+      </a>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}

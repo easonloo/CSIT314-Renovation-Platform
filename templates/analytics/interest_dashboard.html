@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}IDP Interest{% endblock %}
+{% block page_name %}IDP Interest{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1 class="page-title">Project Interest</h1><p class="page-subtitle">Track how much attention your projects receive.</p></div></div>
+<div class="grid grid-2" style="margin-bottom:20px;"><div class="card"><div class="stat-label">Total views</div><div class="stat-number">{{ total_views|default:0 }}</div></div><div class="card"><div class="stat-label">Total shortlists</div><div class="stat-number">{{ total_shortlists|default:0 }}</div></div></div>
+<div class="card"><div class="table-wrap"><table><thead><tr><th>Project</th><th>Views</th><th>Shortlisted</th><th>Interest</th></tr></thead><tbody>{% for project in projects %}<tr><td><strong>{{ project.title }}</strong></td><td>{{ project.view_count }}</td><td>{{ project.shortlist_count }}</td><td><div class="metric-bar"><div class="metric-fill" style="width:{{ project.interest_percentage|default:0 }}%;"></div></div></td></tr>{% empty %}<tr><td colspan="4"><div class="empty-state">No project data available.</div></td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

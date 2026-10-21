@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Interior Design Projects{% endblock %}
+{% block page_name %}Interior Design Projects{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1 class="page-title">{% if request.GET.status == 'past' %}Past{% elif request.GET.status == 'current' %}Current{% endif %} Interior Design Projects</h1><p class="page-subtitle">Manage your renovation project portfolio.</p></div><a class="btn btn-primary" href="{% url 'idp_create' %}">+ Create IDP</a></div>
+<div class="card"><form class="search-row" method="get">{% if request.GET.status %}<input type="hidden" name="status" value="{{ request.GET.status }}">{% endif %}<input class="input" name="q" value="{{ request.GET.q }}" placeholder="Search your projects..."><button class="btn btn-dark">Search</button></form><div class="table-wrap"><table><thead><tr><th>Project</th><th>Category</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead><tbody>{% for project in projects %}<tr><td><strong>{{ project.title }}</strong></td><td>{{ project.category.name|default:'-' }}</td><td><span class="badge {% if project.status == 'current' %}badge-info{% else %}badge-muted{% endif %}">{{ project.get_status_display }}</span></td><td>{{ project.updated_at|date:'d M Y' }}</td><td><a class="btn btn-light" href="{% url 'idp_detail' project.id %}">View</a></td></tr>{% empty %}<tr><td colspan="5"><div class="empty-state"><h3>No projects found</h3><p>Create a project or try a different search.</p></div></td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Reactivate User Profile{% endblock %}
+{% block page_name %}Reactivate User Profile{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Reactivate User Profile</h1>
+  </div>
+</div>
+
+<div class="card">
+  <p>
+    Reactivate <strong>{{ profile.name }}</strong>?
+  </p>
+
+  <p>
+    Users assigned to this profile can log in again,
+    provided their individual accounts are active.
+  </p>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">
+        Confirm reactivation
+      </button>
+
+      <a
+        class="btn btn-light"
+        href="{% url 'profile_detail' profile.pk %}"
+      >
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

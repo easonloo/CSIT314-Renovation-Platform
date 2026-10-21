@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile Details{% endblock %}
+{% block page_name %}Profile Details{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">{{ profile.name }}</h1>
+    <p class="page-subtitle">Review the selected user profile.</p>
+  </div>
+
+  <div class="form-actions">
+    {% if profile.is_active %}
+    <a class="btn btn-warning" href="{% url 'profile_suspend' profile.pk %}">
+      Suspend
+    </a>
+    {% else %}
+    <a class="btn btn-primary" href="{% url 'profile_reactivate' profile.pk %}">
+      Reactivate
+    </a>
+    {% endif %}
+    <a class="btn btn-primary" href="{% url 'profile_update' profile.pk %}">
+      Update
+    </a>
+
+    <a class="btn btn-light" href="{% url 'profile_list' %}">
+      Back to profiles
+    </a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="detail-list">
+    <div class="detail-label">Profile name</div>
+    <div class="detail-value">{{ profile.name }}</div>
+
+    <div class="detail-label">Description</div>
+    <div class="detail-value">{{ profile.description|default:'-' }}</div>
+
+    <div class="detail-label">Status</div>
+    <div class="detail-value">
+      {% if profile.is_active %}
+      <span class="badge badge-success">Active</span>
+      {% else %}
+      <span class="badge badge-danger">Suspended</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action|default:'Create' }} User Profile{% endblock %}
+{% block page_name %}{{ action|default:'Create' }} User Profile{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">{{ action|default:'Create' }} User Profile</h1>
+    <p class="page-subtitle">Enter the profile details below.</p>
+  </div>
+</div>
+<form method="post" class="card">
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+  <div class="alert alert-error" role="alert">{{ form.non_field_errors }}</div>
+  {% endif %}
+  <div class="form-grid">
+    <div class="form-group">
+      <label for="{{ form.name.id_for_label }}">Profile name</label>
+      {{ form.name }}
+      {% if form.name.errors %}
+      <div class="alert alert-error" role="alert">{{ form.name.errors }}</div>
+      {% endif %}
+    </div>
+    <div class="form-group">
+      {{ form.description.label_tag }}
+      {{ form.description }}
+      {% if form.description.errors %}
+      <div class="alert alert-error" role="alert">
+        {{ form.description.errors }}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">Save profile</button>
+    {% if action == 'Update' %}
+    <a class="btn btn-light" href="{% url 'profile_detail' profile.pk %}">
+      Cancel
+    </a>
+    {% else %}
+    <a class="btn btn-light" href="{% url 'profile_list' %}">Cancel</a>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Search Company Information{% endblock %}
+{% block page_name %}Search Company Information{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1 class="page-title">Search Company Information</h1><p class="page-subtitle">Find a specific detail in your company information.</p></div></div>
+<div class="card"><form class="search-row" method="get"><input class="input" name="q" value="{{ request.GET.q }}" placeholder="Search company details..."><button class="btn btn-dark">Search</button></form>{% if results %}<div class="detail-list">{% for label, value in results %}<div class="detail-label">{{ label }}</div><div class="detail-value">{{ value }}</div>{% endfor %}</div>{% else %}<div class="empty-state"><p>Enter a keyword to search your company information.</p></div>{% endif %}</div>
+{% endblock %}

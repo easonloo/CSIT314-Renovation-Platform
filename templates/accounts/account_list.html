@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}User Accounts{% endblock %}
+{% block page_name %}User Accounts{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1 class="page-title">User Accounts</h1>
+
+  <a class="btn btn-primary" href="{% url 'account_create' %}">
+    Create account
+  </a>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Profile</th>
+          <th>Account status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for account in accounts %}
+          <tr>
+            <td>{{ account.user.username }}</td>
+            <td>{{ account.user.email|default:'-' }}</td>
+            <td>{{ account.profile.name }}</td>
+
+            <td>
+              {% if account.user.is_active %}
+                <span class="badge badge-success">Active</span>
+              {% else %}
+                <span class="badge badge-danger">Suspended</span>
+              {% endif %}
+            </td>
+
+            <td>
+              <a
+                class="btn btn-light"
+                href="{% url 'account_detail' account.pk %}"
+              >
+                View
+              </a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5">No accounts found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Renovation Platform{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">RP</div>
+      <div>
+        <div class="brand-title">Renovation Platform</div>
+        <div class="brand-subtitle">CSIT314 Project</div>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+    </div>
+
+    {% if request.user.is_authenticated %}
+      {% if request.user.account.profile.name == 'User Admin' %}
+      <div class="nav-section">
+        <div class="nav-label">User Admin</div>
+        <a class="nav-link" href="{% url 'profile_list' %}">User Profiles</a>
+        <a class="nav-link" href="{% url 'account_list' %}">User Accounts</a>
+      </div>
+      {% endif %}
+
+      {% if request.user.role == 'ID' %}
+      <div class="nav-section">
+        <div class="nav-label">Interior Designer</div>
+        <a class="nav-link" href="{% url 'company_detail' %}">Company Information</a>
+        <a class="nav-link" href="{% url 'idp_list' %}?status=current">Current IDPs</a>
+        <a class="nav-link" href="{% url 'idp_list' %}?status=past">Past IDPs</a>
+        <a class="nav-link" href="{% url 'interest_dashboard' %}">IDP Interest</a>
+      </div>
+      {% endif %}
+
+      {% if request.user.role == 'CUSTOMER' %}
+      <div class="nav-section">
+        <div class="nav-label">Customer</div>
+        <a class="nav-link" href="{% url 'customer_idp_search' %}">Search IDPs</a>
+        <a class="nav-link" href="{% url 'favourite_list' %}">Favourites</a>
+      </div>
+      {% endif %}
+
+      {% if request.user.role == 'PM' %}
+      <div class="nav-section">
+        <div class="nav-label">Platform Management</div>
+        <a class="nav-link" href="{% url 'category_list' %}">IDP Categories</a>
+        <a class="nav-link" href="{% url 'report' 'daily' %}">Reports</a>
+      </div>
+      {% endif %}
+    {% endif %}
+
+    {% if request.user.is_authenticated %}
+    <div class="nav-section">
+      <div class="nav-label">Account</div>
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button class="nav-link" type="submit">Log out</button>
+      </form>
+    </div>
+    {% endif %}
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-title">{% block page_name %}Dashboard{% endblock %}</div>
+      <div class="user-chip">
+        <div class="avatar">{{ request.user.username|slice:":1"|upper }}</div>
+        <div>
+          <div><strong>{{ request.user.username }}</strong></div>
+          <div class="brand-subtitle">{{ request.user.account.profile.name|default:"User" }}</div>
+        </div>
+      </div>
+    </header>
+
+    <section class="content">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+      {% block content %}{% endblock %}
+    </section>
+  </main>
+</div>
+</body>
+</html>

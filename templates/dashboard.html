@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | Renovation Platform{% endblock %}
+{% block page_name %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Welcome, {{ request.user.username }}</h1>
+    <p class="page-subtitle">Use the shortcuts below to continue your work.</p>
+  </div>
+</div>
+<div class="grid grid-3">
+  {% if request.user.account.profile.name == 'User Admin' %}
+    <a class="card" href="{% url 'profile_list' %}"><div class="stat-label">Manage</div><div class="stat-number">User Profiles</div><p class="page-subtitle">Create, search, view, update or suspend profiles.</p></a>
+  {% elif request.user.role == 'ID' %}
+    <a class="card" href="{% url 'company_detail' %}"><div class="stat-label">Company</div><div class="stat-number">Information</div><p class="page-subtitle">Keep your company information accurate.</p></a>
+    <a class="card" href="{% url 'idp_list' %}"><div class="stat-label">Portfolio</div><div class="stat-number">ID Projects</div><p class="page-subtitle">Manage current and past projects.</p></a>
+    <a class="card" href="{% url 'interest_dashboard' %}"><div class="stat-label">Analytics</div><div class="stat-number">Interest</div><p class="page-subtitle">Track project views and shortlists.</p></a>
+  {% elif request.user.role == 'CUSTOMER' %}
+    <a class="card" href="{% url 'customer_idp_search' %}"><div class="stat-label">Discover</div><div class="stat-number">Search IDPs</div><p class="page-subtitle">Find projects that match your renovation needs.</p></a>
+    <a class="card" href="{% url 'favourite_list' %}"><div class="stat-label">Saved</div><div class="stat-number">Favourites</div><p class="page-subtitle">Review the projects you have shortlisted.</p></a>
+  {% elif request.user.role == 'PM' %}
+    <a class="card" href="{% url 'category_list' %}"><div class="stat-label">Manage</div><div class="stat-number">Categories</div><p class="page-subtitle">Maintain the IDP category list.</p></a>
+    <a class="card" href="{% url 'report' 'daily' %}"><div class="stat-label">Monitor</div><div class="stat-number">Reports</div><p class="page-subtitle">Generate daily, weekly and monthly reports.</p></a>
+  {% endif %}
+</div>
+{% endblock %}

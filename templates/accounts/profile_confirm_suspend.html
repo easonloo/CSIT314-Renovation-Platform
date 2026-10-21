@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Suspend User Profile{% endblock %}
+{% block page_name %}Suspend User Profile{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Suspend User Profile</h1>
+  </div>
+</div>
+
+<div class="card">
+  <p>
+    Are you sure you want to suspend
+    <strong>{{ profile.name }}</strong>?
+  </p>
+
+  <p>
+    All users assigned to this profile will be unable to log in.
+  </p>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="form-actions">
+      <button class="btn btn-danger" type="submit">
+        Confirm suspension
+      </button>
+
+      <a
+        class="btn btn-light"
+        href="{% url 'profile_detail' profile.pk %}"
+      >
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

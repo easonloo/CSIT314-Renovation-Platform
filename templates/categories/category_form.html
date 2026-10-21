@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} IDP Category{% endblock %}
+{% block page_name %}{{ action }} IDP Category{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1 class="page-title">{{ action }} IDP Category</h1><p class="page-subtitle">Enter the category information below.</p></div></div>
+<form method="post" class="card">{% csrf_token %}<div class="form-grid"><div class="form-group"><label>Category name</label><input class="input" name="name" value="{{ category.name|default:'' }}" required></div><div class="form-group" style="grid-column:1/-1;"><label>Description</label><textarea class="textarea" name="description">{{ category.description|default:'' }}</textarea></div></div><div class="form-actions"><button class="btn btn-primary">Save category</button><a class="btn btn-light" href="{% url 'category_list' %}">Cancel</a></div></form>
+{% endblock %}

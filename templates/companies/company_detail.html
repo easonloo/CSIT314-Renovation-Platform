@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Company Information{% endblock %}
+{% block page_name %}Company Information{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1 class="page-title">Company Information</h1><p class="page-subtitle">Review what customers can see about your business.</p></div>{% if company %}<div style="display:flex;gap:10px;"><a class="btn btn-light" href="{% url 'company_update' %}">Update</a><form method="post" action="{% url 'company_delete' %}">{% csrf_token %}<button class="btn btn-danger">Delete</button></form></div>{% else %}<a class="btn btn-primary" href="{% url 'company_create' %}">+ Create company information</a>{% endif %}</div>
+{% if company %}<div class="card"><div class="detail-list"><div class="detail-label">Company name</div><div class="detail-value">{{ company.name }}</div><div class="detail-label">Description</div><div class="detail-value">{{ company.description }}</div><div class="detail-label">Email</div><div class="detail-value">{{ company.email }}</div><div class="detail-label">Phone</div><div class="detail-value">{{ company.phone }}</div><div class="detail-label">Address</div><div class="detail-value">{{ company.address }}</div><div class="detail-label">Website</div><div class="detail-value">{{ company.website|default:'-' }}</div></div></div>{% else %}<div class="card empty-state"><h3>No company information yet</h3><p>Create your company information so customers can learn about your business.</p></div>{% endif %}
+{% endblock %}

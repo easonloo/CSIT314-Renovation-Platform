@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}IDP Categories{% endblock %}
+{% block page_name %}IDP Categories{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1 class="page-title">IDP Categories</h1><p class="page-subtitle">Search and manage categories used to organise IDPs.</p></div><a class="btn btn-primary" href="{% url 'category_create' %}">+ Create category</a></div>
+<div class="card"><form class="search-row" method="get"><input class="input" name="q" value="{{ request.GET.q }}" placeholder="Search categories..."><button class="btn btn-dark">Search</button></form><div class="table-wrap"><table><thead><tr><th>Category</th><th>Description</th><th>Projects</th><th>Actions</th></tr></thead><tbody>{% for category in categories %}<tr><td><strong>{{ category.name }}</strong></td><td>{{ category.description|truncatechars:80 }}</td><td>{{ category.project_count|default:0 }}</td><td><a class="btn btn-light" href="{% url 'category_detail' category.id %}">View details</a></td></tr>{% empty %}<tr><td colspan="4"><div class="empty-state"><h3>No categories found</h3></div></td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

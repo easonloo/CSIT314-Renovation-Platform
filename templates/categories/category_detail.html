@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Category Details{% endblock %}
+{% block page_name %}Category Details{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1 class="page-title">{{ category.name }}</h1><p class="page-subtitle">Verify the selected IDP category information is correct.</p></div><div style="display:flex;gap:10px;"><a class="btn btn-light" href="{% url 'category_update' category.id %}">Update</a><form method="post" action="{% url 'category_delete' category.id %}">{% csrf_token %}<button class="btn btn-danger">Delete</button></form></div></div>
+<div class="card"><div class="detail-list"><div class="detail-label">Category name</div><div class="detail-value">{{ category.name }}</div><div class="detail-label">Description</div><div class="detail-value">{{ category.description|default:'-' }}</div><div class="detail-label">Number of IDPs</div><div class="detail-value">{{ category.project_count|default:0 }}</div><div class="detail-label">Last updated</div><div class="detail-value">{{ category.updated_at|date:'d M Y, H:i' }}</div></div></div>
+{% endblock %}
