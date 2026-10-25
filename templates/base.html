@@ -32,17 +32,16 @@
       </div>
       {% endif %}
 
-      {% if request.user.role == 'ID' %}
+      {% if request.user.account.profile.name == 'Interior Designer' %}
       <div class="nav-section">
         <div class="nav-label">Interior Designer</div>
         <a class="nav-link" href="{% url 'company_detail' %}">Company Information</a>
         <a class="nav-link" href="{% url 'idp_list' %}?status=current">Current IDPs</a>
         <a class="nav-link" href="{% url 'idp_list' %}?status=past">Past IDPs</a>
-        <a class="nav-link" href="{% url 'interest_dashboard' %}">IDP Interest</a>
       </div>
       {% endif %}
 
-      {% if request.user.role == 'CUSTOMER' %}
+      {% if request.user.account.profile.name == 'Customer' %}
       <div class="nav-section">
         <div class="nav-label">Customer</div>
         <a class="nav-link" href="{% url 'customer_idp_search' %}">Search IDPs</a>
@@ -50,7 +49,7 @@
       </div>
       {% endif %}
 
-      {% if request.user.role == 'PM' %}
+      {% if request.user.account.profile.name == 'Platform Management' %}
       <div class="nav-section">
         <div class="nav-label">Platform Management</div>
         <a class="nav-link" href="{% url 'category_list' %}">IDP Categories</a>
