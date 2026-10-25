@@ -6,6 +6,8 @@ from django.core.management.base import CommandError
 from django.test import TestCase
 
 from .models import UserAccount, UserProfile
+from companies.models import Company
+from projects.models import InteriorDesignProject
 
 
 class SetupProfilesTests(TestCase):
@@ -16,6 +18,33 @@ class SetupProfilesTests(TestCase):
         self.assertSetEqual(
             set(UserProfile.objects.values_list("name", flat=True)),
             {"User Admin", "Interior Designer", "Customer", "Platform Management"},
+        )
+
+    def test_demo_designers_have_sample_projects_without_duplicates(self):
+        for _ in range(2):
+            call_command("setup_profiles", stdout=StringIO())
+
+        self.assertEqual(
+            UserAccount.objects.filter(profile__name="Interior Designer").count(),
+            3,
+        )
+        self.assertEqual(Company.objects.count(), 3)
+        self.assertEqual(InteriorDesignProject.objects.count(), 9)
+        self.assertEqual(
+            InteriorDesignProject.objects.filter(status="current").count(),
+            6,
+        )
+        self.assertEqual(
+            InteriorDesignProject.objects.filter(status="past").count(),
+            3,
+        )
+        self.assertTrue(
+            InteriorDesignProject.objects.filter(
+                company__user__username="designer_aurora",
+                title="Sunlit Minimalist Living Room",
+                image="sample_idp/sample_1.png",
+                status="current",
+            ).exists()
         )
 
     def test_existing_user_can_be_assigned_to_user_admin(self):

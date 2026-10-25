@@ -1,39 +1,48 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.http import Http404
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
 from accounts.decorators import interior_designer_required
+from accounts.models import UserAccount
 from categories.models import Category
 from companies.models import Company
 
+from .forms import InteriorDesignProjectForm
 from .models import InteriorDesignProject
 
 
 @interior_designer_required
 @require_http_methods(["GET"])
 def idp_list(request):
-    status = request.GET.get("status")
-    q = (request.GET.get("q") or "").strip()
+    status = request.GET.get("status", "").strip()
+    if status not in {"", InteriorDesignProject.STATUS_CURRENT, InteriorDesignProject.STATUS_PAST}:
+        status = ""
+    search_term = request.GET.get("q", "").strip()
 
     projects = InteriorDesignProject.objects.filter(company__user=request.user)
-    if status in {"current", "past"}:
+    if status:
         projects = projects.filter(status=status)
-    if q:
+    if search_term:
         projects = projects.filter(
-            Q(title__icontains=q)
-            | Q(description__icontains=q)
-            | Q(location__icontains=q)
-            | Q(style__icontains=q)
-            | Q(category__name__icontains=q)
+            Q(title__icontains=search_term)
+            | Q(description__icontains=search_term)
+            | Q(location__icontains=search_term)
+            | Q(style__icontains=search_term)
+            | Q(category__name__icontains=search_term)
         )
 
     return render(
         request,
         "projects/idp_list.html",
-        {"projects": projects.select_related("category", "company"), "status": status, "q": q},
+        {
+            "projects": projects.select_related("category", "company"),
+            "status": status,
+            "q": search_term,
+        },
     )
 
 
@@ -44,99 +53,118 @@ def idp_create(request):
     if company is None:
         return redirect("company_create")
 
-    categories = Category.objects.all().order_by("name")
+    form = InteriorDesignProjectForm(
+        request.POST if request.method == "POST" else None,
+        request.FILES if request.method == "POST" else None,
+    )
+    if request.method == "POST" and form.is_valid():
+        project = form.save(commit=False)
+        project.company = company
+        project.save()
+        messages.success(request, "Project saved successfully.")
+        return redirect("idp_detail", pk=project.pk)
 
-    if request.method == "POST":
-        title = (request.POST.get("title") or "").strip()
-        if title:
-            category_id = request.POST.get("category")
-            project = InteriorDesignProject.objects.create(
-                company=company,
-                category=Category.objects.filter(pk=category_id).first() if category_id else None,
-                title=title,
-                description=(request.POST.get("description") or "").strip(),
-                location=(request.POST.get("location") or "").strip(),
-                style=(request.POST.get("style") or "").strip(),
-                status=request.POST.get("status") or InteriorDesignProject.STATUS_CURRENT,
-            )
-            if request.FILES.get("image"):
-                project.image = request.FILES["image"]
-                project.save(update_fields=["image"])
-            messages.success(request, "Project saved successfully.")
-            return redirect("idp_detail", pk=project.pk)
-
-    return render(request, "projects/idp_form.html", {"action": "Create", "categories": categories})
+    return render(
+        request,
+        "projects/idp_form.html",
+        {"form": form, "action": "Create"},
+    )
 
 
 @login_required
 @require_http_methods(["GET"])
 def idp_detail(request, pk):
-    project = InteriorDesignProject.objects.select_related("company", "category").filter(pk=pk).first()
-    if project is None:
-        raise Http404("Interior design project not found.")
+    project = get_object_or_404(
+        InteriorDesignProject.objects.select_related("company", "category"),
+        pk=pk,
+    )
+    account = UserAccount.objects.select_related("profile").filter(
+        user=request.user,
+        profile__is_active=True,
+    ).first()
+    if account is None:
+        raise PermissionDenied
+    if (
+        account.profile.name == "Interior Designer"
+        and project.company.user_id != request.user.pk
+    ):
+        raise Http404("Project not available to this account.")
 
-    if request.user.is_authenticated and request.user.account.profile.name == "Interior Designer":
-        if project.company.user_id != request.user.pk:
-            raise Http404("Project not available to this account.")
-
-    return render(request, "projects/idp_detail.html", {"project": project})
+    return render(
+        request,
+        "projects/idp_detail.html",
+        {"project": project, "is_project_owner": project.company.user_id == request.user.pk},
+    )
 
 
 @interior_designer_required
 @require_http_methods(["GET", "POST"])
 def idp_update(request, pk):
-    project = InteriorDesignProject.objects.filter(pk=pk, company__user=request.user).first()
-    if project is None:
-        raise Http404("Project not found.")
+    project = get_object_or_404(
+        InteriorDesignProject,
+        pk=pk,
+        company__user=request.user,
+    )
+    form = InteriorDesignProjectForm(
+        request.POST if request.method == "POST" else None,
+        request.FILES if request.method == "POST" else None,
+        instance=project,
+    )
 
-    categories = Category.objects.all().order_by("name")
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Project updated successfully.")
+        return redirect("idp_detail", pk=project.pk)
 
-    if request.method == "POST":
-        title = (request.POST.get("title") or "").strip()
-        if title:
-            category_id = request.POST.get("category")
-            project.title = title
-            project.category = Category.objects.filter(pk=category_id).first() if category_id else None
-            project.description = (request.POST.get("description") or "").strip()
-            project.location = (request.POST.get("location") or "").strip()
-            project.style = (request.POST.get("style") or "").strip()
-            project.status = request.POST.get("status") or project.status
-            if request.FILES.get("image"):
-                project.image = request.FILES["image"]
-            project.save()
-            messages.success(request, "Project updated successfully.")
-            return redirect("idp_detail", pk=project.pk)
-
-    return render(request, "projects/idp_form.html", {"project": project, "action": "Update", "categories": categories})
+    return render(
+        request,
+        "projects/idp_form.html",
+        {"form": form, "project": project, "action": "Update"},
+    )
 
 
 @interior_designer_required
 @require_http_methods(["POST"])
 def idp_delete(request, pk):
-    project = InteriorDesignProject.objects.filter(pk=pk, company__user=request.user).first()
-    if project is not None:
-        project.delete()
-        messages.success(request, "Project deleted successfully.")
+    project = get_object_or_404(
+        InteriorDesignProject,
+        pk=pk,
+        company__user=request.user,
+    )
+    project.delete()
+    messages.success(request, "Project deleted successfully.")
     return redirect("idp_list")
 
 
 @login_required
 @require_http_methods(["GET"])
 def customer_idp_search(request):
-    q = (request.GET.get("q") or "").strip()
-    category_id = request.GET.get("category")
-    categories = Category.objects.all().order_by("name")
+    search_term = request.GET.get("q", "").strip()
+    category_id = request.GET.get("category", "").strip()
+    categories = Category.objects.order_by("name")
+    projects = InteriorDesignProject.objects.select_related(
+        "company",
+        "category",
+    )
 
-    projects = InteriorDesignProject.objects.select_related("company", "category").all()
-    if q:
+    if search_term:
         projects = projects.filter(
-            Q(title__icontains=q)
-            | Q(description__icontains=q)
-            | Q(style__icontains=q)
-            | Q(company__name__icontains=q)
-            | Q(category__name__icontains=q)
+            Q(title__icontains=search_term)
+            | Q(description__icontains=search_term)
+            | Q(style__icontains=search_term)
+            | Q(company__name__icontains=search_term)
+            | Q(category__name__icontains=search_term)
         )
-    if category_id:
-        projects = projects.filter(category_id=category_id)
+    if category_id.isdigit():
+        projects = projects.filter(category_id=int(category_id))
 
-    return render(request, "projects/customer_search.html", {"projects": projects, "categories": categories})
+    return render(
+        request,
+        "projects/customer_search.html",
+        {
+            "projects": projects,
+            "categories": categories,
+            "q": search_term,
+            "selected_category": category_id,
+        },
+    )

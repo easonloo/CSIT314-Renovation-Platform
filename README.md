@@ -2,10 +2,10 @@
 
 Django group project for matching renovation customers with interior designers.
 
-Implemented so far: authentication, User Admin profile management, and account
-creation, viewing, updating, suspension, and reactivation. Profile search is also
-available. Account search and the remaining designer/customer/management features
-are still to be implemented.
+Implemented so far: authentication and User Admin account/profile management;
+Interior Designer company information and project portfolio management; and
+customer project search and favourites. Interior Designers can create, view,
+update, delete, and search their current and past Interior Design Projects (IDPs).
 
 ## Set up your own development environment
 
@@ -53,6 +53,15 @@ python manage.py setup_profiles --admin-username your_username
 python manage.py runserver
 ```
 
+The setup command also creates three demo Interior Designer accounts, company
+records, and three sample projects for each designer, with a mix of current and
+past projects. The projects use the sample images in `media/sample_idp/` so the
+portfolio screens are populated for local testing. Their default credentials are:
+
+- `designer_aurora` / `Designer@123`
+- `designer_bloom` / `Designer@456`
+- `designer_cove` / `Designer@789`
+
 Open <http://127.0.0.1:8000/login/> and use your local administrator credentials.
 The Django admin interface is at <http://127.0.0.1:8000/admin/>.
 
@@ -72,6 +81,7 @@ environment variable. These settings are for local development.
 
 ```bash
 python manage.py test accounts
+python manage.py test projects
 python manage.py check
 ```
 
