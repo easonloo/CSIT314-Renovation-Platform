@@ -53,14 +53,18 @@ python manage.py setup_profiles --admin-username your_username
 python manage.py runserver
 ```
 
-The setup command also creates three demo Interior Designer accounts, company
+The setup command also creates six demo Interior Designer accounts, company
 records, and three sample projects for each designer, with a mix of current and
 past projects. The projects use the sample images in `media/sample_idp/` so the
-portfolio screens are populated for local testing. Their default credentials are:
+portfolio screens are populated for local testing. Their default username and
+password combinations are:
 
 - `designer_aurora` / `Designer@123`
 - `designer_bloom` / `Designer@456`
 - `designer_cove` / `Designer@789`
+- `designer_ember` / `Designer@101`
+- `designer_harbor` / `Designer@202`
+- `designer_luna` / `Designer@303`
 
 Open <http://127.0.0.1:8000/login/> and use your local administrator credentials.
 The Django admin interface is at <http://127.0.0.1:8000/admin/>.

@@ -26,17 +26,17 @@ class SetupProfilesTests(TestCase):
 
         self.assertEqual(
             UserAccount.objects.filter(profile__name="Interior Designer").count(),
-            3,
+            6,
         )
-        self.assertEqual(Company.objects.count(), 3)
-        self.assertEqual(InteriorDesignProject.objects.count(), 9)
+        self.assertEqual(Company.objects.count(), 6)
+        self.assertEqual(InteriorDesignProject.objects.count(), 18)
         self.assertEqual(
             InteriorDesignProject.objects.filter(status="current").count(),
-            6,
+            12,
         )
         self.assertEqual(
             InteriorDesignProject.objects.filter(status="past").count(),
-            3,
+            6,
         )
         self.assertTrue(
             InteriorDesignProject.objects.filter(
@@ -45,6 +45,12 @@ class SetupProfilesTests(TestCase):
                 image="sample_idp/sample_1.png",
                 status="current",
             ).exists()
+        )
+        self.assertTrue(
+            UserAccount.objects.filter(user__username="designer_ember").exists()
+        )
+        self.assertTrue(
+            Company.objects.filter(name="Luna Form Atelier").exists()
         )
 
     def test_existing_user_can_be_assigned_to_user_admin(self):
