@@ -128,6 +128,8 @@ tr:last-child td { border-bottom: none; }
 .project-body { padding: 18px; }
 .project-meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 
+.review-section { background: #e8d78a; border-radius: var(--radius); padding: 24px; }
+
 .empty-state { text-align: center; padding: 50px 20px; color: var(--muted); }
 .empty-state h3 { color: var(--text); margin-bottom: 8px; }
 
