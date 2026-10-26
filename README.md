@@ -9,7 +9,9 @@ are still to be implemented.
 
 ## Set up your own development environment
 
-Install Git and Python. The current project has been tested with Python 3.9.
+Install Git and the latest Python 3.12 patch release. Use Python 3.12 for this
+project, even if another version is also installed. The shared dependencies in
+`requirements.txt` pin Django 5.2 LTS and Pillow 13.0.0.
 
 Clone the repository:
 
@@ -21,20 +23,22 @@ cd CSIT314-Renovation-Platform
 On macOS or Linux:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+python3.12 -m venv .venv312
+source .venv312/bin/activate
 ```
 
 On Windows PowerShell:
 
 ```powershell
-py -m venv .venv
-.venv\Scripts\Activate.ps1
+py -3.12 -m venv .venv312
+.venv312\Scripts\Activate.ps1
 ```
 
 Install dependencies and create your local database:
 
 ```bash
+python --version
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 python manage.py migrate
 ```
@@ -71,15 +75,17 @@ environment variable. These settings are for local development.
 ## Run tests
 
 ```bash
-python manage.py test accounts
+python -m pip check
 python manage.py check
+python manage.py makemigrations --check --dry-run
+python manage.py test
 ```
 
 ## Automated checks (CI)
 
 The **Django CI** GitHub Actions workflow runs on pushes and pull requests into
 `main`. It installs `requirements.txt`, checks Django configuration, checks for
-missing migrations, and runs the complete test suite on Python 3.9.
+missing migrations, and runs the complete test suite on Python 3.12.
 
 See the results in the repository's **Actions** tab or in a pull request's checks.
 You can also run it manually from **Actions → Django CI → Run workflow** once the
@@ -88,6 +94,25 @@ database and administrator credentials are not used.
 
 This workflow checks the code. Deployment can be added separately when the group
 is ready for CD.
+
+## Upgrade an existing development environment
+
+Stop the development server and back up your local database before applying
+migrations. Install Python 3.12, pull the updated project code, and create the new
+`.venv312` environment using the commands above. If an older environment is active,
+run `deactivate` first. Creating `.venv312` preserves your old `.venv` environment.
+
+After activating `.venv312`, confirm `python --version` reports 3.12, install
+`requirements.txt`, run the checks above, and run `python manage.py migrate`.
+Reuse your existing database and administrator account.
+
+In VS Code, use **Python: Select Interpreter** to select the Python executable in
+`.venv312` (`bin/python` on macOS/Linux or `Scripts/python.exe` on Windows). Open a
+new terminal and confirm its Python version before starting the server.
+
+After this upgrade is merged into `main`, bring the updated `main` into existing
+feature branches so their dependencies and CI use the same versions. Preserve
+any additional dependencies needed by your feature, then run the full test suite.
 
 ## Work with the group
 
