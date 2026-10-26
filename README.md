@@ -21,15 +21,15 @@ cd CSIT314-Renovation-Platform
 On macOS or Linux:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+python3 -m venv .venv312
+source .venv312/bin/activate
 ```
 
 On Windows PowerShell:
 
 ```powershell
-py -m venv .venv
-.venv\Scripts\Activate.ps1
+py -3.12 -m venv .venv312
+.312venv\Scripts\Activate.ps1
 ```
 
 Install dependencies and create your local database:
