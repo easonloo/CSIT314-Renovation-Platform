@@ -8,6 +8,7 @@ from django.test import TestCase
 from .models import UserAccount, UserProfile
 from companies.models import Company
 from projects.models import InteriorDesignProject
+from reviews.models import ProjectReview
 
 
 class SetupProfilesTests(TestCase):
@@ -52,6 +53,32 @@ class SetupProfilesTests(TestCase):
         self.assertTrue(
             Company.objects.filter(name="Luna Form Atelier").exists()
         )
+        self.assertEqual(ProjectReview.objects.count(), 5)
+        self.assertEqual(
+            UserAccount.objects.filter(profile__name="Customer").count(),
+            2,
+        )
+        self.assertEqual(
+            ProjectReview.objects.filter(
+                customer__username__in=["customer_demo", "customer_jordan"],
+                project__status=InteriorDesignProject.STATUS_PAST,
+            ).count(),
+            5,
+        )
+
+    def test_demo_customer_can_be_skipped(self):
+        call_command(
+            "setup_profiles",
+            skip_demo_customer=True,
+            stdout=StringIO(),
+        )
+
+        self.assertFalse(
+            get_user_model()
+            .objects.filter(username__in=["customer_demo", "customer_jordan"])
+            .exists()
+        )
+        self.assertFalse(ProjectReview.objects.exists())
 
     def test_existing_user_can_be_assigned_to_user_admin(self):
         user = get_user_model().objects.create_user(username="teammate")

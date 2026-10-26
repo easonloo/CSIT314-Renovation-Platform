@@ -66,6 +66,13 @@ password combinations are:
 - `designer_harbor` / `Designer@202`
 - `designer_luna` / `Designer@303`
 
+The setup command also creates demo Customer accounts with sample reviews.
+Customers can leave one 1–5 star rating and optional comment per IDP, whether
+current or past, then update or delete their own review:
+
+- `customer_demo` / `Customer@123`
+- `customer_jordan` / `Customer@456`
+
 Open <http://127.0.0.1:8000/login/> and use your local administrator credentials.
 The Django admin interface is at <http://127.0.0.1:8000/admin/>.
 

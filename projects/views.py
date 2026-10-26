@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
+from django.db.models import Avg, Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
@@ -10,6 +10,7 @@ from accounts.decorators import interior_designer_required
 from accounts.models import UserAccount
 from categories.models import Category
 from companies.models import Company
+from reviews.models import ProjectReview
 
 from .forms import InteriorDesignProjectForm
 from .models import InteriorDesignProject
@@ -90,10 +91,28 @@ def idp_detail(request, pk):
     ):
         raise Http404("Project not available to this account.")
 
+    reviews = project.reviews.select_related("customer")
+    average_rating = reviews.aggregate(average_rating=Avg("rating"))[
+        "average_rating"
+    ]
+    customer_review = None
+    if account.profile.name == "Customer":
+        customer_review = ProjectReview.objects.filter(
+            project=project,
+            customer=request.user,
+        ).first()
+
     return render(
         request,
         "projects/idp_detail.html",
-        {"project": project, "is_project_owner": project.company.user_id == request.user.pk},
+        {
+            "project": project,
+            "is_project_owner": project.company.user_id == request.user.pk,
+            "reviews": reviews,
+            "average_rating": average_rating,
+            "customer_review": customer_review,
+            "can_review": account.profile.name == "Customer",
+        },
     )
 
 
@@ -145,7 +164,7 @@ def customer_idp_search(request):
     projects = InteriorDesignProject.objects.select_related(
         "company",
         "category",
-    )
+    ).annotate(average_rating=Avg("reviews__rating"))
 
     if search_term:
         projects = projects.filter(
@@ -158,6 +177,11 @@ def customer_idp_search(request):
     if category_id.isdigit():
         projects = projects.filter(category_id=int(category_id))
 
+    account = UserAccount.objects.select_related("profile").filter(
+        user=request.user,
+        profile__is_active=True,
+    ).first()
+
     return render(
         request,
         "projects/customer_search.html",
@@ -166,5 +190,6 @@ def customer_idp_search(request):
             "categories": categories,
             "q": search_term,
             "selected_category": category_id,
+            "can_review": account is not None and account.profile.name == "Customer",
         },
     )

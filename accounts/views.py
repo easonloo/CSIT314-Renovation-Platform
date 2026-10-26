@@ -9,6 +9,7 @@ from .controllers import UserAccountController, UserProfileController
 from .decorators import user_admin_required
 from .forms import AccountCreationForm, AccountUpdateForm, UserProfileForm
 from .models import UserAccount
+from reviews.models import ProjectReview
 
 
 @user_admin_required
@@ -39,16 +40,26 @@ def profile_create(request):
 
 @login_required
 def dashboard(request):
-    has_active_profile = UserAccount.objects.filter(
+    account = UserAccount.objects.select_related("profile").filter(
         user=request.user,
         profile__is_active=True,
-    ).exists()
+    ).first()
 
-    if not has_active_profile:
+    if account is None:
         logout(request)
         return redirect("login")
 
-    return render(request, "dashboard.html")
+    customer_reviews = ProjectReview.objects.none()
+    if account.profile.name == "Customer":
+        customer_reviews = ProjectReview.objects.filter(
+            customer=request.user,
+        ).select_related("project", "project__company")
+
+    return render(
+        request,
+        "dashboard.html",
+        {"customer_reviews": customer_reviews},
+    )
 
 
 @user_admin_required

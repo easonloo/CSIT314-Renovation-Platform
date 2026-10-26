@@ -6,6 +6,7 @@ from accounts.models import UserAccount, UserProfile
 from categories.models import Category
 from companies.models import Company
 from projects.models import InteriorDesignProject
+from reviews.models import ProjectReview
 
 
 class Command(BaseCommand):
@@ -247,6 +248,51 @@ class Command(BaseCommand):
             ],
         },
     ]
+    SAMPLE_CUSTOMERS = [
+        {
+            "username": "customer_demo",
+            "password": "Customer@123",
+            "email": "customer@renovation.local",
+            "first_name": "Casey",
+            "last_name": "Tan",
+            "reviews": [
+                (
+                    "Calm Contemporary Bedroom",
+                    5,
+                    "The built-in storage and calm finishes made the room feel much more spacious.",
+                ),
+                (
+                    "Soft-Tone Ensuite Bathroom",
+                    4,
+                    "Thoughtful use of a compact space and the finished details look great.",
+                ),
+                (
+                    "Compact HDB Living Space",
+                    5,
+                    "A practical layout that makes the living area feel open and comfortable.",
+                ),
+            ],
+        },
+        {
+            "username": "customer_jordan",
+            "password": "Customer@456",
+            "email": "jordan.lim@renovation.local",
+            "first_name": "Jordan",
+            "last_name": "Lim",
+            "reviews": [
+                (
+                    "Sunset Master Suite",
+                    4,
+                    "The calm colours and layered lighting make this bedroom feel relaxing.",
+                ),
+                (
+                    "Quiet Reading Nook",
+                    5,
+                    "A clever, comfortable design that makes excellent use of the available space.",
+                ),
+            ],
+        },
+    ]
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -257,6 +303,11 @@ class Command(BaseCommand):
             "--skip-demo-designers",
             action="store_true",
             help="Skip creating the sample Interior Designer demo accounts.",
+        )
+        parser.add_argument(
+            "--skip-demo-customer",
+            action="store_true",
+            help="Skip creating the sample Customer account and reviews.",
         )
 
     @transaction.atomic
@@ -356,6 +407,48 @@ class Command(BaseCommand):
                     self.style.SUCCESS(
                         f"Ready demo Interior Designer '{designer['username']}' with company '{designer['company_name']}' "
                         f"(password: {designer['password']})"
+                    )
+                )
+
+        if not options["skip_demo_customer"]:
+            for customer_data in self.SAMPLE_CUSTOMERS:
+                customer, created = get_user_model().objects.get_or_create(
+                    username=customer_data["username"],
+                    defaults={
+                        "email": customer_data["email"],
+                        "first_name": customer_data["first_name"],
+                        "last_name": customer_data["last_name"],
+                    },
+                )
+                if created:
+                    customer.set_password(customer_data["password"])
+                    customer.save(update_fields=["password"])
+
+                UserAccount.objects.update_or_create(
+                    user=customer,
+                    defaults={"profile": profiles["Customer"]},
+                )
+
+                if not options["skip_demo_designers"]:
+                    for title, rating, comment in customer_data["reviews"]:
+                        project = InteriorDesignProject.objects.filter(
+                            title=title,
+                            status=InteriorDesignProject.STATUS_PAST,
+                        ).first()
+                        if project is None:
+                            raise CommandError(
+                                f"Cannot create sample review: past project '{title}' was not found."
+                            )
+                        ProjectReview.objects.get_or_create(
+                            customer=customer,
+                            project=project,
+                            defaults={"rating": rating, "comment": comment},
+                        )
+
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"Ready demo Customer '{customer_data['username']}' "
+                        f"(password: {customer_data['password']})"
                     )
                 )
 

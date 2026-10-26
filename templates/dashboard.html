@@ -24,4 +24,38 @@
     <a class="card" href="{% url 'report' 'daily' %}"><div class="stat-label">Monitor</div><div class="stat-number">Reports</div><p class="page-subtitle">Generate daily, weekly and monthly reports.</p></a>
   {% endif %}
 </div>
+{% if request.user.account.profile.name == 'Customer' %}
+<section style="margin-top:28px;">
+  <div class="page-head">
+    <div>
+      <h2 class="page-title" style="font-size:24px;">Your IDP reviews</h2>
+      <p class="page-subtitle">Reviews and comments you have left on interior design projects.</p>
+    </div>
+  </div>
+  <div class="grid">
+    {% for review in customer_reviews %}
+      <article class="card">
+        <div class="page-head" style="margin-bottom:10px;">
+          <div>
+            <h3 style="margin:0;"><a href="{% url 'idp_detail' review.project.pk %}">{{ review.project.title }}</a></h3>
+            <p class="page-subtitle">{{ review.project.company.name }} · {{ review.rating }} / 5</p>
+          </div>
+          <a class="btn btn-light" href="{% url 'review_update' review.pk %}">Edit review</a>
+        </div>
+        {% if review.comment %}
+          <p>{{ review.comment|linebreaksbr }}</p>
+        {% else %}
+          <p class="page-subtitle">No written comment.</p>
+        {% endif %}
+      </article>
+    {% empty %}
+      <div class="card empty-state">
+        <h3>No reviews yet</h3>
+        <p>Your reviews will appear here after you submit them on an IDP.</p>
+        <a class="btn btn-primary" href="{% url 'customer_idp_search' %}">Find projects to review</a>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
 {% endblock %}

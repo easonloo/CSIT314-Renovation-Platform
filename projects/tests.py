@@ -1,12 +1,14 @@
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
 from accounts.models import UserAccount, UserProfile
 from categories.models import Category
 from companies.models import Company
+from reviews.models import ProjectReview
 
 from .models import InteriorDesignProject
+from .views import customer_idp_search
 
 
 class InteriorDesignProjectTests(TestCase):
@@ -160,6 +162,31 @@ class InteriorDesignProjectTests(TestCase):
         self.assertNotContains(current_response, "Completed House")
         self.assertContains(past_response, "Completed House")
         self.assertNotContains(past_response, "Current Apartment")
+
+    def test_customer_search_shows_average_rating_for_each_project(self):
+        customer_one = get_user_model().objects.create_user(
+            username="reviewer-one",
+        )
+        customer_two = get_user_model().objects.create_user(
+            username="reviewer-two",
+        )
+        ProjectReview.objects.create(
+            customer=customer_one,
+            project=self.past_project,
+            rating=4,
+        )
+        ProjectReview.objects.create(
+            customer=customer_two,
+            project=self.past_project,
+            rating=5,
+        )
+
+        request = RequestFactory().get(reverse("customer_idp_search"))
+        request.user = self.designer
+        response = customer_idp_search(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("★ 4.5 / 5", response.content.decode())
+        self.assertIn("No reviews", response.content.decode())
 
     def test_designer_can_delete_current_and_past_projects(self):
         for project in (self.current_project, self.past_project):
