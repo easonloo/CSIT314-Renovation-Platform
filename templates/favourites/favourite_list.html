@@ -2,6 +2,89 @@
 {% block title %}My Favourites{% endblock %}
 {% block page_name %}My Favourites{% endblock %}
 {% block content %}
-<div class="page-head"><div><h1 class="page-title">My Favourite IDPs</h1><p class="page-subtitle">Search your saved projects and open one to review its details.</p></div></div>
-<div class="card"><form class="search-row" method="get"><input class="input" name="q" value="{{ request.GET.q }}" placeholder="Search your favourite projects..."><button class="btn btn-dark">Search</button></form><div class="table-wrap"><table><thead><tr><th>Project</th><th>Designer</th><th>Category</th><th>Saved</th><th>Actions</th></tr></thead><tbody>{% for favourite in favourites %}<tr><td><strong>{{ favourite.project.title }}</strong></td><td>{{ favourite.project.company.name }}</td><td>{{ favourite.project.category.name }}</td><td>{{ favourite.created_at|date:'d M Y' }}</td><td><a class="btn btn-light" href="{% url 'idp_detail' favourite.project.id %}">View IDP</a></td></tr>{% empty %}<tr><td colspan="5"><div class="empty-state"><h3>No favourites yet</h3><p>Save an IDP to see it here.</p></div></td></tr>{% endfor %}</tbody></table></div></div>
+<section class="favourites-page">
+  <div class="favourites-heading">
+    <div>
+      <p class="favourites-eyebrow">YOUR COLLECTION</p>
+      <h1>Saved projects</h1>
+      <p>Keep the designs you love close by, and revisit them whenever you need inspiration.</p>
+    </div>
+    <div class="favourites-total" aria-label="{{ favourite_count }} saved projects">
+      <strong>{{ favourite_count }}</strong>
+      <span>saved {% if favourite_count == 1 %}project{% else %}projects{% endif %}</span>
+    </div>
+  </div>
+
+  <div class="favourites-controls">
+    <form class="favourites-search" method="get">
+      <label class="visually-hidden" for="favourites-search">Search saved projects</label>
+      <input id="favourites-search" class="input" type="search" name="q" value="{{ q }}" placeholder="Search projects, designers or styles">
+      <button class="btn btn-dark" type="submit">Search</button>
+      <input type="hidden" name="category" value="{{ category_filter }}">
+      <input type="hidden" name="sort" value="{{ sort_order }}">
+    </form>
+    <div class="favourites-filter-row">
+      <nav class="favourites-categories" aria-label="Filter by category">
+        <a class="favourite-chip{% if not category_filter %} is-selected{% endif %}" href="?q={{ q|urlencode }}&amp;sort={{ sort_order }}">All <span>{{ favourite_count }}</span></a>
+        {% for category in categories %}
+          <a class="favourite-chip{% if category_filter == category.project__category_id|stringformat:'s' %} is-selected{% endif %}" href="?q={{ q|urlencode }}&amp;sort={{ sort_order }}&amp;category={{ category.project__category_id }}">{{ category.project__category__name }} <span>{{ category.count }}</span></a>
+        {% endfor %}
+      </nav>
+      <form class="favourites-sort" method="get">
+        <label for="favourites-sort">Sort by</label>
+        <select id="favourites-sort" class="select" name="sort">
+          <option value="newest"{% if sort_order == 'newest' %} selected{% endif %}>Recently saved</option>
+          <option value="oldest"{% if sort_order == 'oldest' %} selected{% endif %}>First saved</option>
+        </select>
+        <button class="btn btn-light" type="submit">Apply</button>
+        <input type="hidden" name="q" value="{{ q }}">
+        <input type="hidden" name="category" value="{{ category_filter }}">
+      </form>
+    </div>
+  </div>
+
+  <div class="favourites-results-heading">
+    <h2>{% if category_filter %}Filtered favourites{% else %}All your favourites{% endif %}</h2>
+    <span>{{ filtered_count }} {% if filtered_count == 1 %}project{% else %}projects{% endif %}</span>
+  </div>
+
+  {% if favourites %}
+    <div class="favourites-grid">
+      {% for favourite in favourites %}
+        <article class="favourite-card">
+          <a class="favourite-card-image" href="{% url 'idp_detail' favourite.project.id %}" aria-label="View {{ favourite.project.title }}">
+            {% if favourite.project.display_image %}
+              <img src="{{ favourite.project.display_image.url }}" alt="{{ favourite.project.title }}" loading="lazy">
+            {% else %}
+              <span class="favourite-image-placeholder" aria-hidden="true">Project inspiration</span>
+            {% endif %}
+          </a>
+          <span class="favourite-heart" aria-label="Saved to favourites">♥</span>
+          <div class="favourite-card-body">
+            <div class="favourite-card-meta">
+              <span>{{ favourite.project.category.name|default:"Design project" }}</span>
+              <time datetime="{{ favourite.created_at|date:'Y-m-d' }}">Saved {{ favourite.created_at|date:'d M Y' }}</time>
+            </div>
+            <h3><a href="{% url 'idp_detail' favourite.project.id %}">{{ favourite.project.title }}</a></h3>
+            <p>{{ favourite.project.company.name }}</p>
+            <a class="favourite-view-link" href="{% url 'idp_detail' favourite.project.id %}">View project <span aria-hidden="true">→</span></a>
+          </div>
+        </article>
+      {% endfor %}
+      <a class="favourite-explore-card" href="{% url 'customer_idp_search' %}">
+        <span class="favourite-explore-icon" aria-hidden="true">+</span>
+        <strong>Find more inspiration</strong>
+        <span>Explore projects and save the ones you love.</span>
+        <span class="favourite-view-link">Explore projects <span aria-hidden="true">→</span></span>
+      </a>
+    </div>
+  {% else %}
+    <div class="favourites-empty">
+      <span class="favourites-empty-icon" aria-hidden="true">♡</span>
+      <h2>{% if q or category_filter %}No matching projects{% else %}Your collection is waiting{% endif %}</h2>
+      <p>{% if q or category_filter %}Try another search or category, or explore more projects.{% else %}Save projects that inspire you and they will be collected here.{% endif %}</p>
+      <a class="btn btn-primary" href="{% url 'customer_idp_search' %}">Explore projects</a>
+    </div>
+  {% endif %}
+</section>
 {% endblock %}

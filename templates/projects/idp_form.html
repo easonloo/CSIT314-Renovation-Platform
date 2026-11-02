@@ -2,31 +2,198 @@
 {% block title %}{{ action }} IDP{% endblock %}
 {% block page_name %}{{ action }} Interior Design Project{% endblock %}
 {% block content %}
-<div class="page-head">
-  <div>
+<div class="project-form-page">
+  <a class="project-form-back" href="{% url 'idp_list' %}{% if project.status %}?status={{ project.status }}{% endif %}">← Back to projects</a>
+  <div class="project-form-heading">
     <h1 class="page-title">{{ action }} Interior Design Project</h1>
     <p class="page-subtitle">Add or update your project portfolio information.</p>
   </div>
-</div>
-<form method="post" enctype="multipart/form-data" class="card">
-  {% csrf_token %}
-  {% if form.non_field_errors %}
-    <div class="alert alert-error">{{ form.non_field_errors }}</div>
-  {% endif %}
-  <div class="form-grid">
-    {% for field in form %}
-      <div class="form-group" {% if field.name == 'description' %}style="grid-column:1/-1;"{% endif %}>
-        {{ field.label_tag }}
-        {{ field }}
-        {% for error in field.errors %}
-          <div class="alert alert-error">{{ error }}</div>
-        {% endfor %}
+
+  <div class="project-form-layout">
+    <form method="post" enctype="multipart/form-data" class="card project-form-card">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert alert-error">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <section class="project-form-section" aria-labelledby="project-basics-heading">
+        <h2 id="project-basics-heading">Project basics</h2>
+        <div class="form-group">
+          {{ form.title.label_tag }}
+          <div class="project-input-wrap project-title-input">
+            <span aria-hidden="true">T</span>
+            {{ form.title }}
+          </div>
+          {% for error in form.title.errors %}<div class="alert alert-error">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="form-group project-description-group">
+          {{ form.description.label_tag }}
+          {{ form.description }}
+          {% for error in form.description.errors %}<div class="alert alert-error">{{ error }}</div>{% endfor %}
+        </div>
+      </section>
+
+      <section class="project-form-section" aria-labelledby="project-details-heading">
+        <h2 id="project-details-heading">Project details</h2>
+        <div class="project-details-grid">
+          <div class="form-group">
+            {{ form.category.label_tag }}
+            {{ form.category }}
+            {% for error in form.category.errors %}<div class="alert alert-error">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="form-group">
+            {{ form.location.label_tag }}
+            <div class="project-input-wrap project-location-input">
+              <span aria-hidden="true">⌖</span>
+              {{ form.location }}
+            </div>
+            {% for error in form.location.errors %}<div class="alert alert-error">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="form-group">
+            {{ form.style.label_tag }}
+            <div class="project-input-wrap project-style-input">
+              <span aria-hidden="true">◉</span>
+              {{ form.style }}
+            </div>
+            {% for error in form.style.errors %}<div class="alert alert-error">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="form-group">
+            {{ form.status.label_tag }}
+            <div class="project-status-control" role="group" aria-label="Project status">
+              {% for value, label in form.status.field.choices %}
+                <button class="project-status-choice{% if form.status.value == value %} is-selected{% endif %}" type="button" data-status-value="{{ value }}" aria-pressed="{% if form.status.value == value %}true{% else %}false{% endif %}">{{ label }}</button>
+              {% endfor %}
+            </div>
+            <div class="project-status-input">{{ form.status }}</div>
+            {% for error in form.status.errors %}<div class="alert alert-error">{{ error }}</div>{% endfor %}
+          </div>
+        </div>
+      </section>
+
+      <section class="project-form-section" aria-labelledby="project-image-heading">
+        <h2 id="project-image-heading">Project image</h2>
+        <label class="visually-hidden" for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+        <div class="project-upload-area">
+          <span class="project-upload-icon" aria-hidden="true">↑</span>
+          <strong data-upload-prompt>Drag a photo here, or <span>choose a file</span></strong>
+          <span class="project-upload-help" data-upload-help>This image is the cover photo customers see in Explore projects.</span>
+          {{ form.image }}
+        </div>
+        {% for error in form.image.errors %}<div class="alert alert-error">{{ error }}</div>{% endfor %}
+      </section>
+
+      <div class="project-form-actions">
+        <button class="btn btn-primary" type="submit">Save project</button>
+        <a class="btn btn-light" href="{% url 'idp_list' %}{% if project.status %}?status={{ project.status }}{% endif %}">Cancel</a>
       </div>
-    {% endfor %}
+    </form>
+
+    <aside class="project-form-aside">
+      <section class="project-card-preview" aria-labelledby="project-preview-heading">
+        <p class="project-preview-eyebrow" id="project-preview-heading">Card preview</p>
+        <div class="project-preview-card">
+          <div class="project-preview-image">
+            {% if project.display_image %}
+              <img src="{{ project.display_image.url }}" alt="" data-project-preview-image>
+            {% else %}
+              <img alt="" data-project-preview-image hidden>
+            {% endif %}
+            <span class="project-preview-category" data-project-preview-category>Category</span>
+            <span class="project-preview-image-label" data-project-image-placeholder{% if project.display_image %} hidden{% endif %}>[COVER PHOTO]</span>
+          </div>
+          <div class="project-preview-copy">
+            <h2 data-project-preview-title>Your project title</h2>
+            <div class="project-preview-tags">
+              <span data-project-preview-style>Style</span>
+              <span data-project-preview-location>Location</span>
+              <span class="project-preview-status" data-project-preview-status>Current</span>
+            </div>
+          </div>
+        </div>
+        <p class="project-preview-note">This is how your project appears to customers.</p>
+      </section>
+
+      <section class="project-form-tips" aria-labelledby="project-tips-heading">
+        <h2 id="project-tips-heading">Tips for a strong listing</h2>
+        <ul>
+          <li>Use a bright, well-lit cover photo.</li>
+          <li>Keep the title short and descriptive.</li>
+          <li>Mention the style so customers can search for it.</li>
+        </ul>
+      </section>
+    </aside>
   </div>
-  <div class="form-actions">
-    <button class="btn btn-primary" type="submit">Save project</button>
-    <a class="btn btn-light" href="{% url 'idp_list' %}{% if project.status %}?status={{ project.status }}{% endif %}">Cancel</a>
-  </div>
-</form>
+</div>
+<script>
+  (() => {
+    const form = document.querySelector(".project-form-card");
+    if (!form) return;
+
+    const field = (name) => form.querySelector(`[name="${name}"]`);
+    const setText = (selector, value, fallback) => {
+      const target = document.querySelector(selector);
+      if (target) target.textContent = value.trim() || fallback;
+    };
+
+    const updatePreview = () => {
+      setText("[data-project-preview-title]", field("title").value, "Your project title");
+      setText("[data-project-preview-style]", field("style").value, "Style");
+      setText("[data-project-preview-location]", field("location").value, "Location");
+      const category = field("category");
+      setText("[data-project-preview-category]", category.value ? category.selectedOptions[0]?.text ?? "" : "", "Category");
+      const status = field("status");
+      const selectedStatus = status.selectedOptions[0]?.text ?? "Current";
+      setText("[data-project-preview-status]", selectedStatus, "Current");
+      form.querySelectorAll("[data-status-value]").forEach((button) => {
+        const selected = button.dataset.statusValue === status.value;
+        button.classList.toggle("is-selected", selected);
+        button.setAttribute("aria-pressed", String(selected));
+      });
+    };
+
+    ["title", "category", "location", "style", "status"].forEach((name) => {
+      field(name).addEventListener("input", updatePreview);
+      field(name).addEventListener("change", updatePreview);
+    });
+
+    form.querySelectorAll("[data-status-value]").forEach((button) => {
+      button.addEventListener("click", () => {
+        field("status").value = button.dataset.statusValue;
+        field("status").dispatchEvent(new Event("change", { bubbles: true }));
+      });
+    });
+
+    const imageInput = field("image");
+    imageInput.addEventListener("change", () => {
+      const file = imageInput.files[0];
+      const image = document.querySelector("[data-project-preview-image]");
+      const placeholder = document.querySelector("[data-project-image-placeholder]");
+      const prompt = document.querySelector("[data-upload-prompt]");
+      const help = document.querySelector("[data-upload-help]");
+      if (!file) return;
+
+      image.src = URL.createObjectURL(file);
+      image.hidden = false;
+      placeholder.hidden = true;
+      prompt.textContent = file.name;
+      help.textContent = "Cover photo preview";
+    });
+
+    const uploadArea = document.querySelector(".project-upload-area");
+    uploadArea.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      uploadArea.classList.add("is-dragging");
+    });
+    uploadArea.addEventListener("dragleave", () => uploadArea.classList.remove("is-dragging"));
+    uploadArea.addEventListener("drop", (event) => {
+      event.preventDefault();
+      uploadArea.classList.remove("is-dragging");
+      if (!event.dataTransfer.files.length) return;
+      imageInput.files = event.dataTransfer.files;
+      imageInput.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+
+    updatePreview();
+  })();
+</script>
 {% endblock %}

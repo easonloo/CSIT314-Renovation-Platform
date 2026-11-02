@@ -2,6 +2,142 @@
 {% block title %}{{ action }} Company Information{% endblock %}
 {% block page_name %}{{ action }} Company Information{% endblock %}
 {% block content %}
-<div class="page-head"><div><h1 class="page-title">{{ action }} Company Information</h1><p class="page-subtitle">Keep your public company profile accurate and current.</p></div></div>
-<form method="post" class="card">{% csrf_token %}<div class="form-grid"><div class="form-group"><label>Company name</label><input class="input" name="name" value="{{ company.name|default:'' }}" required></div><div class="form-group"><label>Email</label><input class="input" type="email" name="email" value="{{ company.email|default:'' }}"></div><div class="form-group"><label>Phone</label><input class="input" name="phone" value="{{ company.phone|default:'' }}"></div><div class="form-group"><label>Website</label><input class="input" name="website" value="{{ company.website|default:'' }}"></div><div class="form-group" style="grid-column:1/-1;"><label>Address</label><input class="input" name="address" value="{{ company.address|default:'' }}"></div><div class="form-group" style="grid-column:1/-1;"><label>Description</label><textarea class="textarea" name="description">{{ company.description|default:'' }}</textarea></div></div><div class="form-actions"><button class="btn btn-primary">Save company information</button><a class="btn btn-light" href="{% url 'company_detail' %}">Cancel</a></div></form>
+<div class="company-form-page">
+  <a class="company-form-back" href="{% url 'company_detail' %}">← Back to Company</a>
+  <div class="company-form-heading">
+    <h1 class="page-title">{{ action }} Company Information</h1>
+    <p class="page-subtitle">Keep your public company profile accurate and current.</p>
+  </div>
+
+  <div class="company-form-layout">
+    <form method="post" class="card company-form-card">
+      {% csrf_token %}
+      <section class="company-form-section" aria-labelledby="company-contact-heading">
+        <h2 id="company-contact-heading">Contact details</h2>
+        <div class="company-contact-grid">
+          <div class="form-group">
+            <label for="company-name">Company name</label>
+            <div class="company-input-wrap">
+              <span aria-hidden="true">▧</span>
+              <input class="input" id="company-name" name="name" value="{{ company.name|default:'' }}" placeholder="e.g. Aurora Nest Studio" required data-preview="name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="company-email">Email</label>
+            <div class="company-input-wrap">
+              <span aria-hidden="true">✉</span>
+              <input class="input" id="company-email" type="email" name="email" value="{{ company.email|default:'' }}" placeholder="name@company.com" data-preview="email">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="company-phone">Phone</label>
+            <div class="company-input-wrap">
+              <span aria-hidden="true">☎</span>
+              <input class="input" id="company-phone" name="phone" value="{{ company.phone|default:'' }}" placeholder="+65 6123 4567" data-preview="phone">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="company-website">Website</label>
+            <div class="company-input-wrap">
+              <span aria-hidden="true">◎</span>
+              <input class="input" id="company-website" type="url" name="website" value="{{ company.website|default:'' }}" placeholder="https://www.yourcompany.com" data-preview="website">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="company-form-section" aria-labelledby="company-location-heading">
+        <h2 id="company-location-heading">Location</h2>
+        <div class="form-group">
+          <label for="company-address">Address</label>
+          <div class="company-input-wrap">
+            <span aria-hidden="true">⌖</span>
+            <input class="input" id="company-address" name="address" value="{{ company.address|default:'' }}" placeholder="Street, unit number and postal code" data-preview="address">
+          </div>
+        </div>
+      </section>
+
+      <section class="company-form-section" aria-labelledby="company-about-heading">
+        <h2 id="company-about-heading">About your company</h2>
+        <div class="form-group">
+          <label for="company-description">Description</label>
+          <textarea class="textarea" id="company-description" name="description" placeholder="Tell customers what you specialise in, the styles you design and what makes your team different." data-preview="description">{{ company.description|default:'' }}</textarea>
+          <div class="company-description-meta">
+            <span>Shown on your public profile.</span>
+            <span><span data-description-count>0</span> characters</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="company-form-actions">
+        <button class="btn btn-primary" type="submit">Save company information</button>
+        <a class="btn btn-light" href="{% url 'company_detail' %}">Cancel</a>
+      </div>
+    </form>
+
+    <aside class="company-form-aside">
+      <section class="company-profile-preview" aria-labelledby="company-preview-heading">
+        <p class="company-preview-eyebrow" id="company-preview-heading">Profile preview</p>
+        <div class="company-preview-heading">
+          <span class="company-preview-avatar" data-preview-initial aria-hidden="true">C</span>
+          <div>
+            <h2 data-preview-name>Your company name</h2>
+            <p data-preview-address>Your address</p>
+          </div>
+        </div>
+        <p class="company-preview-description" data-preview-description>Your description will appear here for customers browsing your projects.</p>
+        <div class="company-preview-contact">
+          <span data-preview-email>name@company.com</span>
+          <span data-preview-phone>+65 6123 4567</span>
+          <span data-preview-website>www.yourcompany.com</span>
+        </div>
+      </section>
+
+      <section class="company-profile-tips" aria-labelledby="company-tips-heading">
+        <h2 id="company-tips-heading">Tips for a great profile</h2>
+        <ul>
+          <li>Use an email you check often.</li>
+          <li>Include your full address so customers can find you.</li>
+          <li>Mention your design styles in the description.</li>
+        </ul>
+      </section>
+    </aside>
+  </div>
+</div>
+<script>
+  (() => {
+    const form = document.querySelector(".company-form-card");
+    if (!form) return;
+
+    const fields = ["name", "email", "phone", "website", "address", "description"];
+    const previewValues = {
+      name: "Your company name",
+      email: "name@company.com",
+      phone: "+65 6123 4567",
+      website: "www.yourcompany.com",
+      address: "Your address",
+      description: "Your description will appear here for customers browsing your projects."
+    };
+
+    const updatePreview = (field) => {
+      const input = form.querySelector(`[data-preview="${field}"]`);
+      const value = input.value.trim();
+      const target = document.querySelector(`[data-preview-${field}]`);
+      if (target) target.textContent = value || previewValues[field];
+
+      if (field === "name") {
+        document.querySelector("[data-preview-initial]").textContent = (value || "C").slice(0, 1).toUpperCase();
+      }
+      if (field === "description") {
+        document.querySelector("[data-description-count]").textContent = input.value.length;
+      }
+    };
+
+    fields.forEach((field) => {
+      const input = form.querySelector(`[data-preview="${field}"]`);
+      input.addEventListener("input", () => updatePreview(field));
+      updatePreview(field);
+    });
+  })();
+</script>
 {% endblock %}

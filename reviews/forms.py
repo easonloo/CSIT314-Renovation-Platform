@@ -8,9 +8,9 @@ class ProjectReviewForm(forms.ModelForm):
         model = ProjectReview
         fields = ["rating", "comment"]
         widgets = {
-            "rating": forms.Select(
+            "rating": forms.RadioSelect(
                 choices=[(rating, f"{rating} / 5") for rating in range(1, 6)],
-                attrs={"class": "select"},
+                attrs={"class": "star-rating-input"},
             ),
             "comment": forms.Textarea(
                 attrs={"class": "textarea", "rows": 4}

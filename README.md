@@ -9,7 +9,7 @@ update, delete, and search their current and past Interior Design Projects (IDPs
 
 ## Set up your own development environment
 
-Install Git and Python. The current project has been tested with Python 3.9.
+Install Git and Python 3.12. The project's automated checks run on Python 3.12.
 
 Clone the repository:
 
@@ -29,7 +29,6 @@ On Windows PowerShell:
 
 ```powershell
 py -3.12 -m venv .venv312
-.312venv\Scripts\Activate.ps1
 ```
 
 Install dependencies and create your local database:

@@ -4,29 +4,125 @@
 {% block page_name %}{{ action|default:'Create' }} User Account{% endblock %}
 
 {% block content %}
-<h1>{{ action|default:'Create' }} User Account</h1>
+<div class="account-form-page">
+  {% if action == 'Update' %}
+    <a class="account-form-back" href="{% url 'account_detail' account.pk %}">← Back to account</a>
+  {% else %}
+    <a class="account-form-back" href="{% url 'account_list' %}">← Back to user accounts</a>
+  {% endif %}
 
-<form method="post" class="card">
-  {% csrf_token %}
-  {{ form.as_p }}
-
-  <div class="form-actions">
-    <button class="btn btn-primary" type="submit">
-      Save account
-    </button>
-
-    {% if action == 'Update' %}
-      <a
-        class="btn btn-light"
-        href="{% url 'account_detail' account.pk %}"
-      >
-        Cancel
-      </a>
-    {% else %}
-      <a class="btn btn-light" href="{% url 'account_list' %}">
-        Cancel
-      </a>
-    {% endif %}
+  <div class="account-form-heading">
+    <h1 class="page-title">{{ action|default:'Create' }} User Account</h1>
+    <p class="page-subtitle">{% if action == 'Update' %}Update account details and access profile.{% else %}Create an account and choose the right access profile.{% endif %}</p>
   </div>
-</form>
+
+  <div class="account-form-layout">
+    <form method="post" class="card account-form-card">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert alert-error">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <section class="account-form-section" aria-labelledby="account-details-heading">
+        <h2 id="account-details-heading">Account details</h2>
+        <div class="account-form-fields">
+          {% for field in form %}
+            {% if field.name != 'password1' and field.name != 'password2' %}
+              <div class="form-group account-field-{{ field.name }}">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}<div class="account-field-help">{{ field.help_text|safe }}</div>{% endif %}
+                {% for error in field.errors %}<div class="alert alert-error">{{ error }}</div>{% endfor %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </section>
+
+      {% if form.password1 %}
+        <section class="account-form-section account-password-section" aria-labelledby="account-password-heading">
+          <h2 id="account-password-heading">Set a password</h2>
+          <div class="account-form-fields">
+            {% for field in form %}
+              {% if field.name == 'password1' or field.name == 'password2' %}
+                <div class="form-group account-field-{{ field.name }}">
+                  {{ field.label_tag }}
+                  {{ field }}
+                  {% if field.help_text %}<div class="account-field-help">{{ field.help_text|safe }}</div>{% endif %}
+                  {% for error in field.errors %}<div class="alert alert-error">{{ error }}</div>{% endfor %}
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+
+      <div class="account-form-actions">
+        <button class="btn btn-primary" type="submit">{% if action == 'Update' %}Save changes{% else %}Save account{% endif %}</button>
+        {% if action == 'Update' %}
+          <a class="btn btn-light" href="{% url 'account_detail' account.pk %}">Cancel</a>
+        {% else %}
+          <a class="btn btn-light" href="{% url 'account_list' %}">Cancel</a>
+        {% endif %}
+      </div>
+    </form>
+
+    <aside class="account-form-aside">
+      <section class="account-preview-card" aria-labelledby="account-preview-heading">
+        <p class="account-preview-eyebrow" id="account-preview-heading">Account preview</p>
+        <div class="account-preview-person">
+          <span class="account-preview-avatar" data-account-initial aria-hidden="true">U</span>
+          <div>
+            <h2 data-account-name>Your name</h2>
+            <p data-account-username>@username</p>
+          </div>
+        </div>
+        <div class="account-preview-profile">
+          <span>Access profile</span>
+          <strong data-account-profile>Select a profile</strong>
+        </div>
+        <p class="account-preview-note">The profile determines which parts of the platform this account can access.</p>
+      </section>
+
+      <section class="account-form-tips" aria-labelledby="account-tips-heading">
+        <h2 id="account-tips-heading">{% if action == 'Update' %}Account access{% else %}Before you save{% endif %}</h2>
+        <ul>
+          <li>Use a unique username that’s easy to identify.</li>
+          <li>Choose the profile that matches the person’s role.</li>
+          {% if form.password1 %}<li>Use a strong password and enter it the same way twice.</li>{% endif %}
+        </ul>
+      </section>
+    </aside>
+  </div>
+</div>
+<script>
+  (() => {
+    const form = document.querySelector(".account-form-card");
+    if (!form) return;
+
+    const field = (name) => form.querySelector(`[name="${name}"]`);
+    const updatePreview = () => {
+      const firstName = field("first_name")?.value.trim() || "";
+      const lastName = field("last_name")?.value.trim() || "";
+      const username = field("username")?.value.trim() || "";
+      const fullName = [firstName, lastName].filter(Boolean).join(" ");
+      const profile = field("profile");
+
+      document.querySelector("[data-account-name]").textContent = fullName || username || "Your name";
+      document.querySelector("[data-account-username]").textContent = username ? `@${username}` : "@username";
+      document.querySelector("[data-account-initial]").textContent = (firstName || username || "U").slice(0, 1).toUpperCase();
+      document.querySelector("[data-account-profile]").textContent = profile?.value
+        ? profile.selectedOptions[0].text
+        : "Select a profile";
+    };
+
+    ["first_name", "last_name", "username", "profile"].forEach((name) => {
+      const input = field(name);
+      input?.addEventListener("input", updatePreview);
+      input?.addEventListener("change", updatePreview);
+    });
+
+    updatePreview();
+  })();
+</script>
 {% endblock %}

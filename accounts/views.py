@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Q
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
@@ -8,7 +9,9 @@ from django.views.decorators.http import require_http_methods
 from .controllers import UserAccountController, UserProfileController
 from .decorators import user_admin_required
 from .forms import AccountCreationForm, AccountUpdateForm, UserProfileForm
-from .models import UserAccount
+from .models import UserAccount, UserProfile
+from favourites.models import Favourite
+from projects.models import InteriorDesignProject
 from reviews.models import ProjectReview
 
 
@@ -16,12 +19,33 @@ from reviews.models import ProjectReview
 @require_http_methods(["GET"])
 def profile_list(request):
     search_term = request.GET.get("q", "").strip()
+    status_filter = request.GET.get("status", "all").strip()
+    if status_filter not in {"all", "active", "suspended"}:
+        status_filter = "all"
+
     profiles = UserProfileController.list_profiles(search_term=search_term)
+    if status_filter == "active":
+        profiles = profiles.filter(is_active=True)
+    elif status_filter == "suspended":
+        profiles = profiles.filter(is_active=False)
+    profiles = profiles.annotate(user_count=Count("accounts"))
+
+    profile_counts = UserProfile.objects.aggregate(
+        total=Count("pk"),
+        active=Count("pk", filter=Q(is_active=True)),
+        suspended=Count("pk", filter=Q(is_active=False)),
+    )
 
     return render(
         request,
         "accounts/profile_list.html",
-        {"profiles": profiles, "q": search_term},
+        {
+            "profiles": profiles,
+            "q": search_term,
+            "status_filter": status_filter,
+            "profile_counts": profile_counts,
+            "filtered_count": profiles.count(),
+        },
     )
 
 
@@ -50,15 +74,25 @@ def dashboard(request):
         return redirect("login")
 
     customer_reviews = ProjectReview.objects.none()
+    favourite_count = 0
+    recommended_projects = InteriorDesignProject.objects.none()
     if account.profile.name == "Customer":
         customer_reviews = ProjectReview.objects.filter(
-            customer=request.user,
-        ).select_related("project", "project__company")
+        ).select_related("customer", "project", "project__company")
+        favourite_count = Favourite.objects.filter(user=request.user).count()
+        recommended_projects = InteriorDesignProject.objects.filter(
+            status=InteriorDesignProject.STATUS_CURRENT,
+        ).select_related("company", "category")[:3]
 
     return render(
         request,
         "dashboard.html",
-        {"customer_reviews": customer_reviews},
+        {
+            "customer_reviews": customer_reviews,
+            "favourite_count": favourite_count,
+            "review_count": customer_reviews.count(),
+            "recommended_projects": recommended_projects,
+        },
     )
 
 
@@ -142,10 +176,46 @@ def profile_reactivate(request, pk):
 @user_admin_required
 @require_http_methods(["GET"])
 def account_list(request):
+    search_term = request.GET.get("q", "").strip()
+    status_filter = request.GET.get("status", "all").strip()
+    if status_filter not in {"all", "active", "suspended"}:
+        status_filter = "all"
+    profile_filter = request.GET.get("profile", "").strip()
+
+    accounts = UserAccountController.list_accounts()
+    if search_term:
+        accounts = accounts.filter(
+            Q(user__username__icontains=search_term)
+            | Q(user__first_name__icontains=search_term)
+            | Q(user__last_name__icontains=search_term)
+            | Q(user__email__icontains=search_term)
+        )
+    if status_filter == "active":
+        accounts = accounts.filter(user__is_active=True)
+    elif status_filter == "suspended":
+        accounts = accounts.filter(user__is_active=False)
+    if profile_filter.isdigit():
+        accounts = accounts.filter(profile_id=int(profile_filter))
+
+    account_counts = UserAccount.objects.aggregate(
+        total=Count("pk"),
+        active=Count("pk", filter=Q(user__is_active=True)),
+        suspended=Count("pk", filter=Q(user__is_active=False)),
+    )
+    profiles = UserProfile.objects.order_by("name")
+
     return render(
         request,
         "accounts/account_list.html",
-        {"accounts": UserAccountController.list_accounts()},
+        {
+            "accounts": accounts,
+            "q": search_term,
+            "status_filter": status_filter,
+            "profile_filter": profile_filter,
+            "profiles": profiles,
+            "account_counts": account_counts,
+            "filtered_count": accounts.count(),
+        },
     )
 
 

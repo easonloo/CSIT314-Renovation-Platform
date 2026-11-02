@@ -4,58 +4,111 @@
 {% block page_name %}User Accounts{% endblock %}
 
 {% block content %}
-<div class="page-head">
-  <h1 class="page-title">User Accounts</h1>
-
-  <a class="btn btn-primary" href="{% url 'account_create' %}">
-    Create account
-  </a>
+<div class="profile-breadcrumb"><a href="{% url 'dashboard' %}">Admin</a><span aria-hidden="true">/</span><span>User Accounts</span></div>
+<div class="page-head profile-page-head">
+  <div>
+    <h1 class="page-title">User Accounts</h1>
+    <p class="page-subtitle">View and manage access to the renovation platform.</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'account_create' %}"><span aria-hidden="true">+</span> Create account</a>
 </div>
 
-<div class="card">
-  <div class="table-wrap">
-    <table>
+<section class="profile-stats" aria-label="Account summary">
+  <article class="profile-stat-card">
+    <span>Total accounts</span>
+    <strong>{{ account_counts.total }}</strong>
+  </article>
+  <article class="profile-stat-card">
+    <span>Active</span>
+    <strong class="profile-stat-active">{{ account_counts.active }}</strong>
+  </article>
+  <article class="profile-stat-card">
+    <span>Suspended</span>
+    <strong>{{ account_counts.suspended }}</strong>
+  </article>
+</section>
+
+<section class="profile-manager" aria-label="Manage user accounts">
+  <form method="get" action="{% url 'account_list' %}" class="profile-toolbar account-toolbar" role="search">
+    <label class="profile-search">
+      <span class="visually-hidden">Search user accounts</span>
+      <span class="profile-search-icon" aria-hidden="true">⌕</span>
+      <input type="search" name="q" value="{{ q }}" placeholder="Search username, name or email...">
+    </label>
+    <label class="account-profile-filter">
+      <span class="visually-hidden">Filter by profile</span>
+      <select name="profile" aria-label="Filter by profile">
+        <option value="">All profiles</option>
+        {% for profile in profiles %}
+        <option value="{{ profile.pk }}"{% if profile_filter == profile.pk|stringformat:'s' %} selected{% endif %}>{{ profile.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <div class="profile-filters" aria-label="Filter accounts by status">
+      <button class="profile-filter{% if status_filter == 'all' %} active{% endif %}" type="submit" name="status" value="all" aria-pressed="{% if status_filter == 'all' %}true{% else %}false{% endif %}">All</button>
+      <button class="profile-filter{% if status_filter == 'active' %} active{% endif %}" type="submit" name="status" value="active" aria-pressed="{% if status_filter == 'active' %}true{% else %}false{% endif %}">Active</button>
+      <button class="profile-filter{% if status_filter == 'suspended' %} active{% endif %}" type="submit" name="status" value="suspended" aria-pressed="{% if status_filter == 'suspended' %}true{% else %}false{% endif %}">Suspended</button>
+    </div>
+    <button class="account-apply-filter" type="submit" name="status" value="{{ status_filter }}">Apply</button>
+  </form>
+
+  <div class="table-wrap profile-table-wrap">
+    <table class="profile-table account-table">
       <thead>
         <tr>
           <th>Username</th>
+          <th>Name</th>
           <th>Email</th>
           <th>Profile</th>
-          <th>Account status</th>
+          <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
-
       <tbody>
         {% for account in accounts %}
-          <tr>
-            <td>{{ account.user.username }}</td>
-            <td>{{ account.user.email|default:'-' }}</td>
-            <td>{{ account.profile.name }}</td>
-
-            <td>
-              {% if account.user.is_active %}
-                <span class="badge badge-success">Active</span>
-              {% else %}
-                <span class="badge badge-danger">Suspended</span>
-              {% endif %}
-            </td>
-
-            <td>
-              <a
-                class="btn btn-light"
-                href="{% url 'account_detail' account.pk %}"
-              >
-                View
-              </a>
-            </td>
-          </tr>
+        <tr>
+          <td>
+            <div class="profile-name-cell">
+              <span class="profile-initial" aria-hidden="true">{{ account.user.username|slice:":1"|upper }}</span>
+              <span>{{ account.user.username }}</span>
+            </div>
+          </td>
+          <td>{{ account.user.get_full_name|default:'-' }}</td>
+          <td>{{ account.user.email|default:'-' }}</td>
+          <td>{{ account.profile.name }}</td>
+          <td>
+            {% if account.user.is_active %}
+            <span class="badge badge-success"><span aria-hidden="true">●</span> Active</span>
+            {% else %}
+            <span class="badge badge-danger"><span aria-hidden="true">●</span> Suspended</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="profile-row-actions">
+              <a class="btn btn-light" href="{% url 'account_detail' account.pk %}">View</a>
+              <details class="profile-action-menu">
+                <summary aria-label="More actions for {{ account.user.username }}">•••</summary>
+                <div class="profile-action-options">
+                  <a href="{% url 'account_update' account.pk %}">Edit account</a>
+                  {% if account.user.is_active %}
+                  <a href="{% url 'account_suspend' account.pk %}">Suspend account</a>
+                  {% else %}
+                  <a href="{% url 'account_reactivate' account.pk %}">Reactivate account</a>
+                  {% endif %}
+                </div>
+              </details>
+            </div>
+          </td>
+        </tr>
         {% empty %}
-          <tr>
-            <td colspan="5">No accounts found.</td>
-          </tr>
+        <tr><td class="profile-empty-row" colspan="6">No accounts found.</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-</div>
+  <footer class="profile-table-footer">
+    <span>Showing {{ filtered_count }} of {{ account_counts.total }} accounts</span>
+    <span>Accounts are sorted by username</span>
+  </footer>
+</section>
 {% endblock %}

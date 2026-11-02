@@ -14,7 +14,17 @@
     {% for field in form %}
       <div class="form-group" style="margin-bottom:18px;">
         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
+        {% if field.name == 'rating' %}
+          <div class="star-rating" role="radiogroup" aria-label="Rating">
+            {% for subwidget in field.subwidgets %}
+              {{ subwidget.tag }}
+              <label class="star-rating-option" for="{{ subwidget.id_for_label }}" data-rating="{{ subwidget.data.value }}" aria-label="{{ subwidget.data.value }} star{{ subwidget.data.value|pluralize }}">★</label>
+            {% endfor %}
+          </div>
+          <p class="star-rating-prompt" aria-live="polite">Click to rate</p>
+        {% else %}
+          {{ field }}
+        {% endif %}
         {% for error in field.errors %}<p class="form-help" style="color:var(--danger);">{{ error }}</p>{% endfor %}
       </div>
     {% endfor %}
@@ -24,4 +34,40 @@
     </div>
   </form>
 </div>
+<script>
+  document.querySelectorAll(".star-rating").forEach(group => {
+    const options = [...group.querySelectorAll(".star-rating-option")];
+    const prompt = group.nextElementSibling;
+
+    function highlightStars(rating, className) {
+      options.forEach(option => {
+        option.classList.toggle(className, Number(option.dataset.rating) <= rating);
+      });
+    }
+
+    const selected = group.querySelector("input:checked");
+    if (selected) {
+      const rating = Number(selected.value);
+      highlightStars(rating, "is-selected");
+      prompt.textContent = `${rating} out of 5`;
+    }
+
+    group.addEventListener("change", event => {
+      if (event.target.matches("input[name='rating']")) {
+        const rating = Number(event.target.value);
+        highlightStars(rating, "is-selected");
+        prompt.textContent = `${rating} out of 5`;
+      }
+    });
+
+    options.forEach(option => {
+      option.addEventListener("pointerenter", () => {
+        highlightStars(Number(option.dataset.rating), "is-hovered");
+      });
+    });
+    group.addEventListener("pointerleave", () => {
+      highlightStars(0, "is-hovered");
+    });
+  });
+</script>
 {% endblock %}

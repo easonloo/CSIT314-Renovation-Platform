@@ -68,6 +68,34 @@ class ProjectReviewTests(TestCase):
         )
         self.assertEqual(review.rating, 5)
 
+    def test_review_form_renders_five_accessible_star_options(self):
+        response = self.client.get(
+            reverse("review_create", args=[self.past_project.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.content.decode().count('class="star-rating-option"'),
+            5,
+        )
+        self.assertContains(response, 'role="radiogroup"')
+        self.assertContains(response, 'name="rating"')
+
+    def test_review_edit_form_keeps_the_saved_rating_selected(self):
+        review = ProjectReview.objects.create(
+            customer=self.customer,
+            project=self.past_project,
+            rating=4,
+        )
+
+        response = self.client.get(reverse("review_update", args=[review.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertRegex(
+            response.content.decode(),
+            r'<input[^>]*value="4"[^>]*checked',
+        )
+
     def test_customer_can_review_current_project(self):
         response = self.client.post(
             reverse("review_create", args=[self.current_project.pk]),
@@ -174,7 +202,7 @@ class ProjectReviewTests(TestCase):
         )
         self.assertEqual(ProjectReview.objects.count(), 1)
 
-    def test_customer_dashboard_lists_only_the_customers_own_reviews(self):
+    def test_customer_dashboard_lists_all_customer_reviews(self):
         review = ProjectReview.objects.create(
             customer=self.customer,
             project=self.current_project,
@@ -184,7 +212,7 @@ class ProjectReviewTests(TestCase):
         other_customer = get_user_model().objects.create_user(
             username="dashboard_other_customer"
         )
-        ProjectReview.objects.create(
+        other_review = ProjectReview.objects.create(
             customer=other_customer,
             project=self.past_project,
             rating=2,
@@ -197,8 +225,13 @@ class ProjectReviewTests(TestCase):
         dashboard_html = response.content.decode()
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Your IDP reviews", dashboard_html)
+        self.assertIn("What Customers Are Saying", dashboard_html)
         self.assertIn(self.current_project.title, dashboard_html)
         self.assertIn("The progress is looking good.", dashboard_html)
+        self.assertIn("Private other customer comment.", dashboard_html)
+        self.assertIn("dashboard_other_customer", dashboard_html)
         self.assertIn(reverse("review_update", args=[review.pk]), dashboard_html)
-        self.assertNotIn("Private other customer comment.", dashboard_html)
+        self.assertNotIn(
+            reverse("review_update", args=[other_review.pk]),
+            dashboard_html,
+        )

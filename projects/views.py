@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db.models import Avg, Q
+from django.db.models import Avg, Count, Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
@@ -10,6 +10,7 @@ from accounts.decorators import interior_designer_required
 from accounts.models import UserAccount
 from categories.models import Category
 from companies.models import Company
+from favourites.models import Favourite
 from reviews.models import ProjectReview
 
 from .forms import InteriorDesignProjectForm
@@ -160,11 +161,17 @@ def idp_delete(request, pk):
 def customer_idp_search(request):
     search_term = request.GET.get("q", "").strip()
     category_id = request.GET.get("category", "").strip()
+    sort_order = request.GET.get("sort", "recommended").strip()
+    if sort_order not in {"recommended", "rating", "newest"}:
+        sort_order = "recommended"
     categories = Category.objects.order_by("name")
     projects = InteriorDesignProject.objects.select_related(
         "company",
         "category",
-    ).annotate(average_rating=Avg("reviews__rating"))
+    ).annotate(
+        average_rating=Avg("reviews__rating"),
+        review_count=Count("reviews"),
+    )
 
     if search_term:
         projects = projects.filter(
@@ -176,11 +183,27 @@ def customer_idp_search(request):
         )
     if category_id.isdigit():
         projects = projects.filter(category_id=int(category_id))
+    if sort_order == "rating":
+        projects = projects.order_by("-average_rating", "-updated_at")
+    elif sort_order == "newest":
+        projects = projects.order_by("-created_at")
+    else:
+        projects = projects.order_by(
+            "-average_rating",
+            "-review_count",
+            "-updated_at",
+        )
 
     account = UserAccount.objects.select_related("profile").filter(
         user=request.user,
         profile__is_active=True,
     ).first()
+    can_favourite = account is not None and account.profile.name == "Customer"
+    favourite_project_ids = (
+        Favourite.objects.filter(user=request.user).values_list("project_id", flat=True)
+        if can_favourite
+        else ()
+    )
 
     return render(
         request,
@@ -191,5 +214,9 @@ def customer_idp_search(request):
             "q": search_term,
             "selected_category": category_id,
             "can_review": account is not None and account.profile.name == "Customer",
+            "can_favourite": can_favourite,
+            "favourite_project_ids": favourite_project_ids,
+            "project_count": projects.count(),
+            "sort_order": sort_order,
         },
     )
