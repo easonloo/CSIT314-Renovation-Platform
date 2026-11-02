@@ -7,9 +7,13 @@
     <div>
       <p class="report-eyebrow">Platform insights</p>
       <h1 class="page-title">{{ report.period|title }} Report</h1>
-      <p class="page-subtitle">Monitor platform activity and performance.</p>
+      <p class="page-subtitle">Activity from {{ report.start_date|date:'d M Y' }} to {{ report.end_date|date:'d M Y' }}.</p>
     </div>
-    <span class="report-period-badge">{{ report.period|title }} overview</span>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <span class="report-period-badge">{{ report.period|title }} overview</span>
+      <a class="btn btn-primary" href="{% url 'report_download' 'monthly' %}">Download Monthly PDF</a>
+      <a class="btn btn-dark" href="{% url 'report_download' 'weekly' %}">Download Weekly PDF</a>
+    </div>
   </header>
 
   <nav class="report-tabs" aria-label="Report period">

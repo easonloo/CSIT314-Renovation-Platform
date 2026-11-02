@@ -59,11 +59,22 @@ class SetupProfilesTests(TestCase):
             2,
         )
         self.assertEqual(
+            UserAccount.objects.filter(
+                profile__name="Platform Management"
+            ).count(),
+            2,
+        )
+        self.assertEqual(
             ProjectReview.objects.filter(
                 customer__username__in=["customer_demo", "customer_jordan"],
                 project__status=InteriorDesignProject.STATUS_PAST,
             ).count(),
             5,
+        )
+        self.assertTrue(
+            get_user_model()
+            .objects.filter(username="platform_manager_1")
+            .exists()
         )
 
     def test_demo_customer_can_be_skipped(self):

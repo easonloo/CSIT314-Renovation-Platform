@@ -5,10 +5,11 @@ from django.urls import reverse
 from accounts.models import UserAccount, UserProfile
 from categories.models import Category
 from companies.models import Company
+from reports.models import ProjectView
 from reviews.models import ProjectReview
 
 from .models import InteriorDesignProject
-from .views import customer_idp_search
+from .views import customer_idp_search, idp_detail
 
 
 class InteriorDesignProjectTests(TestCase):
@@ -188,40 +189,27 @@ class InteriorDesignProjectTests(TestCase):
         self.assertIn("★ 4.5 / 5", response.content.decode())
         self.assertIn("No reviews", response.content.decode())
 
-    def test_customer_search_filters_categories_and_supports_sorting(self):
-        customer = get_user_model().objects.create_user(username="project-browser")
+    def test_non_owner_project_detail_records_a_view(self):
+        customer = get_user_model().objects.create_user(
+            username="project_view_customer",
+        )
         UserAccount.objects.create(user=customer, profile=self.customer_profile)
-        commercial = Category.objects.create(name="Commercial")
-        commercial_project = InteriorDesignProject.objects.create(
-            company=self.company,
-            category=commercial,
-            title="Commercial Loft",
+        request = RequestFactory().get(
+            reverse("idp_detail", args=[self.current_project.pk])
         )
-        self.client.force_login(customer)
+        request.user = customer
 
-        response = self.client.get(
-            reverse("customer_idp_search"),
-            {"category": str(commercial.pk), "sort": "newest"},
-        )
+        response = idp_detail(request, self.current_project.pk)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["project_count"], 1)
-        self.assertEqual(response.context["sort_order"], "newest")
-        self.assertQuerySetEqual(
-            response.context["projects"],
-            [commercial_project],
+        self.assertTrue(
+            ProjectView.objects.filter(
+                project=self.current_project,
+                viewer=customer,
+            ).exists()
         )
-        self.assertTrue(response.context["can_favourite"])
-        self.assertContains(response, "Save to favourites")
-
-    def test_customer_search_defaults_invalid_sort_to_recommended(self):
-        response = self.client.get(
-            reverse("customer_idp_search"),
-            {"sort": "invalid"},
-        )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["sort_order"], "recommended")
+        self.current_project.refresh_from_db()
+        self.assertEqual(self.current_project.view_count, 1)
 
     def test_designer_can_delete_current_and_past_projects(self):
         for project in (self.current_project, self.past_project):

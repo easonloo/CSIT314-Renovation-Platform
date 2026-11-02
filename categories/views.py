@@ -1,14 +1,16 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q
 
+from accounts.decorators import platform_manager_required
+
+from .forms import CategoryForm
 from .models import Category
 
 
-@login_required
+@platform_manager_required
 @require_http_methods(["GET"])
 def category_list(request):
     q = (request.GET.get("q") or "").strip()
@@ -18,7 +20,7 @@ def category_list(request):
     return render(request, "categories/category_list.html", {"categories": categories, "q": q})
 
 
-@login_required
+@platform_manager_required
 @require_http_methods(["GET"])
 def category_detail(request, pk):
     category = Category.objects.filter(pk=pk).first()
@@ -27,38 +29,43 @@ def category_detail(request, pk):
     return render(request, "categories/category_detail.html", {"category": category})
 
 
-@login_required
+@platform_manager_required
 @require_http_methods(["GET", "POST"])
 def category_create(request):
-    if request.method == "POST":
-        name = (request.POST.get("name") or "").strip()
-        description = (request.POST.get("description") or "").strip()
-        if name:
-            category = Category.objects.create(name=name, description=description)
-            messages.success(request, "Category created successfully.")
-            return redirect("category_detail", pk=category.pk)
+    form = CategoryForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        category = form.save()
+        messages.success(request, "Category created successfully.")
+        return redirect("category_detail", pk=category.pk)
 
-    return render(request, "categories/category_form.html", {"action": "Create"})
+    return render(
+        request,
+        "categories/category_form.html",
+        {"action": "Create", "form": form},
+    )
 
 
-@login_required
+@platform_manager_required
 @require_http_methods(["GET", "POST"])
 def category_update(request, pk):
     category = Category.objects.filter(pk=pk).first()
     if category is None:
         raise Http404("Category not found.")
 
-    if request.method == "POST":
-        category.name = (request.POST.get("name") or "").strip()
-        category.description = (request.POST.get("description") or "").strip()
-        category.save()
+    form = CategoryForm(request.POST or None, instance=category)
+    if request.method == "POST" and form.is_valid():
+        category = form.save()
         messages.success(request, "Category updated successfully.")
         return redirect("category_detail", pk=category.pk)
 
-    return render(request, "categories/category_form.html", {"category": category, "action": "Update"})
+    return render(
+        request,
+        "categories/category_form.html",
+        {"category": category, "action": "Update", "form": form},
+    )
 
 
-@login_required
+@platform_manager_required
 @require_http_methods(["POST"])
 def category_delete(request, pk):
     category = Category.objects.filter(pk=pk).first()

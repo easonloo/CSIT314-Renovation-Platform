@@ -293,6 +293,22 @@ class Command(BaseCommand):
             ],
         },
     ]
+    SAMPLE_PLATFORM_MANAGERS = [
+        {
+            "username": "platform_manager_1",
+            "password": "Platform@123",
+            "email": "pm.one@renovation.local",
+            "first_name": "Avery",
+            "last_name": "Ng",
+        },
+        {
+            "username": "platform_manager_2",
+            "password": "Platform@456",
+            "email": "pm.two@renovation.local",
+            "first_name": "Morgan",
+            "last_name": "Lee",
+        },
+    ]
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -308,6 +324,11 @@ class Command(BaseCommand):
             "--skip-demo-customer",
             action="store_true",
             help="Skip creating the sample Customer account and reviews.",
+        )
+        parser.add_argument(
+            "--skip-demo-platform-managers",
+            action="store_true",
+            help="Skip creating the sample Platform Management accounts.",
         )
 
     @transaction.atomic
@@ -343,6 +364,32 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.SUCCESS(f"Assigned '{username}' to User Admin.")
             )
+
+        if not options["skip_demo_platform_managers"]:
+            for manager_data in self.SAMPLE_PLATFORM_MANAGERS:
+                manager, created = get_user_model().objects.get_or_create(
+                    username=manager_data["username"],
+                    defaults={
+                        "email": manager_data["email"],
+                        "first_name": manager_data["first_name"],
+                        "last_name": manager_data["last_name"],
+                    },
+                )
+                if created:
+                    manager.set_password(manager_data["password"])
+                    manager.save(update_fields=["password"])
+
+                UserAccount.objects.update_or_create(
+                    user=manager,
+                    defaults={"profile": profiles["Platform Management"]},
+                )
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"Ready demo Platform Management account "
+                        f"'{manager_data['username']}' "
+                        f"(password: {manager_data['password']})"
+                    )
+                )
 
         if not options["skip_demo_designers"]:
             for designer in self.SAMPLE_DESIGNERS:

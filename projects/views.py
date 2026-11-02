@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db.models import Avg, Count, Q
+from django.db import transaction
+from django.db.models import Avg, Count, F, Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
@@ -12,6 +13,7 @@ from categories.models import Category
 from companies.models import Company
 from favourites.models import Favourite
 from reviews.models import ProjectReview
+from reports.models import ProjectView
 
 from .forms import InteriorDesignProjectForm
 from .models import InteriorDesignProject
@@ -91,6 +93,13 @@ def idp_detail(request, pk):
         and project.company.user_id != request.user.pk
     ):
         raise Http404("Project not available to this account.")
+
+    if project.company.user_id != request.user.pk:
+        with transaction.atomic():
+            ProjectView.objects.create(project=project, viewer=request.user)
+            InteriorDesignProject.objects.filter(pk=project.pk).update(
+                view_count=F("view_count") + 1
+            )
 
     reviews = project.reviews.select_related("customer")
     average_rating = reviews.aggregate(average_rating=Avg("rating"))[

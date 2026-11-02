@@ -17,13 +17,19 @@
   <form method="post" class="card category-form-card">
     {% csrf_token %}
     <div class="form-group category-name-field">
-      <label for="category-name">Category name</label>
-      <input class="input" id="category-name" name="name" value="{{ category.name|default:'' }}" maxlength="100" placeholder="e.g. Living Room" required>
+      <label for="{{ form.name.id_for_label }}">Category name</label>
+      {{ form.name }}
+      {% for error in form.name.errors %}
+        <p class="form-help" style="color:var(--danger);">{{ error }}</p>
+      {% endfor %}
     </div>
 
     <div class="form-group category-description-field">
-      <label for="category-description">Description</label>
-      <textarea class="textarea" id="category-description" name="description" rows="3" placeholder="Describe the types of projects customers will find in this category.">{{ category.description|default:'' }}</textarea>
+      <label for="{{ form.description.id_for_label }}">Description</label>
+      {{ form.description }}
+      {% for error in form.description.errors %}
+        <p class="form-help" style="color:var(--danger);">{{ error }}</p>
+      {% endfor %}
       <p class="category-form-help">A short description helps explain which projects belong in this category.</p>
     </div>
 
