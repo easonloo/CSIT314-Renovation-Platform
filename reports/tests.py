@@ -13,7 +13,7 @@ from favourites.models import Favourite
 from projects.models import InteriorDesignProject
 
 from .models import ProjectView
-from .views import report
+from .views import _create_report_pdf, report, report_download
 
 # Create your tests here.
 
@@ -65,6 +65,46 @@ class PlatformManagerReportTests(TestCase):
 
     def setUp(self):
         self.request_factory = RequestFactory()
+        self.client.force_login(self.manager)
+
+    def test_pdf_download_contains_report_period_metrics_and_timestamp(self):
+        response = self.client.get("/reports/daily/download/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/pdf")
+        self.assertIn("attachment; filename=", response["Content-Disposition"])
+        self.assertTrue(response.content.startswith(b"%PDF-1.4"))
+        self.assertIn(b"Daily Platform Report", response.content)
+        self.assertIn(b"Report dates:", response.content)
+        self.assertIn(b"Generated:", response.content)
+        self.assertIn(b"New users:", response.content)
+        self.assertIn(b"IDP views:", response.content)
+        self.assertIn(b"Shortlists:", response.content)
+        self.assertIn(b"New projects:", response.content)
+        self.assertIn(b"Active users:", response.content)
+        self.assertIn(b"Total IDPs:", response.content)
+
+    def test_weekly_pdf_download_has_weekly_filename_and_content(self):
+        response = self.client.get("/reports/weekly/download/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/pdf")
+        self.assertIn("platform-weekly-report-", response["Content-Disposition"])
+        self.assertIn(b"Weekly Platform Report", response.content)
+        self.assertIn(b"Report dates:", response.content)
+        self.assertIn(b"Generated:", response.content)
+
+    def test_pdf_builder_escapes_pdf_text_delimiters(self):
+        pdf = _create_report_pdf(["Report (draft)"])
+
+        self.assertIn(b"(Report \\(draft\\)) Tj", pdf)
+
+    def test_non_platform_manager_cannot_download_reports(self):
+        request = self.request_factory.get("/reports/daily/download/")
+        request.user = self.today_viewer
+
+        with self.assertRaises(PermissionDenied):
+            report_download(request, "daily")
 
     def test_daily_weekly_and_monthly_report_metrics_use_their_period(self):
         today = datetime(2026, 11, 2).date()

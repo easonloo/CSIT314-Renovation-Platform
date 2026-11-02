@@ -161,7 +161,8 @@ merging. Each developer uses their own database and credentials.
 | `config/` | Django settings and root routes |
 
 Platform Management accounts can manage categories and view daily, weekly, and
-monthly reports. Report periods use Singapore local dates; the weekly report
+monthly reports, and download each report as a PDF with its date range and
+generation timestamp. Report periods use Singapore local dates; the weekly report
 covers Monday through Sunday. New users and projects are counted by creation
 date, while views and favourite saves are recorded with timestamps so reports
 show activity within the selected period. Active users are distinct active
