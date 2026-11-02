@@ -29,7 +29,7 @@ On Windows PowerShell:
 
 ```powershell
 py -3.12 -m venv .venv312
-.312venv\Scripts\Activate.ps1
+.venv312\Scripts\Activate.ps1
 ```
 
 Install dependencies and create your local database:
@@ -53,6 +53,10 @@ python manage.py setup_profiles --admin-username your_username
 python manage.py runserver
 ```
 
+The `setup_profiles` command creates the initial user profiles and demo
+Interior Designer, Customer, and Platform Management accounts below. It is
+safe to run again; existing demo accounts and profiles are not duplicated.
+
 The setup command also creates six demo Interior Designer accounts, company
 records, and three sample projects for each designer, with a mix of current and
 past projects. The projects use the sample images in `media/sample_idp/` so the
@@ -72,6 +76,12 @@ current or past, then update or delete their own review:
 
 - `customer_demo` / `Customer@123`
 - `customer_jordan` / `Customer@456`
+
+The setup command also creates two demo Platform Management accounts for
+testing category management and platform reports:
+
+- `platform_manager_1` / `Platform@123`
+- `platform_manager_2` / `Platform@456`
 
 Open <http://127.0.0.1:8000/login/> and use your local administrator credentials.
 The Django admin interface is at <http://127.0.0.1:8000/admin/>.
@@ -149,6 +159,13 @@ merging. Each developer uses their own database and credentials.
 | `templates/` | Django HTML templates |
 | `static/` | Shared CSS and other static assets |
 | `config/` | Django settings and root routes |
+
+Platform Management accounts can manage categories and view daily, weekly, and
+monthly reports. Report periods use Singapore local dates; the weekly report
+covers Monday through Sunday. New users and projects are counted by creation
+date, while views and favourite saves are recorded with timestamps so reports
+show activity within the selected period. Active users are distinct active
+accounts that viewed or saved an IDP during that period.
 
 Use the assignment's Boundary–Control–Entity structure: request handling and
 templates form the boundary, controller classes coordinate operations, and models

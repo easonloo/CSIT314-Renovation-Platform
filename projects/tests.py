@@ -5,10 +5,11 @@ from django.urls import reverse
 from accounts.models import UserAccount, UserProfile
 from categories.models import Category
 from companies.models import Company
+from reports.models import ProjectView
 from reviews.models import ProjectReview
 
 from .models import InteriorDesignProject
-from .views import customer_idp_search
+from .views import customer_idp_search, idp_detail
 
 
 class InteriorDesignProjectTests(TestCase):
@@ -187,6 +188,28 @@ class InteriorDesignProjectTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("★ 4.5 / 5", response.content.decode())
         self.assertIn("No reviews", response.content.decode())
+
+    def test_non_owner_project_detail_records_a_view(self):
+        customer = get_user_model().objects.create_user(
+            username="project_view_customer",
+        )
+        UserAccount.objects.create(user=customer, profile=self.customer_profile)
+        request = RequestFactory().get(
+            reverse("idp_detail", args=[self.current_project.pk])
+        )
+        request.user = customer
+
+        response = idp_detail(request, self.current_project.pk)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            ProjectView.objects.filter(
+                project=self.current_project,
+                viewer=customer,
+            ).exists()
+        )
+        self.current_project.refresh_from_db()
+        self.assertEqual(self.current_project.view_count, 1)
 
     def test_designer_can_delete_current_and_past_projects(self):
         for project in (self.current_project, self.past_project):

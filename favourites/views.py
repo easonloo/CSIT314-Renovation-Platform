@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import F, Q
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
@@ -30,6 +30,10 @@ def favourite_add(request, project_id):
     if project is None:
         return redirect("customer_idp_search")
 
-    Favourite.objects.get_or_create(user=request.user, project=project)
+    _, created = Favourite.objects.get_or_create(user=request.user, project=project)
+    if created:
+        InteriorDesignProject.objects.filter(pk=project.pk).update(
+            shortlist_count=F("shortlist_count") + 1
+        )
     messages.success(request, "Project saved to favourites.")
     return redirect("idp_detail", pk=project.pk)
