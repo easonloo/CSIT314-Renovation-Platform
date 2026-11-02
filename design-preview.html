@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5f0">
+  <title>Renova — Find a home that feels like you</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #272720;
+      --muted: #77766e;
+      --paper: #f7f5f0;
+      --white: #fffefa;
+      --line: #e7e3d9;
+      --accent: #db7544;
+      --accent-dark: #b9502c;
+      --sage: #e8ebe2;
+      --serif: Georgia, "Times New Roman", serif;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+    button { color: inherit; }
+
+    .topbar {
+      position: sticky;
+      z-index: 10;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 76px;
+      padding: 0 max(5.5vw, 24px);
+      background: rgba(255, 254, 250, .94);
+      border-bottom: 1px solid rgba(39, 39, 32, .07);
+      backdrop-filter: blur(14px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 750; letter-spacing: -.04em; }
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      color: white;
+      background: var(--accent);
+      border-radius: 11px 11px 11px 3px;
+      font-family: var(--serif);
+      font-size: 22px;
+      font-style: italic;
+      line-height: 1;
+    }
+    .brand-name { font-size: 21px; }
+    .nav { display: flex; align-items: center; gap: 34px; color: #55554e; font-size: 13px; font-weight: 600; }
+    .nav a:hover { color: var(--accent-dark); }
+    .nav .sign-in { padding: 11px 17px; border: 1px solid var(--line); border-radius: 999px; }
+    .menu-toggle { display: none; border: 0; background: none; font-size: 23px; cursor: pointer; }
+
+    .hero {
+      position: relative;
+      display: grid;
+      min-height: 565px;
+      align-items: center;
+      overflow: hidden;
+      background: #d9d2c5 url("https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2200&q=88") center 54% / cover no-repeat;
+    }
+    .hero::before {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(28, 29, 25, .67) 0%, rgba(28, 29, 25, .45) 43%, rgba(28, 29, 25, .08) 100%);
+      content: "";
+    }
+    .hero-content { position: relative; width: min(720px, 89%); margin-left: max(8vw, 28px); padding: 72px 0 98px; color: white; }
+    .eyebrow { display: flex; align-items: center; gap: 10px; margin: 0 0 20px; color: #f5d5c3; font-size: 11px; font-weight: 750; letter-spacing: .16em; text-transform: uppercase; }
+    .eyebrow::before { width: 27px; height: 1px; background: currentColor; content: ""; }
+    h1, h2, h3, p { margin-top: 0; }
+    .hero h1 { max-width: 650px; margin-bottom: 18px; font-family: var(--serif); font-size: clamp(47px, 6vw, 78px); font-weight: 400; letter-spacing: -.055em; line-height: .99; }
+    .hero-copy { max-width: 490px; margin-bottom: 30px; color: rgba(255,255,255,.88); font-size: 16px; line-height: 1.7; }
+    .button {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 0 20px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      background: var(--accent);
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .18s ease, transform .18s ease;
+    }
+    .button:hover { transform: translateY(-1px); background: var(--accent-dark); }
+    .button-light { background: var(--white); color: var(--ink); }
+    .button-light:hover { background: #f1eee7; }
+    .hero-note { display: inline-block; margin-left: 15px; color: rgba(255,255,255,.82); font-size: 12px; }
+    .hero-stamp {
+      position: absolute;
+      right: 7%;
+      bottom: 38px;
+      display: flex;
+      width: 114px;
+      height: 114px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,.68);
+      border-radius: 50%;
+      color: white;
+      font-family: var(--serif);
+      font-size: 16px;
+      line-height: 1.3;
+      text-align: center;
+      transform: rotate(9deg);
+    }
+
+    .search-wrap { position: relative; z-index: 2; margin-top: -34px; padding: 0 24px; }
+    .search-panel {
+      display: grid;
+      width: min(1060px, 100%);
+      grid-template-columns: 1.5fr 1fr auto;
+      align-items: end;
+      gap: 14px;
+      margin: auto;
+      padding: 21px 23px;
+      border: 1px solid rgba(39,39,32,.08);
+      border-radius: 16px;
+      background: var(--white);
+      box-shadow: 0 16px 45px rgba(45, 39, 29, .09);
+    }
+    .field label { display: block; margin: 0 0 8px 2px; color: #79776e; font-size: 10px; font-weight: 750; letter-spacing: .11em; text-transform: uppercase; }
+    .field input, .field select {
+      width: 100%;
+      height: 46px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      outline: none;
+      background: white;
+      color: var(--ink);
+      font-size: 13px;
+    }
+    .field input:focus, .field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(219,117,68,.13); }
+    .search-panel .button { height: 46px; min-height: 46px; border-radius: 9px; }
+
+    .section { width: min(1160px, calc(100% - 48px)); margin: 0 auto; padding: 91px 0; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 25px; margin-bottom: 27px; }
+    .section-heading .eyebrow { margin-bottom: 12px; color: var(--accent-dark); }
+    .section-heading h2 { margin-bottom: 0; font-family: var(--serif); font-size: clamp(34px, 4vw, 48px); font-weight: 400; letter-spacing: -.045em; line-height: 1.05; }
+    .section-heading p { max-width: 360px; margin: 0 0 3px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .text-link { display: inline-flex; align-items: center; gap: 8px; color: var(--accent-dark); font-size: 13px; font-weight: 700; white-space: nowrap; }
+    .text-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+    .category-row { display: flex; gap: 9px; overflow-x: auto; margin: 0 0 24px; padding-bottom: 4px; scrollbar-width: thin; }
+    .category-chip { flex: 0 0 auto; padding: 9px 15px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: #66655e; font-size: 12px; cursor: pointer; }
+    .category-chip:hover, .category-chip.active { border-color: var(--ink); background: var(--ink); color: white; }
+
+    .project-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 21px; }
+    .project-card { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: var(--white); transition: transform .2s ease, box-shadow .2s ease; }
+    .project-card:hover { transform: translateY(-4px); box-shadow: 0 16px 35px rgba(45, 39, 29, .09); }
+    .project-image { position: relative; height: 222px; overflow: hidden; background: #ded8ce; }
+    .project-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s ease; }
+    .project-card:hover .project-image img { transform: scale(1.035); }
+    .project-tag { position: absolute; top: 13px; left: 13px; padding: 7px 10px; border-radius: 999px; background: rgba(255,254,250,.94); color: #56554d; font-size: 10px; font-weight: 700; }
+    .save-button { position: absolute; top: 11px; right: 11px; display: grid; width: 35px; height: 35px; place-items: center; border: 0; border-radius: 50%; background: rgba(255,254,250,.95); font-size: 18px; cursor: pointer; }
+    .save-button[aria-pressed="true"] { color: var(--accent-dark); }
+    .project-info { padding: 17px 17px 16px; }
+    .project-title-row { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+    .project-info h3 { margin: 0 0 6px; font-family: var(--serif); font-size: 21px; font-weight: 400; letter-spacing: -.025em; }
+    .rating { flex: 0 0 auto; color: #986a28; font-size: 12px; font-weight: 700; }
+    .project-company { margin-bottom: 15px; color: var(--muted); font-size: 12px; }
+    .project-meta { display: flex; flex-wrap: wrap; gap: 7px; padding-top: 13px; border-top: 1px solid var(--line); }
+    .meta-pill { padding: 6px 9px; border-radius: 999px; background: #f1efe9; color: #69675f; font-size: 10px; }
+    .empty-message { display: none; grid-column: 1 / -1; padding: 38px; border: 1px dashed #d5cec1; border-radius: 12px; color: var(--muted); text-align: center; }
+
+    .story {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 7%;
+      padding: 50px;
+      border-radius: 18px;
+      background: var(--sage);
+    }
+    .story-photo { min-height: 320px; border-radius: 11px; background: #c5b7a1 url("https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1100&q=85") center / cover no-repeat; }
+    .story-copy .eyebrow { color: var(--accent-dark); }
+    .story-copy h2 { margin: 0 0 16px; font-family: var(--serif); font-size: clamp(36px, 4vw, 50px); font-weight: 400; letter-spacing: -.05em; line-height: 1.04; }
+    .story-copy p { max-width: 420px; margin-bottom: 23px; color: #67685f; font-size: 14px; line-height: 1.8; }
+
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 38px; }
+    .step { padding-top: 18px; border-top: 1px solid #d7d2c7; }
+    .step-number { margin-bottom: 18px; color: var(--accent-dark); font-family: var(--serif); font-size: 22px; font-style: italic; }
+    .step h3 { margin-bottom: 8px; font-family: var(--serif); font-size: 22px; font-weight: 400; }
+    .step p { max-width: 300px; margin-bottom: 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+    .designer-cta { display: flex; align-items: center; justify-content: space-between; gap: 26px; padding: 35px 38px; border-radius: 14px; background: #292b25; color: white; }
+    .designer-cta h2 { margin: 0 0 7px; font-family: var(--serif); font-size: 32px; font-weight: 400; letter-spacing: -.03em; }
+    .designer-cta p { margin: 0; color: #c6c5bd; font-size: 13px; }
+    .designer-cta .button { flex: 0 0 auto; }
+
+    footer { padding: 29px max(5.5vw, 24px); border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .footer-links { display: flex; gap: 20px; }
+    .toast { position: fixed; z-index: 20; right: 22px; bottom: 22px; padding: 12px 17px; border-radius: 10px; background: var(--ink); color: white; box-shadow: 0 8px 25px rgba(0,0,0,.18); font-size: 12px; opacity: 0; pointer-events: none; transform: translateY(8px); transition: .2s ease; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 800px) {
+      .topbar { height: 68px; }
+      .menu-toggle { display: block; }
+      .nav { position: absolute; top: 67px; right: 0; left: 0; display: none; align-items: stretch; gap: 0; padding: 10px 24px 18px; border-bottom: 1px solid var(--line); background: var(--white); }
+      .nav.open { display: flex; flex-direction: column; }
+      .nav a { padding: 12px 0; }
+      .nav .sign-in { align-self: start; padding: 10px 15px; }
+      .hero { min-height: 520px; background-position: 57% center; }
+      .hero-content { margin-left: 6vw; }
+      .hero-stamp { right: 5%; width: 90px; height: 90px; font-size: 13px; }
+      .search-panel { grid-template-columns: 1fr 1fr; }
+      .search-panel .button { grid-column: 1 / -1; }
+      .section { padding: 70px 0; }
+      .project-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .story { gap: 28px; padding: 30px; }
+    }
+    @media (max-width: 560px) {
+      .hero { min-height: 555px; align-items: start; background-position: 59% center; }
+      .hero::before { background: linear-gradient(90deg, rgba(28,29,25,.72), rgba(28,29,25,.31)); }
+      .hero-content { width: 88%; margin-left: 24px; padding-top: 75px; }
+      .hero h1 { max-width: 400px; font-size: 54px; }
+      .hero-copy { font-size: 14px; }
+      .hero-note { display: block; margin: 12px 0 0; }
+      .hero-stamp { right: 20px; bottom: 25px; width: 78px; height: 78px; font-size: 11px; }
+      .search-wrap { margin-top: -19px; padding: 0 15px; }
+      .search-panel { grid-template-columns: 1fr; gap: 12px; padding: 17px; }
+      .search-panel .button { grid-column: auto; }
+      .section { width: calc(100% - 34px); padding: 58px 0; }
+      .section-heading { align-items: start; flex-direction: column; gap: 12px; }
+      .section-heading p { font-size: 12px; }
+      .project-grid { grid-template-columns: 1fr; gap: 14px; }
+      .project-image { height: 235px; }
+      .story { grid-template-columns: 1fr; padding: 20px; }
+      .story-photo { min-height: 230px; }
+      .steps { grid-template-columns: 1fr; gap: 22px; }
+      .designer-cta { align-items: start; flex-direction: column; padding: 26px 22px; }
+      .designer-cta h2 { font-size: 28px; }
+      .footer-inner { align-items: start; flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="Renova home">
+      <span class="brand-mark" aria-hidden="true">r</span>
+      <span class="brand-name">renova</span>
+    </a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-label="Open navigation">☰</button>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="#projects">Explore projects</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#designers">For designers</a>
+      <a class="sign-in" href="#sign-in" data-demo="Sign in">Sign in</a>
+    </nav>
+  </header>
+
+  <main id="home">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-content">
+        <p class="eyebrow">A better way to plan your renovation</p>
+        <h1 id="hero-title">Make a home<br>that feels like you.</h1>
+        <p class="hero-copy">Explore real design projects, find a style you love, and meet the interior designers who can bring it home.</p>
+        <a class="button" href="#projects">Explore the gallery <span aria-hidden="true">↗</span></a>
+        <span class="hero-note">Good ideas start with a little inspiration.</span>
+      </div>
+      <div class="hero-stamp" aria-hidden="true">Spaces<br>to feel<br>at home</div>
+    </section>
+
+    <div class="search-wrap" id="projects">
+      <form class="search-panel" id="project-search" role="search">
+        <div class="field">
+          <label for="search-query">What are you looking for?</label>
+          <input id="search-query" type="search" placeholder="Try “warm minimalist” or “kitchen”">
+        </div>
+        <div class="field">
+          <label for="search-category">Room type</label>
+          <select id="search-category">
+            <option value="all">All rooms</option>
+            <option value="living">Living room</option>
+            <option value="kitchen">Kitchen</option>
+            <option value="bedroom">Bedroom</option>
+          </select>
+        </div>
+        <button class="button" type="submit"><span aria-hidden="true">⌕</span> Find inspiration</button>
+      </form>
+    </div>
+
+    <section class="section" aria-labelledby="projects-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Ideas for your next chapter</p>
+          <h2 id="projects-title">Find your kind of home.</h2>
+        </div>
+        <p>Browse thoughtfully selected spaces from local designers, and save the ones that speak to you.</p>
+      </div>
+      <div class="category-row" aria-label="Filter by room">
+        <button class="category-chip active" type="button" data-filter="all" aria-pressed="true">All projects</button>
+        <button class="category-chip" type="button" data-filter="living" aria-pressed="false">Living rooms</button>
+        <button class="category-chip" type="button" data-filter="kitchen" aria-pressed="false">Kitchens</button>
+        <button class="category-chip" type="button" data-filter="bedroom" aria-pressed="false">Bedrooms</button>
+      </div>
+      <div class="project-grid" id="project-grid">
+        <article class="project-card" data-category="living" data-search="sunlit living room warm minimalist aurora nest bukit timah">
+          <div class="project-image">
+            <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=85" alt="Bright living room with calm, natural finishes" loading="lazy">
+            <span class="project-tag">Living room</span>
+            <button class="save-button" type="button" aria-label="Save Sunlit minimalist living" aria-pressed="false">♡</button>
+          </div>
+          <div class="project-info">
+            <div class="project-title-row"><h3>Sunlit minimalist living</h3><span class="rating">★ 4.8</span></div>
+            <p class="project-company">Aurora Nest Studio</p>
+            <div class="project-meta"><span class="meta-pill">Warm minimal</span><span class="meta-pill">Bukit Timah</span></div>
+          </div>
+        </article>
+        <article class="project-card" data-category="kitchen" data-search="natural oak kitchen scandinavian aurora nest tampines">
+          <div class="project-image">
+            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=85" alt="Airy kitchen with natural wood details" loading="lazy">
+            <span class="project-tag">Kitchen</span>
+            <button class="save-button" type="button" aria-label="Save Natural oak kitchen" aria-pressed="false">♡</button>
+          </div>
+          <div class="project-info">
+            <div class="project-title-row"><h3>A kitchen in natural oak</h3><span class="rating">★ 4.9</span></div>
+            <p class="project-company">Aurora Nest Studio</p>
+            <div class="project-meta"><span class="meta-pill">Scandinavian</span><span class="meta-pill">Tampines</span></div>
+          </div>
+        </article>
+        <article class="project-card" data-category="bedroom" data-search="quiet contemporary bedroom cove living queenstown">
+          <div class="project-image">
+            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1000&q=85" alt="Soft, restful bedroom in neutral tones" loading="lazy">
+            <span class="project-tag">Bedroom</span>
+            <button class="save-button" type="button" aria-label="Save Quiet contemporary bedroom" aria-pressed="false">♡</button>
+          </div>
+          <div class="project-info">
+            <div class="project-title-row"><h3>A quieter kind of bedroom</h3><span class="rating">★ 4.7</span></div>
+            <p class="project-company">Cove Living Co.</p>
+            <div class="project-meta"><span class="meta-pill">Contemporary</span><span class="meta-pill">Queenstown</span></div>
+          </div>
+        </article>
+        <article class="project-card" data-category="living" data-search="textured city living room modern eclectic bloom form orchard">
+          <div class="project-image">
+            <img src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1000&q=85" alt="Layered city living room with warm textures" loading="lazy">
+            <span class="project-tag">Living room</span>
+            <button class="save-button" type="button" aria-label="Save Textured city living" aria-pressed="false">♡</button>
+          </div>
+          <div class="project-info">
+            <div class="project-title-row"><h3>Texture, light, and city life</h3><span class="rating">★ 4.9</span></div>
+            <p class="project-company">Bloom &amp; Form Interiors</p>
+            <div class="project-meta"><span class="meta-pill">Modern eclectic</span><span class="meta-pill">Orchard</span></div>
+          </div>
+        </article>
+        <article class="project-card" data-category="kitchen" data-search="small space kitchen refresh functional modern geylang cove living">
+          <div class="project-image">
+            <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1000&q=85" alt="Compact kitchen refreshed with practical finishes" loading="lazy">
+            <span class="project-tag">Kitchen</span>
+            <button class="save-button" type="button" aria-label="Save Small-space kitchen" aria-pressed="false">♡</button>
+          </div>
+          <div class="project-info">
+            <div class="project-title-row"><h3>Small-space, big possibility</h3><span class="rating">★ 4.6</span></div>
+            <p class="project-company">Cove Living Co.</p>
+            <div class="project-meta"><span class="meta-pill">Functional modern</span><span class="meta-pill">Geylang</span></div>
+          </div>
+        </article>
+        <article class="project-card" data-category="bedroom" data-search="soft tone restful bedroom ember pine novena">
+          <div class="project-image">
+            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=85" alt="Relaxed bedroom with warm and soft details" loading="lazy">
+            <span class="project-tag">Bedroom</span>
+            <button class="save-button" type="button" aria-label="Save Soft-tone bedroom" aria-pressed="false">♡</button>
+          </div>
+          <div class="project-info">
+            <div class="project-title-row"><h3>Soft tones, slower mornings</h3><span class="rating">★ 4.8</span></div>
+            <p class="project-company">Ember &amp; Pine Studio</p>
+            <div class="project-meta"><span class="meta-pill">Natural modern</span><span class="meta-pill">Novena</span></div>
+          </div>
+        </article>
+        <p class="empty-message" id="empty-message">No projects match that search. Try a different room or keyword.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="story-title" style="padding-top:0">
+      <div class="story">
+        <div class="story-photo" role="img" aria-label="Warm and inviting renovated home"></div>
+        <div class="story-copy">
+          <p class="eyebrow">Good design, made personal</p>
+          <h2 id="story-title">Start with a feeling. Find the details later.</h2>
+          <p>Save the spaces you love, notice what they have in common, and use your collection to start a more thoughtful conversation with a designer.</p>
+          <a class="text-link" href="#projects">Build your inspiration list <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how-it-works" style="padding-top:8px">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">From first idea to first hello</p>
+          <h2>A simpler place to begin.</h2>
+        </div>
+        <p>No pressure to have it all figured out. Take the next step when you are ready.</p>
+      </div>
+      <div class="steps">
+        <article class="step"><div class="step-number">01</div><h3>Explore real projects</h3><p>See different homes, styles, and design approaches in one place.</p></article>
+        <article class="step"><div class="step-number">02</div><h3>Save what you love</h3><p>Keep your favourites together while you shape your own ideas.</p></article>
+        <article class="step"><div class="step-number">03</div><h3>Meet a designer</h3><p>Find a studio whose work feels right for the home you want to create.</p></article>
+      </div>
+    </section>
+
+    <section class="section" id="designers" style="padding-top:0">
+      <div class="designer-cta">
+        <div><h2>Design homes people remember.</h2><p>Share your work with people planning their next home.</p></div>
+        <a class="button" href="#designer-contact" data-demo="Designer enquiry">I’m a designer <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <a class="brand" href="#home"><span class="brand-mark" aria-hidden="true">r</span><span class="brand-name">renova</span></a>
+      <span>Design preview · Project images from the local sample gallery</span>
+      <div class="footer-links"><a href="#how-it-works">About</a><a href="#designers">For designers</a></div>
+    </div>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const cards = [...document.querySelectorAll(".project-card")];
+    const searchInput = document.querySelector("#search-query");
+    const categorySelect = document.querySelector("#search-category");
+    const emptyMessage = document.querySelector("#empty-message");
+    const toast = document.querySelector("#toast");
+    let activeFilter = "all";
+    let toastTimer;
+
+    function updateProjects() {
+      const query = searchInput.value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      for (const card of cards) {
+        const matchesCategory = activeFilter === "all" || card.dataset.category === activeFilter;
+        const matchesQuery = card.dataset.search.includes(query);
+        const visible = matchesCategory && matchesQuery;
+        card.hidden = !visible;
+        if (visible) visibleCount += 1;
+      }
+      emptyMessage.style.display = visibleCount ? "none" : "block";
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    document.querySelector("#project-search").addEventListener("submit", event => {
+      event.preventDefault();
+      activeFilter = categorySelect.value;
+      document.querySelectorAll(".category-chip").forEach(chip => {
+        const selected = chip.dataset.filter === activeFilter;
+        chip.classList.toggle("active", selected);
+        chip.setAttribute("aria-pressed", String(selected));
+      });
+      updateProjects();
+      document.querySelector("#projects-title").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    document.querySelectorAll(".category-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        activeFilter = chip.dataset.filter;
+        categorySelect.value = activeFilter;
+        document.querySelectorAll(".category-chip").forEach(option => {
+          const selected = option === chip;
+          option.classList.toggle("active", selected);
+          option.setAttribute("aria-pressed", String(selected));
+        });
+        updateProjects();
+      });
+    });
+
+    searchInput.addEventListener("input", updateProjects);
+    document.querySelectorAll(".save-button").forEach(button => {
+      button.addEventListener("click", () => {
+        const saved = button.getAttribute("aria-pressed") !== "true";
+        button.setAttribute("aria-pressed", String(saved));
+        button.textContent = saved ? "♥" : "♡";
+        showToast(saved ? "Saved to your favourites" : "Removed from your favourites");
+      });
+    });
+
+    document.querySelectorAll("[data-demo]").forEach(link => {
+      link.addEventListener("click", event => {
+        event.preventDefault();
+        showToast(`${link.dataset.demo} is a preview-only action`);
+      });
+    });
+
+    const menuToggle = document.querySelector(".menu-toggle");
+    const navigation = document.querySelector(".nav");
+    menuToggle.addEventListener("click", () => {
+      const expanded = menuToggle.getAttribute("aria-expanded") !== "true";
+      menuToggle.setAttribute("aria-expanded", String(expanded));
+      menuToggle.setAttribute("aria-label", expanded ? "Close navigation" : "Open navigation");
+      navigation.classList.toggle("open", expanded);
+    });
+    navigation.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        navigation.classList.remove("open");
+        menuToggle.setAttribute("aria-expanded", "false");
+        menuToggle.setAttribute("aria-label", "Open navigation");
+      });
+    });
+  </script>
+</body>
+</html>
