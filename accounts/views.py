@@ -6,7 +6,11 @@ from django.http import Http404
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
-from .controllers import UserAccountController, UserProfileController
+from .controllers import (
+    AccountAccessController,
+    UserAccountController,
+    UserProfileController,
+)
 from .decorators import user_admin_required
 from .forms import AccountCreationForm, AccountUpdateForm, UserProfileForm
 from .models import UserAccount, UserProfile
@@ -64,9 +68,12 @@ def profile_create(request):
 
 @login_required
 def dashboard(request):
+    if not AccountAccessController.can_access_platform(request.user):
+        logout(request)
+        return redirect("login")
+
     account = UserAccount.objects.select_related("profile").filter(
         user=request.user,
-        profile__is_active=True,
     ).first()
 
     if account is None:
@@ -182,14 +189,7 @@ def account_list(request):
         status_filter = "all"
     profile_filter = request.GET.get("profile", "").strip()
 
-    accounts = UserAccountController.list_accounts()
-    if search_term:
-        accounts = accounts.filter(
-            Q(user__username__icontains=search_term)
-            | Q(user__first_name__icontains=search_term)
-            | Q(user__last_name__icontains=search_term)
-            | Q(user__email__icontains=search_term)
-        )
+    accounts = UserAccountController.list_accounts(search_term=search_term)
     if status_filter == "active":
         accounts = accounts.filter(user__is_active=True)
     elif status_filter == "suspended":
@@ -269,7 +269,10 @@ def account_update(request, pk):
         UserAccountController.update_account(account, **form.cleaned_data)
         messages.success(request, "User account updated successfully.")
 
-        if account.user_id == request.user.pk and account.profile.name != "User Admin":
+        if (
+            account.user_id == request.user.pk
+            and not AccountAccessController.can_manage_users(request.user)
+        ):
             return redirect("dashboard")
 
         return redirect("account_detail", pk=account.pk)

@@ -5,7 +5,8 @@ from django.contrib.auth.forms import UserCreationForm
 
 from django import forms
 from django.db.models import Q
-from .models import UserAccount, UserProfile
+from .controllers import AccountAccessController
+from .models import UserProfile
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
@@ -28,14 +29,7 @@ class AccountLoginForm(AuthenticationForm):
     def confirm_login_allowed(self, user):
         super().confirm_login_allowed(user)
 
-
-
-        has_active_profile = UserAccount.objects.filter(
-            user=user,
-            profile__is_active=True,
-        ).exists()
-
-        if not has_active_profile:
+        if not AccountAccessController.can_access_platform(user):
             raise ValidationError(
                 "Your account is unavailable. "
                 "Please contact a user administrator.",
