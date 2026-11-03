@@ -2,6 +2,11 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
+from companies.models import Company
+from favourites.models import Favourite
+from projects.models import InteriorDesignProject
+from reviews.models import ProjectReview
+
 from .models import UserAccount, UserProfile
 
 
@@ -290,6 +295,41 @@ class ProfileTests(TestCase):
                     reverse("profile_detail", args=[profile.pk])
                 ),
             )
+
+    def test_profile_list_shows_counts_user_totals_and_status_filter(self):
+        self.client.force_login(self.admin_user)
+        self.customer_profile.is_active = False
+        self.customer_profile.save(update_fields=["is_active"])
+
+        response = self.client.get(
+            reverse("profile_list"),
+            {"q": "Customer", "status": "suspended"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["profile_counts"], {
+            "total": 2,
+            "active": 1,
+            "suspended": 1,
+        })
+        self.assertEqual(response.context["filtered_count"], 1)
+        profile = response.context["profiles"].get()
+        self.assertEqual(profile.name, "Customer")
+        self.assertEqual(profile.user_count, 1)
+        self.assertContains(response, "Showing 1 of 2 profiles")
+        self.assertContains(response, 'value="suspended" aria-pressed="true"')
+
+    def test_invalid_profile_status_filter_defaults_to_all(self):
+        self.client.force_login(self.admin_user)
+
+        response = self.client.get(
+            reverse("profile_list"),
+            {"status": "unknown"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["status_filter"], "all")
+        self.assertEqual(response.context["filtered_count"], 2)
 
     def test_customer_cannot_view_profile_details(self):
         self.client.force_login(self.customer)
@@ -762,6 +802,16 @@ class AccountCreationTests(TestCase):
             "profile": self.customer_profile.pk,
         }
 
+    def test_create_account_form_uses_the_account_design_layout(self):
+        response = self.client.get(reverse("account_create"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Account details")
+        self.assertContains(response, "Set a password")
+        self.assertContains(response, "Account preview")
+        self.assertContains(response, "Password:")
+        self.assertContains(response, "Password confirmation:")
+
     def test_admin_can_create_account(self):
         response = self.client.post(
             reverse("account_create"),
@@ -958,6 +1008,44 @@ class AccountCreationTests(TestCase):
             response,
             'href="{}"'.format(detail_url),
         )
+
+    def test_account_list_shows_counts_and_filters_accounts(self):
+        suspended_account = self.make_update_target()
+        suspended_account.user.is_active = False
+        suspended_account.user.save(update_fields=["is_active"])
+
+        response = self.client.get(
+            reverse("account_list"),
+            {
+                "q": "updatecustomer",
+                "profile": str(self.customer_profile.pk),
+                "status": "suspended",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["account_counts"], {
+            "total": 2,
+            "active": 1,
+            "suspended": 1,
+        })
+        self.assertEqual(response.context["filtered_count"], 1)
+        self.assertEqual(
+            list(response.context["accounts"]),
+            [suspended_account],
+        )
+        self.assertContains(response, "Showing 1 of 2 accounts")
+        self.assertContains(response, "Suspended")
+
+    def test_invalid_account_status_filter_defaults_to_all(self):
+        response = self.client.get(
+            reverse("account_list"),
+            {"status": "unknown"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["status_filter"], "all")
+        self.assertEqual(response.context["filtered_count"], 1)
 
 
     def make_update_target(self):
@@ -1324,3 +1412,53 @@ class AccountCreationTests(TestCase):
                     response,
                     'href="{}"'.format(reverse(other_action, args=[account.pk])),
                 )
+
+
+class CustomerDashboardTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        customer_profile = UserProfile.objects.create(name="Customer")
+        designer_profile = UserProfile.objects.create(name="Interior Designer")
+        cls.customer = get_user_model().objects.create_user(
+            username="dashboard_customer",
+        )
+        designer = get_user_model().objects.create_user(
+            username="dashboard_designer",
+        )
+        UserAccount.objects.create(user=cls.customer, profile=customer_profile)
+        UserAccount.objects.create(user=designer, profile=designer_profile)
+        company = Company.objects.create(user=designer, name="Studio")
+        cls.current_project = InteriorDesignProject.objects.create(
+            company=company,
+            title="Current project",
+            style="Scandinavian",
+        )
+        InteriorDesignProject.objects.create(
+            company=company,
+            title="Past project",
+            status=InteriorDesignProject.STATUS_PAST,
+        )
+        Favourite.objects.create(user=cls.customer, project=cls.current_project)
+        ProjectReview.objects.create(
+            customer=cls.customer,
+            project=cls.current_project,
+            rating=5,
+            comment="Lovely work",
+        )
+
+    def test_customer_dashboard_shows_activity_and_current_recommendations(self):
+        self.client.force_login(self.customer)
+
+        response = self.client.get(reverse("dashboard"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["favourite_count"], 1)
+        self.assertEqual(response.context["review_count"], 1)
+        self.assertEqual(
+            list(response.context["recommended_projects"]),
+            [self.current_project],
+        )
+        self.assertContains(response, "Recommended for you")
+        self.assertContains(response, "What Customers Are Saying")
+        self.assertContains(response, "Lovely work")
+        self.assertNotContains(response, "Past project")

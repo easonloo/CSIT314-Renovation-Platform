@@ -2,10 +2,10 @@
 
 Django group project for matching renovation customers with interior designers.
 
-Implemented so far: authentication, User Admin profile management, and account
-creation, viewing, updating, suspension, and reactivation. Profile search is also
-available. Account search and the remaining designer/customer/management features
-are still to be implemented.
+Implemented so far: authentication and User Admin account/profile management;
+Interior Designer company information and project portfolio management; and
+customer project search and favourites. Interior Designers can create, view,
+update, delete, and search their current and past Interior Design Projects (IDPs).
 
 ## Set up your own development environment
 
@@ -56,6 +56,36 @@ profile. Replace `your_username` with the username you just created:
 python manage.py setup_profiles --admin-username your_username
 python manage.py runserver
 ```
+
+The `setup_profiles` command creates the initial user profiles and demo
+Interior Designer, Customer, and Platform Management accounts below. It is
+safe to run again; existing demo accounts and profiles are not duplicated.
+
+The setup command also creates six demo Interior Designer accounts, company
+records, and three sample projects for each designer, with a mix of current and
+past projects. The projects use the sample images in `media/sample_idp/` so the
+portfolio screens are populated for local testing. Their default username and
+password combinations are:
+
+- `designer_aurora` / `Designer@123`
+- `designer_bloom` / `Designer@456`
+- `designer_cove` / `Designer@789`
+- `designer_ember` / `Designer@101`
+- `designer_harbor` / `Designer@202`
+- `designer_luna` / `Designer@303`
+
+The setup command also creates demo Customer accounts with sample reviews.
+Customers can leave one 1–5 star rating and optional comment per IDP, whether
+current or past, then update or delete their own review:
+
+- `customer_demo` / `Customer@123`
+- `customer_jordan` / `Customer@456`
+
+The setup command also creates two demo Platform Management accounts for
+testing category management and platform reports:
+
+- `platform_manager_1` / `Platform@123`
+- `platform_manager_2` / `Platform@456`
 
 Open <http://127.0.0.1:8000/login/> and use your local administrator credentials.
 The Django admin interface is at <http://127.0.0.1:8000/admin/>.
@@ -153,6 +183,14 @@ merging. Each developer uses their own database and credentials.
 | `templates/` | Django HTML templates |
 | `static/` | Shared CSS and other static assets |
 | `config/` | Django settings and root routes |
+
+Platform Management accounts can manage categories and view daily, weekly, and
+monthly reports, and download each report as a PDF with its date range and
+generation timestamp. Report periods use Singapore local dates; the weekly report
+covers Monday through Sunday. New users and projects are counted by creation
+date, while views and favourite saves are recorded with timestamps so reports
+show activity within the selected period. Active users are distinct active
+accounts that viewed or saved an IDP during that period.
 
 Use the assignment's Boundary–Control–Entity structure: request handling and
 templates form the boundary, controller classes coordinate operations, and models

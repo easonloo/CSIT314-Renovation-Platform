@@ -1,9 +1,69 @@
 {% extends 'base.html' %}
-{% block title %}{{ period|title }} Report{% endblock %}
+{% block title %}{{ report.period|title }} Report{% endblock %}
 {% block page_name %}Platform Reports{% endblock %}
 {% block content %}
-<div class="page-head"><div><h1 class="page-title">{{ period|title }} Report</h1><p class="page-subtitle">Monitor platform activity and performance.</p></div></div>
-<div class="report-tabs"><a class="{% if period == 'daily' %}active{% endif %}" href="{% url 'report' 'daily' %}">Daily</a><a class="{% if period == 'weekly' %}active{% endif %}" href="{% url 'report' 'weekly' %}">Weekly</a><a class="{% if period == 'monthly' %}active{% endif %}" href="{% url 'report' 'monthly' %}">Monthly</a></div>
-<div class="grid grid-4" style="margin-bottom:20px;"><div class="card"><div class="stat-label">New users</div><div class="stat-number">{{ report.new_users|default:0 }}</div></div><div class="card"><div class="stat-label">IDP views</div><div class="stat-number">{{ report.views|default:0 }}</div></div><div class="card"><div class="stat-label">Shortlists</div><div class="stat-number">{{ report.shortlists|default:0 }}</div></div><div class="card"><div class="stat-label">New projects</div><div class="stat-number">{{ report.new_projects|default:0 }}</div></div></div>
-<div class="card"><h3 style="margin-top:0;">Activity summary</h3><div class="table-wrap"><table><thead><tr><th>Metric</th><th>Value</th><th>Notes</th></tr></thead><tbody><tr><td>Active users</td><td>{{ report.active_users|default:0 }}</td><td>Users active during this reporting period.</td></tr><tr><td>Total IDPs</td><td>{{ report.total_projects|default:0 }}</td><td>Projects available on the platform.</td></tr><tr><td>Favourite saves</td><td>{{ report.shortlists|default:0 }}</td><td>Number of times customers saved an IDP.</td></tr></tbody></table></div></div>
+<div class="report-page">
+  <header class="report-page-heading">
+    <div>
+      <p class="report-eyebrow">Platform insights</p>
+      <h1 class="page-title">{{ report.period|title }} Report</h1>
+      <p class="page-subtitle">Activity from {{ report.start_date|date:'d M Y' }} to {{ report.end_date|date:'d M Y' }}.</p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <span class="report-period-badge">{{ report.period|title }} overview</span>
+      <a class="btn btn-primary" href="{% url 'report_download' 'monthly' %}">Download Monthly PDF</a>
+      <a class="btn btn-dark" href="{% url 'report_download' 'weekly' %}">Download Weekly PDF</a>
+    </div>
+  </header>
+
+  <nav class="report-tabs" aria-label="Report period">
+    <a class="{% if report.period == 'daily' %}active{% endif %}" href="{% url 'report' 'daily' %}"{% if report.period == 'daily' %} aria-current="page"{% endif %}>Daily</a>
+    <a class="{% if report.period == 'weekly' %}active{% endif %}" href="{% url 'report' 'weekly' %}"{% if report.period == 'weekly' %} aria-current="page"{% endif %}>Weekly</a>
+    <a class="{% if report.period == 'monthly' %}active{% endif %}" href="{% url 'report' 'monthly' %}"{% if report.period == 'monthly' %} aria-current="page"{% endif %}>Monthly</a>
+  </nav>
+
+  <section class="grid grid-4 report-metrics" aria-label="{{ report.period|title }} key metrics">
+    <article class="card report-metric">
+      <span class="report-metric-icon" aria-hidden="true">＋</span>
+      <p class="stat-label">New users</p>
+      <strong class="stat-number">{{ report.new_users|default:0 }}</strong>
+    </article>
+    <article class="card report-metric">
+      <span class="report-metric-icon" aria-hidden="true">◉</span>
+      <p class="stat-label">IDP views</p>
+      <strong class="stat-number">{{ report.views|default:0 }}</strong>
+    </article>
+    <article class="card report-metric">
+      <span class="report-metric-icon" aria-hidden="true">♡</span>
+      <p class="stat-label">Shortlists</p>
+      <strong class="stat-number">{{ report.shortlists|default:0 }}</strong>
+    </article>
+    <article class="card report-metric">
+      <span class="report-metric-icon" aria-hidden="true">▧</span>
+      <p class="stat-label">New projects</p>
+      <strong class="stat-number">{{ report.new_projects|default:0 }}</strong>
+    </article>
+  </section>
+
+  <section class="card report-summary" aria-labelledby="report-summary-heading">
+    <div class="report-summary-heading">
+      <div>
+        <h2 id="report-summary-heading">Activity summary</h2>
+        <p>Key figures for the selected reporting period.</p>
+      </div>
+    </div>
+    <div class="table-wrap report-table-wrap">
+      <table class="report-table">
+        <thead>
+          <tr><th scope="col">Metric</th><th scope="col">Value</th><th scope="col">Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Active users</td><td class="report-table-value">{{ report.active_users|default:0 }}</td><td>Users active during this reporting period.</td></tr>
+          <tr><td>Total IDPs</td><td class="report-table-value">{{ report.total_projects|default:0 }}</td><td>Projects available on the platform.</td></tr>
+          <tr><td>Favourite saves</td><td class="report-table-value">{{ report.shortlists|default:0 }}</td><td>Number of times customers saved an IDP.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
 {% endblock %}

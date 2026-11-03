@@ -2,25 +2,148 @@
 {% block title %}Dashboard | Renovation Platform{% endblock %}
 {% block page_name %}Dashboard{% endblock %}
 {% block content %}
-<div class="page-head">
-  <div>
-    <h1 class="page-title">Welcome, {{ request.user.username }}</h1>
-    <p class="page-subtitle">Use the shortcuts below to continue your work.</p>
+<section class="dashboard-hero">
+  <div class="dashboard-hero-copy">
+    <p class="dashboard-eyebrow">Your renovation journey</p>
+    <h1>Welcome back, {{ request.user.username }}</h1>
+    {% if request.user.account.profile.name == 'Customer' %}
+      <p>Ready to plan your next renovation? Find ideas and projects that feel like home.</p>
+      <form class="dashboard-search" method="get" action="{% url 'customer_idp_search' %}" role="search">
+        <label class="visually-hidden" for="dashboard-project-search">Search design projects</label>
+        <input id="dashboard-project-search" class="input" type="search" name="q" placeholder="Try “small kitchen, Scandinavian”">
+        <button class="btn btn-primary" type="submit">Search IDPs</button>
+      </form>
+    {% else %}
+      <p>Here are your tools to keep your renovation work moving.</p>
+    {% endif %}
   </div>
-</div>
-<div class="grid grid-3">
-  {% if request.user.account.profile.name == 'User Admin' %}
-    <a class="card" href="{% url 'profile_list' %}"><div class="stat-label">Manage</div><div class="stat-number">User Profiles</div><p class="page-subtitle">Create, search, view, update or suspend profiles.</p></a>
-  {% elif request.user.role == 'ID' %}
-    <a class="card" href="{% url 'company_detail' %}"><div class="stat-label">Company</div><div class="stat-number">Information</div><p class="page-subtitle">Keep your company information accurate.</p></a>
-    <a class="card" href="{% url 'idp_list' %}"><div class="stat-label">Portfolio</div><div class="stat-number">ID Projects</div><p class="page-subtitle">Manage current and past projects.</p></a>
-    <a class="card" href="{% url 'interest_dashboard' %}"><div class="stat-label">Analytics</div><div class="stat-number">Interest</div><p class="page-subtitle">Track project views and shortlists.</p></a>
-  {% elif request.user.role == 'CUSTOMER' %}
-    <a class="card" href="{% url 'customer_idp_search' %}"><div class="stat-label">Discover</div><div class="stat-number">Search IDPs</div><p class="page-subtitle">Find projects that match your renovation needs.</p></a>
-    <a class="card" href="{% url 'favourite_list' %}"><div class="stat-label">Saved</div><div class="stat-number">Favourites</div><p class="page-subtitle">Review the projects you have shortlisted.</p></a>
-  {% elif request.user.role == 'PM' %}
-    <a class="card" href="{% url 'category_list' %}"><div class="stat-label">Manage</div><div class="stat-number">Categories</div><p class="page-subtitle">Maintain the IDP category list.</p></a>
-    <a class="card" href="{% url 'report' 'daily' %}"><div class="stat-label">Monitor</div><div class="stat-number">Reports</div><p class="page-subtitle">Generate daily, weekly and monthly reports.</p></a>
+  {% if request.user.account.profile.name == 'Customer' %}
+  <div class="dashboard-stats" aria-label="Your activity">
+    <div class="dashboard-stat"><strong>{{ favourite_count }}</strong><span>Favourites</span></div>
+    <div class="dashboard-stat"><strong>{{ review_count }}</strong><span>Reviews</span></div>
+  </div>
   {% endif %}
-</div>
+</section>
+
+<nav class="dashboard-shortcuts" aria-label="Dashboard shortcuts">
+  {% if request.user.account.profile.name == 'User Admin' %}
+    <a class="dashboard-shortcut" href="{% url 'profile_list' %}"><span class="shortcut-icon" aria-hidden="true">◎</span><span><strong>User Profiles</strong><small>Create, search, update or suspend profiles.</small></span><span class="shortcut-arrow" aria-hidden="true">→</span></a>
+    <a class="dashboard-shortcut" href="{% url 'account_list' %}"><span class="shortcut-icon" aria-hidden="true">♙</span><span><strong>User Accounts</strong><small>Create and manage platform accounts.</small></span><span class="shortcut-arrow" aria-hidden="true">→</span></a>
+  {% elif request.user.account.profile.name == 'Interior Designer' %}
+    <a class="dashboard-shortcut" href="{% url 'company_detail' %}"><span class="shortcut-icon" aria-hidden="true">⌂</span><span><strong>Company information</strong><small>Keep your studio details up to date.</small></span><span class="shortcut-arrow" aria-hidden="true">→</span></a>
+    <a class="dashboard-shortcut" href="{% url 'idp_list' %}"><span class="shortcut-icon" aria-hidden="true">▧</span><span><strong>Your projects</strong><small>Manage current and past projects.</small></span><span class="shortcut-arrow" aria-hidden="true">→</span></a>
+  {% elif request.user.account.profile.name == 'Customer' %}
+    <a class="dashboard-shortcut" href="{% url 'customer_idp_search' %}"><span class="shortcut-icon" aria-hidden="true">⌕</span><span><strong>Search IDPs</strong><small>Find projects that match your renovation needs.</small></span><span class="shortcut-arrow" aria-hidden="true">→</span></a>
+    <a class="dashboard-shortcut" href="{% url 'favourite_list' %}"><span class="shortcut-icon" aria-hidden="true">♡</span><span><strong>Favourites</strong><small>Review the projects you have shortlisted.</small></span><span class="shortcut-arrow" aria-hidden="true">→</span></a>
+  {% elif request.user.account.profile.name == 'Platform Management' %}
+    <a class="dashboard-shortcut" href="{% url 'category_list' %}"><span class="shortcut-icon" aria-hidden="true">▤</span><span><strong>Categories</strong><small>Organise the project gallery.</small></span><span class="shortcut-arrow" aria-hidden="true">→</span></a>
+    <a class="dashboard-shortcut" href="{% url 'report' 'daily' %}"><span class="shortcut-icon" aria-hidden="true">▥</span><span><strong>Reports</strong><small>Review platform activity and trends.</small></span><span class="shortcut-arrow" aria-hidden="true">→</span></a>
+  {% endif %}
+</nav>
+{% if request.user.account.profile.name == 'Customer' %}
+<section class="dashboard-section" aria-labelledby="recommended-heading">
+  <div class="dashboard-section-heading">
+    <h2 id="recommended-heading">Recommended for you</h2>
+    <a class="text-link" href="{% url 'customer_idp_search' %}">View all <span aria-hidden="true">→</span></a>
+  </div>
+  <div class="recommended-grid">
+    {% for project in recommended_projects %}
+    <a class="recommended-card" href="{% url 'idp_detail' project.pk %}">
+      {% if project.display_image %}
+        <img class="recommended-image" src="{{ project.display_image.url }}" alt="{{ project.title }}" loading="lazy">
+      {% else %}
+        <div class="recommended-image recommended-placeholder" aria-hidden="true">Project photo</div>
+      {% endif %}
+      <div class="recommended-copy">
+        <strong>{{ project.title }}</strong>
+        <span>{{ project.company.name }} · {{ project.style|default:'Design' }}{% if project.location %} · {{ project.location }}{% endif %}</span>
+      </div>
+    </a>
+    {% empty %}
+      <div class="recommended-empty">New projects will appear here as designers share their work.</div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="dashboard-section dashboard-reviews" aria-labelledby="reviews-heading">
+  <div class="dashboard-section-heading dashboard-review-heading">
+    <div>
+      <h2 id="reviews-heading">What Customers Are Saying</h2>
+      <p>Reviews and comments customers have left on interior design projects. <strong>{{ review_count }} review{{ review_count|pluralize }}</strong></p>
+    </div>
+    <nav class="dashboard-review-navigation" aria-label="Review navigation">
+      <button class="dashboard-review-nav-button" type="button" data-review-direction="previous" aria-label="Previous reviews" aria-controls="dashboard-review-viewport" disabled>‹</button>
+      <button class="dashboard-review-nav-button" type="button" data-review-direction="next" aria-label="Next reviews" aria-controls="dashboard-review-viewport">›</button>
+    </nav>
+  </div>
+  <div class="dashboard-review-viewport" id="dashboard-review-viewport" role="region" aria-label="Customer reviews" tabindex="0">
+    <div class="dashboard-review-list">
+    {% for review in customer_reviews %}
+      <article class="dashboard-review-card">
+        <div class="dashboard-review-rating">
+          <span class="dashboard-review-stars" aria-label="{{ review.rating }} out of 5 stars">{% for star in "12345" %}<span{% if forloop.counter <= review.rating %} class="is-filled"{% endif %}>★</span>{% endfor %}</span>
+          <strong>{{ review.rating|floatformat:1 }} / 5.0</strong>
+        </div>
+        <p class="dashboard-review-company">{{ review.project.company.name }}</p>
+        <h3><a href="{% url 'idp_detail' review.project.pk %}">{{ review.project.title }}</a></h3>
+        <p class="dashboard-review-author">
+          {{ review.customer.get_full_name|default:review.customer.username }}{% if review.customer_id == request.user.pk %} (You){% endif %}
+        </p>
+        {% if review.comment %}
+          <p class="dashboard-review-comment">{{ review.comment|linebreaksbr }}</p>
+        {% else %}
+          <p class="dashboard-review-comment review-no-comment">No written comment.</p>
+        {% endif %}
+        <footer class="dashboard-review-footer">
+          <time datetime="{{ review.created_at|date:'c' }}">Reviewed {{ review.created_at|date:"M j, Y" }}</time>
+          {% if review.customer_id == request.user.pk %}
+            <a class="btn btn-light" href="{% url 'review_update' review.pk %}">Edit review</a>
+          {% endif %}
+        </footer>
+      </article>
+    {% empty %}
+      <div class="dashboard-review-empty">
+        <span class="empty-star" aria-hidden="true">☆</span>
+        <h3>No reviews yet</h3>
+        <p>Customer reviews will appear here as people share feedback on IDPs.</p>
+        <a class="btn btn-primary" href="{% url 'customer_idp_search' %}">Find projects to review</a>
+      </div>
+    {% endfor %}
+    </div>
+  </div>
+</section>
+<script>
+  (() => {
+    const viewport = document.getElementById("dashboard-review-viewport");
+    const track = viewport?.querySelector(".dashboard-review-list");
+    const previousButton = document.querySelector("[data-review-direction='previous']");
+    const nextButton = document.querySelector("[data-review-direction='next']");
+
+    if (!viewport || !track || !previousButton || !nextButton) return;
+
+    const getStep = () => {
+      const card = track.querySelector(".dashboard-review-card");
+      const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+      return card ? card.getBoundingClientRect().width + gap : viewport.clientWidth;
+    };
+
+    const updateButtons = () => {
+      const maxScroll = viewport.scrollWidth - viewport.clientWidth;
+      previousButton.disabled = viewport.scrollLeft <= 1;
+      nextButton.disabled = viewport.scrollLeft >= maxScroll - 1;
+      previousButton.parentElement.hidden = maxScroll <= 1;
+    };
+
+    previousButton.addEventListener("click", () => {
+      viewport.scrollBy({ left: -getStep(), behavior: "smooth" });
+    });
+    nextButton.addEventListener("click", () => {
+      viewport.scrollBy({ left: getStep(), behavior: "smooth" });
+    });
+    viewport.addEventListener("scroll", updateButtons, { passive: true });
+    window.addEventListener("resize", updateButtons);
+    updateButtons();
+  })();
+</script>
+{% endif %}
 {% endblock %}

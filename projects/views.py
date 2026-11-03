@@ -1,3 +1,231 @@
-from django.shortcuts import render
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.db import transaction
+from django.db.models import Avg, Count, F, Q
+from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_http_methods
 
-# Create your views here.
+from accounts.decorators import interior_designer_required
+from accounts.models import UserAccount
+from categories.models import Category
+from companies.models import Company
+from favourites.models import Favourite
+from reviews.models import ProjectReview
+from reports.models import ProjectView
+
+from .forms import InteriorDesignProjectForm
+from .models import InteriorDesignProject
+
+
+@interior_designer_required
+@require_http_methods(["GET"])
+def idp_list(request):
+    status = request.GET.get("status", "").strip()
+    if status not in {"", InteriorDesignProject.STATUS_CURRENT, InteriorDesignProject.STATUS_PAST}:
+        status = ""
+    search_term = request.GET.get("q", "").strip()
+
+    projects = InteriorDesignProject.objects.filter(company__user=request.user)
+    if status:
+        projects = projects.filter(status=status)
+    if search_term:
+        projects = projects.filter(
+            Q(title__icontains=search_term)
+            | Q(description__icontains=search_term)
+            | Q(location__icontains=search_term)
+            | Q(style__icontains=search_term)
+            | Q(category__name__icontains=search_term)
+        )
+
+    return render(
+        request,
+        "projects/idp_list.html",
+        {
+            "projects": projects.select_related("category", "company"),
+            "status": status,
+            "q": search_term,
+        },
+    )
+
+
+@interior_designer_required
+@require_http_methods(["GET", "POST"])
+def idp_create(request):
+    company = Company.objects.filter(user=request.user).first()
+    if company is None:
+        return redirect("company_create")
+
+    form = InteriorDesignProjectForm(
+        request.POST if request.method == "POST" else None,
+        request.FILES if request.method == "POST" else None,
+    )
+    if request.method == "POST" and form.is_valid():
+        project = form.save(commit=False)
+        project.company = company
+        project.save()
+        messages.success(request, "Project saved successfully.")
+        return redirect("idp_detail", pk=project.pk)
+
+    return render(
+        request,
+        "projects/idp_form.html",
+        {"form": form, "action": "Create"},
+    )
+
+
+@login_required
+@require_http_methods(["GET"])
+def idp_detail(request, pk):
+    project = get_object_or_404(
+        InteriorDesignProject.objects.select_related("company", "category"),
+        pk=pk,
+    )
+    account = UserAccount.objects.select_related("profile").filter(
+        user=request.user,
+        profile__is_active=True,
+    ).first()
+    if account is None:
+        raise PermissionDenied
+    if (
+        account.profile.name == "Interior Designer"
+        and project.company.user_id != request.user.pk
+    ):
+        raise Http404("Project not available to this account.")
+
+    if project.company.user_id != request.user.pk:
+        with transaction.atomic():
+            ProjectView.objects.create(project=project, viewer=request.user)
+            InteriorDesignProject.objects.filter(pk=project.pk).update(
+                view_count=F("view_count") + 1
+            )
+
+    reviews = project.reviews.select_related("customer")
+    average_rating = reviews.aggregate(average_rating=Avg("rating"))[
+        "average_rating"
+    ]
+    customer_review = None
+    if account.profile.name == "Customer":
+        customer_review = ProjectReview.objects.filter(
+            project=project,
+            customer=request.user,
+        ).first()
+
+    return render(
+        request,
+        "projects/idp_detail.html",
+        {
+            "project": project,
+            "is_project_owner": project.company.user_id == request.user.pk,
+            "reviews": reviews,
+            "average_rating": average_rating,
+            "customer_review": customer_review,
+            "can_review": account.profile.name == "Customer",
+        },
+    )
+
+
+@interior_designer_required
+@require_http_methods(["GET", "POST"])
+def idp_update(request, pk):
+    project = get_object_or_404(
+        InteriorDesignProject,
+        pk=pk,
+        company__user=request.user,
+    )
+    form = InteriorDesignProjectForm(
+        request.POST if request.method == "POST" else None,
+        request.FILES if request.method == "POST" else None,
+        instance=project,
+    )
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Project updated successfully.")
+        return redirect("idp_detail", pk=project.pk)
+
+    return render(
+        request,
+        "projects/idp_form.html",
+        {"form": form, "project": project, "action": "Update"},
+    )
+
+
+@interior_designer_required
+@require_http_methods(["POST"])
+def idp_delete(request, pk):
+    project = get_object_or_404(
+        InteriorDesignProject,
+        pk=pk,
+        company__user=request.user,
+    )
+    project.delete()
+    messages.success(request, "Project deleted successfully.")
+    return redirect("idp_list")
+
+
+@login_required
+@require_http_methods(["GET"])
+def customer_idp_search(request):
+    search_term = request.GET.get("q", "").strip()
+    category_id = request.GET.get("category", "").strip()
+    sort_order = request.GET.get("sort", "recommended").strip()
+    if sort_order not in {"recommended", "rating", "newest"}:
+        sort_order = "recommended"
+    categories = Category.objects.order_by("name")
+    projects = InteriorDesignProject.objects.select_related(
+        "company",
+        "category",
+    ).annotate(
+        average_rating=Avg("reviews__rating"),
+        review_count=Count("reviews"),
+    )
+
+    if search_term:
+        projects = projects.filter(
+            Q(title__icontains=search_term)
+            | Q(description__icontains=search_term)
+            | Q(style__icontains=search_term)
+            | Q(company__name__icontains=search_term)
+            | Q(category__name__icontains=search_term)
+        )
+    if category_id.isdigit():
+        projects = projects.filter(category_id=int(category_id))
+    if sort_order == "rating":
+        projects = projects.order_by("-average_rating", "-updated_at")
+    elif sort_order == "newest":
+        projects = projects.order_by("-created_at")
+    else:
+        projects = projects.order_by(
+            "-average_rating",
+            "-review_count",
+            "-updated_at",
+        )
+
+    account = UserAccount.objects.select_related("profile").filter(
+        user=request.user,
+        profile__is_active=True,
+    ).first()
+    can_favourite = account is not None and account.profile.name == "Customer"
+    favourite_project_ids = (
+        Favourite.objects.filter(user=request.user).values_list("project_id", flat=True)
+        if can_favourite
+        else ()
+    )
+
+    return render(
+        request,
+        "projects/customer_search.html",
+        {
+            "projects": projects,
+            "categories": categories,
+            "q": search_term,
+            "selected_category": category_id,
+            "can_review": account is not None and account.profile.name == "Customer",
+            "can_favourite": can_favourite,
+            "favourite_project_ids": favourite_project_ids,
+            "project_count": projects.count(),
+            "sort_order": sort_order,
+        },
+    )

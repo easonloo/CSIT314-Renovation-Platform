@@ -2,6 +2,87 @@
 {% block title %}IDP Categories{% endblock %}
 {% block page_name %}IDP Categories{% endblock %}
 {% block content %}
-<div class="page-head"><div><h1 class="page-title">IDP Categories</h1><p class="page-subtitle">Search and manage categories used to organise IDPs.</p></div><a class="btn btn-primary" href="{% url 'category_create' %}">+ Create category</a></div>
-<div class="card"><form class="search-row" method="get"><input class="input" name="q" value="{{ request.GET.q }}" placeholder="Search categories..."><button class="btn btn-dark">Search</button></form><div class="table-wrap"><table><thead><tr><th>Category</th><th>Description</th><th>Projects</th><th>Actions</th></tr></thead><tbody>{% for category in categories %}<tr><td><strong>{{ category.name }}</strong></td><td>{{ category.description|truncatechars:80 }}</td><td>{{ category.project_count|default:0 }}</td><td><a class="btn btn-light" href="{% url 'category_detail' category.id %}">View details</a></td></tr>{% empty %}<tr><td colspan="4"><div class="empty-state"><h3>No categories found</h3></div></td></tr>{% endfor %}</tbody></table></div></div>
+<div class="category-list-page">
+  <header class="category-list-heading">
+    <div>
+      <p class="category-list-eyebrow">Project organisation</p>
+      <h1 class="page-title">IDP Categories</h1>
+      <p class="page-subtitle">Search and manage categories used to organise IDPs.</p>
+    </div>
+    <a class="btn btn-primary category-create-button" href="{% url 'category_create' %}">
+      <span aria-hidden="true">＋</span> Create category
+    </a>
+  </header>
+
+  <section class="card category-manager" aria-label="Manage categories">
+    <form class="category-search" method="get" role="search">
+      <label class="visually-hidden" for="category-search-input">Search categories</label>
+      <span aria-hidden="true">⌕</span>
+      <input class="input" id="category-search-input" type="search" name="q" value="{{ q }}" placeholder="Search categories by name or description">
+      {% if q %}<a class="category-clear-search" href="{% url 'category_list' %}">Clear</a>{% endif %}
+      <button class="btn btn-dark" type="submit">Search</button>
+    </form>
+
+    <div class="category-results-heading">
+      <div>
+        <h2>All categories</h2>
+        {% if q %}
+          <p>Results matching “{{ q }}”</p>
+        {% else %}
+          <p>Browse and manage project categories.</p>
+        {% endif %}
+      </div>
+      <span class="category-results-count">{{ categories|length }} result{{ categories|length|pluralize }}</span>
+    </div>
+
+    <div class="table-wrap category-table-wrap">
+      <table class="category-table">
+        <thead>
+          <tr>
+            <th scope="col">Category</th>
+            <th scope="col">Description</th>
+            <th scope="col">Projects</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for category in categories %}
+            <tr>
+              <td>
+                <div class="category-name-cell">
+                  <span class="category-name-icon" aria-hidden="true">{{ category.name|slice:":1"|upper }}</span>
+                  <strong>{{ category.name }}</strong>
+                </div>
+              </td>
+              <td>
+                {% if category.description %}
+                  <span class="category-description">{{ category.description|truncatechars:100 }}</span>
+                {% else %}
+                  <span class="category-description category-description-empty">No description provided</span>
+                {% endif %}
+              </td>
+              <td><span class="category-project-count">{{ category.project_count|default:0 }}</span></td>
+              <td><a class="btn btn-light category-view-button" href="{% url 'category_detail' category.id %}">View details <span aria-hidden="true">→</span></a></td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="4">
+                <div class="category-empty">
+                  <span class="category-empty-icon" aria-hidden="true">⌕</span>
+                  <h3>{% if q %}No matching categories{% else %}No categories yet{% endif %}</h3>
+                  <p>{% if q %}Try another search term or clear your search.{% else %}Create a category to help organise interior design projects.{% endif %}</p>
+                  {% if q %}
+                    <a class="btn btn-light" href="{% url 'category_list' %}">Clear search</a>
+                  {% else %}
+                    <a class="btn btn-primary" href="{% url 'category_create' %}">Create category</a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
 {% endblock %}

@@ -1,8 +1,105 @@
 {% extends 'base.html' %}
-{% block title %}Search IDPs{% endblock %}
-{% block page_name %}Search IDPs{% endblock %}
+{% block title %}Explore Projects{% endblock %}
+{% block page_name %}Explore Projects{% endblock %}
 {% block content %}
-<div class="page-head"><div><h1 class="page-title">Find Interior Design Projects</h1><p class="page-subtitle">Search for designs that match your renovation needs.</p></div></div>
-<div class="card" style="margin-bottom:20px;"><form method="get" class="form-grid"><div class="form-group"><label>Keyword</label><input class="input" name="q" value="{{ request.GET.q }}" placeholder="Search project title, style or designer..."></div><div class="form-group"><label>Category</label><select class="select" name="category"><option value="">All categories</option>{% for category in categories %}<option value="{{ category.id }}">{{ category.name }}</option>{% endfor %}</select></div><div class="form-actions" style="grid-column:1/-1;margin-top:0;"><button class="btn btn-dark">Search</button></div></form></div>
-<div class="grid grid-3">{% for project in projects %}<article class="card project-card"><div class="project-image">Project image</div><div class="project-body"><span class="badge badge-info">{{ project.category.name }}</span><h3>{{ project.title }}</h3><p class="page-subtitle">{{ project.company.name }}</p><div class="project-meta"><span class="badge badge-muted">{{ project.style|default:'Design' }}</span><span class="badge badge-muted">{{ project.location|default:'Singapore' }}</span></div><a class="btn btn-primary" href="{% url 'idp_detail' project.id %}">View details</a></div></article>{% empty %}<div class="card empty-state" style="grid-column:1/-1;"><h3>No matching projects</h3><p>Try changing your search terms or category.</p></div>{% endfor %}</div>
+<section class="explore-page">
+  <div class="explore-hero">
+    <h1>Find Interior Design Projects</h1>
+    <p>Search for designs that match your renovation needs.</p>
+    <form class="explore-search" method="get" role="search">
+      <label class="visually-hidden" for="project-search">Search projects</label>
+      <span class="explore-search-icon" aria-hidden="true">⌕</span>
+      <input id="project-search" type="search" name="q" value="{{ q }}" placeholder="Search project title, style or designer...">
+      <input type="hidden" name="category" value="{{ selected_category }}">
+      <input type="hidden" name="sort" value="{{ sort_order }}">
+      <button class="btn" type="submit">Search</button>
+    </form>
+  </div>
+
+  <div class="explore-toolbar">
+    <nav class="explore-categories" aria-label="Filter projects by category">
+      <a class="explore-category{% if not selected_category %} is-selected{% endif %}" href="?q={{ q|urlencode }}&amp;sort={{ sort_order }}">All categories</a>
+      {% for category in categories %}
+        {% if forloop.counter <= 3 %}
+          <a class="explore-category{% if selected_category == category.id|stringformat:'s' %} is-selected{% endif %}" href="?q={{ q|urlencode }}&amp;sort={{ sort_order }}&amp;category={{ category.id }}">{{ category.name }}</a>
+        {% endif %}
+      {% endfor %}
+      {% if categories|length > 3 %}
+        <details class="explore-more">
+          <summary>More <span aria-hidden="true">⌄</span></summary>
+          <div class="explore-more-menu">
+            {% for category in categories %}
+              {% if forloop.counter > 3 %}
+                <a href="?q={{ q|urlencode }}&amp;sort={{ sort_order }}&amp;category={{ category.id }}">{{ category.name }}</a>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </details>
+      {% endif %}
+    </nav>
+    <div class="explore-sort">
+      <span>{{ project_count }} {% if project_count == 1 %}project{% else %}projects{% endif %}</span>
+      <form method="get">
+        <label class="visually-hidden" for="project-sort">Sort projects</label>
+        <select id="project-sort" class="select" name="sort" onchange="this.form.submit()">
+          <option value="recommended"{% if sort_order == 'recommended' %} selected{% endif %}>Sort: Recommended</option>
+          <option value="rating"{% if sort_order == 'rating' %} selected{% endif %}>Sort: Top rated</option>
+          <option value="newest"{% if sort_order == 'newest' %} selected{% endif %}>Sort: Newest</option>
+        </select>
+        <input type="hidden" name="q" value="{{ q }}">
+        <input type="hidden" name="category" value="{{ selected_category }}">
+      </form>
+    </div>
+  </div>
+
+  <div class="explore-project-grid">
+    {% for project in projects %}
+      <article class="explore-project-card">
+        <a class="explore-project-image" href="{% url 'idp_detail' project.id %}" aria-label="View {{ project.title }}">
+          {% if project.display_image %}
+            <img src="{{ project.display_image.url }}" alt="{{ project.title }}" loading="lazy">
+          {% else %}
+            <span>Project photo</span>
+          {% endif %}
+          <span class="explore-project-category">{{ project.category.name|default:"Design" }}</span>
+        </a>
+        {% if can_favourite %}
+          <form class="explore-favourite-form" method="post" action="{% url 'favourite_add' project.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            {% if project.id in favourite_project_ids %}
+              <button class="explore-favourite is-saved" type="submit" aria-label="Save {{ project.title }} to favourites" title="Saved to favourites">♥</button>
+            {% else %}
+              <button class="explore-favourite" type="submit" aria-label="Save {{ project.title }} to favourites" title="Save to favourites">♡</button>
+            {% endif %}
+          </form>
+        {% endif %}
+        <div class="explore-project-body">
+          <h2><a href="{% url 'idp_detail' project.id %}">{{ project.title }}</a></h2>
+          <p class="explore-project-designer">by {{ project.company.name }}</p>
+          <div class="explore-project-tags">
+            <span>{{ project.style|default:"Design" }}</span>
+            {% if project.location %}<span>{{ project.location }}</span>{% endif %}
+            {% if project.average_rating != None %}
+              <span class="explore-rating">★ {{ project.average_rating|floatformat:1 }} / 5</span>
+            {% else %}
+              <span>No reviews</span>
+            {% endif %}
+          </div>
+          <div class="explore-project-actions">
+            <a class="btn btn-primary" href="{% url 'idp_detail' project.id %}">View details</a>
+            {% if can_review %}<a class="btn btn-light" href="{% url 'review_create' project.id %}">Write review</a>{% endif %}
+          </div>
+        </div>
+      </article>
+    {% empty %}
+      <div class="explore-empty">
+        <span aria-hidden="true">⌕</span>
+        <h2>No matching projects</h2>
+        <p>Try changing your search terms or category.</p>
+        <a class="btn btn-primary" href="{% url 'customer_idp_search' %}">Clear filters</a>
+      </div>
+    {% endfor %}
+  </div>
+</section>
 {% endblock %}

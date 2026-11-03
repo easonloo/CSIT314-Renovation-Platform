@@ -6,6 +6,9 @@ from django.core.management.base import CommandError
 from django.test import TestCase
 
 from .models import UserAccount, UserProfile
+from companies.models import Company
+from projects.models import InteriorDesignProject
+from reviews.models import ProjectReview
 
 
 class SetupProfilesTests(TestCase):
@@ -17,6 +20,76 @@ class SetupProfilesTests(TestCase):
             set(UserProfile.objects.values_list("name", flat=True)),
             {"User Admin", "Interior Designer", "Customer", "Platform Management"},
         )
+
+    def test_demo_designers_have_sample_projects_without_duplicates(self):
+        for _ in range(2):
+            call_command("setup_profiles", stdout=StringIO())
+
+        self.assertEqual(
+            UserAccount.objects.filter(profile__name="Interior Designer").count(),
+            6,
+        )
+        self.assertEqual(Company.objects.count(), 6)
+        self.assertEqual(InteriorDesignProject.objects.count(), 18)
+        self.assertEqual(
+            InteriorDesignProject.objects.filter(status="current").count(),
+            12,
+        )
+        self.assertEqual(
+            InteriorDesignProject.objects.filter(status="past").count(),
+            6,
+        )
+        self.assertTrue(
+            InteriorDesignProject.objects.filter(
+                company__user__username="designer_aurora",
+                title="Sunlit Minimalist Living Room",
+                image="sample_idp/sample_1.png",
+                status="current",
+            ).exists()
+        )
+        self.assertTrue(
+            UserAccount.objects.filter(user__username="designer_ember").exists()
+        )
+        self.assertTrue(
+            Company.objects.filter(name="Luna Form Atelier").exists()
+        )
+        self.assertEqual(ProjectReview.objects.count(), 5)
+        self.assertEqual(
+            UserAccount.objects.filter(profile__name="Customer").count(),
+            2,
+        )
+        self.assertEqual(
+            UserAccount.objects.filter(
+                profile__name="Platform Management"
+            ).count(),
+            2,
+        )
+        self.assertEqual(
+            ProjectReview.objects.filter(
+                customer__username__in=["customer_demo", "customer_jordan"],
+                project__status=InteriorDesignProject.STATUS_PAST,
+            ).count(),
+            5,
+        )
+        self.assertTrue(
+            get_user_model()
+            .objects.filter(username="platform_manager_1")
+            .exists()
+        )
+
+    def test_demo_customer_can_be_skipped(self):
+        call_command(
+            "setup_profiles",
+            skip_demo_customer=True,
+            stdout=StringIO(),
+        )
+
+        self.assertFalse(
+            get_user_model()
+            .objects.filter(username__in=["customer_demo", "customer_jordan"])
+            .exists()
+        )
+        self.assertFalse(ProjectReview.objects.exists())
 
     def test_existing_user_can_be_assigned_to_user_admin(self):
         user = get_user_model().objects.create_user(username="teammate")
