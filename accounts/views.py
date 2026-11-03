@@ -6,15 +6,17 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 
 
-from .controllers import UserAccountController, UserProfileController
+from .controllers import (
+    AccountAccessController,
+    UserAccountController,
+    UserProfileController,
+)
 from .decorators import user_admin_required
 from .forms import (
     AccountCreationForm,
     AccountUpdateForm,
     UserProfileForm,
 )
-
-from .models import UserAccount
 
 
 @user_admin_required
@@ -58,14 +60,10 @@ def profile_create(request):
         {"form": form},
     )
 
+
 @login_required
 def dashboard(request):
-    has_active_profile = UserAccount.objects.filter(
-        user=request.user,
-        profile__is_active=True,
-    ).exists()
-
-    if not has_active_profile:
+    if not AccountAccessController.can_access_platform(request.user):
         logout(request)
         return redirect("login")
 
@@ -182,10 +180,13 @@ def profile_reactivate(request, pk):
 @user_admin_required
 @require_http_methods(["GET"])
 def account_list(request):
+    search_term = request.GET.get("q", "").strip()
+    accounts = UserAccountController.list_accounts(search_term=search_term)
+
     return render(
         request,
         "accounts/account_list.html",
-        {"accounts": UserAccountController.list_accounts()},
+        {"accounts": accounts, "q": search_term},
     )
 
 
@@ -267,7 +268,7 @@ def account_update(request, pk):
 
         if (
             account.user_id == request.user.pk
-            and account.profile.name != "User Admin"
+            and not AccountAccessController.can_manage_users(request.user)
         ):
             return redirect("dashboard")
 
