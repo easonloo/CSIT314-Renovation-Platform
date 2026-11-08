@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Company{% endblock %}
+{% block page_name %}Delete Company{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Delete Company</h1>
+    <p class="page-subtitle">Review your company before confirming deletion.</p>
+  </div>
+</div>
+
+<div class="card">
+  <p>Delete the company <strong>{{ company.name }}</strong>?</p>
+  <p>
+    This permanently removes your company information and all of its projects,
+    including their saved favourites, reviews and view records.
+  </p>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-actions">
+      <button class="btn btn-danger" type="submit">Confirm deletion</button>
+      <a class="btn btn-light" href="{% url 'company_detail' %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

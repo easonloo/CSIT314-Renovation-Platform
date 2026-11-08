@@ -7,7 +7,17 @@ from django.views.decorators.http import require_http_methods
 
 from accounts.decorators import interior_designer_required
 
-from .controllers import ProjectAccessDenied, ProjectController
+from .controllers import (
+    CreateIDPController,
+    DeleteIDPController,
+    IDPFormController,
+    ProjectAccessDenied,
+    SearchIDPsController,
+    SearchOwnedIDPsController,
+    UpdateIDPController,
+    ViewIDPController,
+    ViewOwnedIDPController,
+)
 from .forms import InteriorDesignProjectForm
 from .models import InteriorDesignProject
 
@@ -15,7 +25,7 @@ from .models import InteriorDesignProject
 @interior_designer_required
 @require_http_methods(["GET"])
 def idp_list(request):
-    context = ProjectController.get_list_data(
+    context = SearchOwnedIDPsController().get_list_data(
         request.user,
         status=request.GET.get("status", ""),
         search_term=request.GET.get("q", ""),
@@ -26,7 +36,7 @@ def idp_list(request):
 @interior_designer_required
 @require_http_methods(["GET", "POST"])
 def idp_create(request):
-    company = ProjectController.get_company(request.user)
+    company = IDPFormController().get_company(request.user)
     if company is None:
         return redirect("company_create")
     form = InteriorDesignProjectForm(
@@ -34,7 +44,7 @@ def idp_create(request):
         request.FILES if request.method == "POST" else None,
     )
     if request.method == "POST" and form.is_valid():
-        project = ProjectController.create_project(company, **form.cleaned_data)
+        project = CreateIDPController().create_project(company, **form.cleaned_data)
         messages.success(request, "Project saved successfully.")
         return redirect("idp_detail", pk=project.pk)
     return render(request, "projects/idp_form.html", {"form": form, "action": "Create"})
@@ -44,7 +54,7 @@ def idp_create(request):
 @require_http_methods(["GET"])
 def idp_detail(request, pk):
     try:
-        context = ProjectController.get_detail_data(request.user, pk)
+        context = ViewIDPController().get_detail_data(request.user, pk)
     except InteriorDesignProject.DoesNotExist as error:
         raise Http404("Project not available to this account.") from error
     except ProjectAccessDenied as error:
@@ -56,7 +66,7 @@ def idp_detail(request, pk):
 @require_http_methods(["GET", "POST"])
 def idp_update(request, pk):
     try:
-        project = ProjectController.get_owned_project(request.user, pk)
+        project = ViewOwnedIDPController().get_project(request.user, pk)
     except InteriorDesignProject.DoesNotExist as error:
         raise Http404("Project not available to this account.") from error
     form = InteriorDesignProjectForm(
@@ -66,7 +76,7 @@ def idp_update(request, pk):
     )
     if request.method == "POST" and form.is_valid():
         try:
-            project = ProjectController.update_project(request.user, pk, **form.cleaned_data)
+            project = UpdateIDPController().update_project(request.user, pk, **form.cleaned_data)
         except InteriorDesignProject.DoesNotExist as error:
             raise Http404("Project not available to this account.") from error
         messages.success(request, "Project updated successfully.")
@@ -77,10 +87,13 @@ def idp_update(request, pk):
 
 
 @interior_designer_required
-@require_http_methods(["POST"])
+@require_http_methods(["GET", "POST"])
 def idp_delete(request, pk):
     try:
-        ProjectController.delete_project(request.user, pk)
+        if request.method == "GET":
+            project = ViewOwnedIDPController().get_project(request.user, pk)
+            return render(request, "projects/idp_confirm_delete.html", {"project": project})
+        DeleteIDPController().delete_project(request.user, pk)
     except InteriorDesignProject.DoesNotExist as error:
         raise Http404("Project not available to this account.") from error
     messages.success(request, "Project deleted successfully.")
@@ -91,7 +104,7 @@ def idp_delete(request, pk):
 @require_http_methods(["GET"])
 def customer_idp_search(request):
     try:
-        context = ProjectController.get_search_data(
+        context = SearchIDPsController().get_search_data(
             request.user,
             search_term=request.GET.get("q", ""),
             category_id=request.GET.get("category", ""),

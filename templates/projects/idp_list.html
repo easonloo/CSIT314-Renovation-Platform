@@ -45,10 +45,7 @@
               <div style="display:flex;gap:6px;flex-wrap:wrap;">
                 <a class="btn btn-light" href="{% url 'idp_detail' project.id %}">View</a>
                 <a class="btn btn-light" href="{% url 'idp_update' project.id %}">Update</a>
-                <form method="post" action="{% url 'idp_delete' project.id %}">
-                  {% csrf_token %}
-                  <button class="btn btn-danger" type="submit">Delete</button>
-                </form>
+                <a class="btn btn-danger" href="{% url 'idp_delete' project.id %}">Delete</a>
               </div>
             </td>
           </tr>

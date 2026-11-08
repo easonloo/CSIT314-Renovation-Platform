@@ -23,6 +23,9 @@
     <a class="btn btn-primary" href="{% url 'profile_update' profile.pk %}">
       Update
     </a>
+    <a class="btn btn-danger" href="{% url 'profile_delete' profile.pk %}">
+      Delete
+    </a>
 
     <a class="btn btn-light" href="{% url 'profile_list' %}">
       Back to profiles

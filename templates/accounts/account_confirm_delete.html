@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete User Account{% endblock %}
+{% block page_name %}Delete User Account{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Delete User Account</h1>
+    <p class="page-subtitle">Review the account before confirming deletion.</p>
+  </div>
+</div>
+
+<div class="card">
+  <p>Delete the account <strong>{{ account.user.username }}</strong>?</p>
+  <p>
+    This permanently removes the account and its login, along with its
+    favourites, reviews and view records. Any company and projects owned by
+    this user will also be deleted.
+  </p>
+
+  {% if error %}
+  <p class="alert alert-error" role="alert">{{ error }}</p>
+  {% elif not can_delete %}
+  <p>You cannot delete your own user account.</p>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-actions">
+      {% if can_delete %}
+      <button class="btn btn-danger" type="submit">Confirm deletion</button>
+      {% endif %}
+      <a class="btn btn-light" href="{% url 'account_detail' account.pk %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

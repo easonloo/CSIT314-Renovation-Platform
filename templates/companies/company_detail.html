@@ -13,10 +13,7 @@
       Search company information
     </a>
     <a class="btn btn-light" href="{% url 'company_update' %}">Update</a>
-    <form method="post" action="{% url 'company_delete' %}">
-      {% csrf_token %}
-      <button class="btn btn-danger">Delete</button>
-    </form>
+    <a class="btn btn-danger" href="{% url 'company_delete' %}">Delete</a>
   </div>
   {% else %}
   <a class="btn btn-primary" href="{% url 'company_create' %}">

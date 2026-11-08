@@ -1,13 +1,9 @@
-from django.db import transaction
-from django.db.models import Avg, Count, F, Q
-
+"""Use-case controls: coordinate entities without issuing database operations."""
 from accounts.controllers import AccountAccessController
 from categories.controllers import CategoryController
 from companies.controllers import CompanyController
-from favourites.controllers import FavouriteController
 from favourites.models import Favourite
-from reports.models import ProjectView
-from reviews.controllers import ProjectReviewController
+from reviews.controllers import ViewProjectReviewsController
 
 from .models import InteriorDesignProject
 
@@ -16,114 +12,196 @@ class ProjectAccessDenied(PermissionError):
     pass
 
 
-class ProjectController:
-    @staticmethod
-    def get_company(user):
+class IDPFormController:
+    def get_company(self, user):
         return CompanyController.get_company(user)
 
-    @staticmethod
-    def get_categories():
+    def get_categories(self):
         return CategoryController.list_categories()
 
-    @staticmethod
-    def get_owned_project(user, pk):
-        return InteriorDesignProject.objects.get(pk=pk, company__user=user)
 
-    @staticmethod
-    def get_list_data(user, *, status="", search_term=""):
+class ViewOwnedIDPController:
+    def get_project(self, user, pk):
+        return InteriorDesignProject.find_owned(user, pk)
+
+
+class _StatusIDPController:
+    status = None
+
+    def get_project(self, user, pk):
+        return InteriorDesignProject.find_owned(user, pk, status=self.status)
+
+
+class CreateCurrentIDPController(_StatusIDPController):
+    """Story 20: create an ongoing project."""
+    status = InteriorDesignProject.STATUS_CURRENT
+
+    def create_project(self, company, **details):
+        details["status"] = self.status
+        return InteriorDesignProject.create_project(company, **details)
+
+
+class ViewCurrentIDPController(_StatusIDPController):
+    """Story 21: view an owned ongoing project."""
+    status = InteriorDesignProject.STATUS_CURRENT
+
+    def view_project(self, user, pk):
+        return self.get_project(user, pk)
+
+
+class UpdateCurrentIDPController(_StatusIDPController):
+    """Story 22: update a current project, including marking it complete."""
+    status = InteriorDesignProject.STATUS_CURRENT
+
+    def update_project(self, user, pk, **details):
+        return self.get_project(user, pk).update_details(**details)
+
+
+class DeleteCurrentIDPController(_StatusIDPController):
+    """Story 23: delete an owned ongoing project."""
+    status = InteriorDesignProject.STATUS_CURRENT
+
+    def delete_project(self, user, pk):
+        self.get_project(user, pk).delete_project()
+
+
+class SearchCurrentIDPsController(_StatusIDPController):
+    """Story 24: search ongoing projects belonging to the designer."""
+    status = InteriorDesignProject.STATUS_CURRENT
+
+    def search_projects(self, user, search_term=""):
+        return InteriorDesignProject.search_owned(
+            user, status=self.status, search_term=(search_term or "").strip(),
+        )
+
+
+class CreatePastIDPController(CreateCurrentIDPController):
+    """Story 25: create a completed project."""
+    status = InteriorDesignProject.STATUS_PAST
+
+
+class ViewPastIDPController(ViewCurrentIDPController):
+    """Story 26: view an owned completed project."""
+    status = InteriorDesignProject.STATUS_PAST
+
+
+class UpdatePastIDPController(UpdateCurrentIDPController):
+    """Story 27: update an owned completed project."""
+    status = InteriorDesignProject.STATUS_PAST
+
+
+class DeletePastIDPController(DeleteCurrentIDPController):
+    """Story 28: delete an owned completed project."""
+    status = InteriorDesignProject.STATUS_PAST
+
+
+class SearchPastIDPsController(SearchCurrentIDPsController):
+    """Story 29: search completed projects belonging to the designer."""
+    status = InteriorDesignProject.STATUS_PAST
+
+
+class CreateIDPController:
+    def create_project(self, company, **details):
+        control = (
+            CreatePastIDPController()
+            if details.get("status") == InteriorDesignProject.STATUS_PAST
+            else CreateCurrentIDPController()
+        )
+        return control.create_project(company, **details)
+
+
+class UpdateIDPController:
+    def update_project(self, user, pk, **details):
+        project = ViewOwnedIDPController().get_project(user, pk)
+        control = (
+            UpdatePastIDPController()
+            if project.status == InteriorDesignProject.STATUS_PAST
+            else UpdateCurrentIDPController()
+        )
+        return control.update_project(user, pk, **details)
+
+
+class DeleteIDPController:
+    def delete_project(self, user, pk):
+        project = ViewOwnedIDPController().get_project(user, pk)
+        control = (
+            DeletePastIDPController()
+            if project.status == InteriorDesignProject.STATUS_PAST
+            else DeleteCurrentIDPController()
+        )
+        control.delete_project(user, pk)
+
+
+class SearchOwnedIDPsController:
+    def get_list_data(self, user, *, status="", search_term=""):
         status = (status or "").strip()
-        if status not in {
-            "", InteriorDesignProject.STATUS_CURRENT, InteriorDesignProject.STATUS_PAST,
-        }:
+        if status not in {"", InteriorDesignProject.STATUS_CURRENT, InteriorDesignProject.STATUS_PAST}:
             status = ""
         search_term = (search_term or "").strip()
-        projects = InteriorDesignProject.objects.filter(company__user=user)
-        if status:
-            projects = projects.filter(status=status)
-        if search_term:
-            projects = projects.filter(
-                Q(title__icontains=search_term)
-                | Q(description__icontains=search_term)
-                | Q(location__icontains=search_term)
-                | Q(style__icontains=search_term)
-                | Q(category__name__icontains=search_term)
-            )
-        return {
-            "projects": projects.select_related("category", "company"),
-            "status": status,
-            "q": search_term,
-        }
+        if status == InteriorDesignProject.STATUS_CURRENT:
+            projects = SearchCurrentIDPsController().search_projects(user, search_term)
+        elif status == InteriorDesignProject.STATUS_PAST:
+            projects = SearchPastIDPsController().search_projects(user, search_term)
+        else:
+            projects = InteriorDesignProject.search_owned(user, search_term=search_term)
+        return {"projects": projects, "status": status, "q": search_term}
 
-    @staticmethod
-    def create_project(
-        company, *, title, description="", category=None, location="", style="",
-        status=InteriorDesignProject.STATUS_CURRENT, image=None,
-    ):
-        return InteriorDesignProject.objects.create(
-            company=company,
-            title=title,
-            description=description,
-            category=category,
-            location=location,
-            style=style,
-            status=status,
-            image=image or "",
-        )
 
-    @classmethod
-    def update_project(
-        cls, user, pk, *, title, description="", category=None, location="", style="",
-        status=InteriorDesignProject.STATUS_CURRENT, image=None,
-    ):
-        project = cls.get_owned_project(user, pk)
-        project.title = title
-        project.description = description
-        project.category = category
-        project.location = location
-        project.style = style
-        project.status = status
-        if image is not None:
-            # ClearableFileInput returns False when the existing image is cleared.
-            project.image = image or ""
-        project.save()
-        return project
+class ViewIDPViewsController:
+    """Story 37: let an owner inspect their project's view count."""
+    def view_views(self, user, project):
+        if project.company.user_id != user.pk:
+            raise InteriorDesignProject.DoesNotExist("Project not available to this account.")
+        return project.number_of_views()
 
-    @classmethod
-    def delete_project(cls, user, pk):
-        cls.get_owned_project(user, pk).delete()
 
-    @staticmethod
-    @transaction.atomic
-    def record_view(project, viewer):
-        if project.company.user_id == viewer.pk:
-            return
-        ProjectView.objects.create(project=project, viewer=viewer)
-        InteriorDesignProject.objects.filter(pk=project.pk).update(
-            view_count=F("view_count") + 1,
-        )
-        project.view_count += 1
+class ViewIDPShortlistsController:
+    """Story 38: let an owner inspect their project's shortlist count."""
+    def view_shortlists(self, user, project):
+        if project.company.user_id != user.pk:
+            raise InteriorDesignProject.DoesNotExist("Project not available to this account.")
+        return project.number_of_shortlists()
 
-    @classmethod
-    def get_detail_data(cls, user, pk):
-        project = InteriorDesignProject.objects.select_related("company", "category").get(pk=pk)
+
+class ViewIDPController:
+    """Story 33 and shared detail boundary; owner requests dispatch to story 21/26."""
+    def get_detail_data(self, user, pk):
+        project = InteriorDesignProject.find(pk)
         account = AccountAccessController.get_active_account(user)
         if account is None:
             raise ProjectAccessDenied("The account or its profile is unavailable.")
-        is_project_owner = project.company.user_id == user.pk
-        if account.profile.name == "Interior Designer" and not is_project_owner:
+        is_owner = project.company.user_id == user.pk
+        if account.profile.name == "Interior Designer" and not is_owner:
             raise InteriorDesignProject.DoesNotExist("Project not available to this account.")
-        cls.record_view(project, user)
+        if is_owner:
+            owner_control = (
+                ViewPastIDPController()
+                if project.status == InteriorDesignProject.STATUS_PAST
+                else ViewCurrentIDPController()
+            )
+            project = owner_control.view_project(user, pk)
+        project.record_view(user)
         is_customer = account.profile.name == "Customer"
         return {
             "project": project,
-            "is_project_owner": is_project_owner,
-            **ProjectReviewController.get_project_data(project, user if is_customer else None),
+            "is_project_owner": is_owner,
+            **ViewProjectReviewsController().get_project_data(project, user if is_customer else None),
             "can_review": is_customer,
-            "is_favourited": is_customer and FavouriteController.is_saved(user, project.pk),
+            "is_favourited": is_customer and Favourite.is_saved(user, project.pk),
+            "view_count": (
+                ViewIDPViewsController().view_views(user, project)
+                if is_owner else project.number_of_views()
+            ),
+            "shortlist_count": (
+                ViewIDPShortlistsController().view_shortlists(user, project)
+                if is_owner else project.number_of_shortlists()
+            ),
         }
 
-    @classmethod
-    def get_search_data(cls, user, *, search_term="", category_id="", sort_order="recommended"):
+
+class SearchIDPsController:
+    """Story 32: discover projects using search, category and ranking."""
+    def get_search_data(self, user, *, search_term="", category_id="", sort_order="recommended"):
         account = AccountAccessController.get_active_account(user)
         if account is None:
             raise ProjectAccessDenied("The account or its profile is unavailable.")
@@ -132,41 +210,33 @@ class ProjectController:
         sort_order = (sort_order or "recommended").strip()
         if sort_order not in {"recommended", "rating", "newest"}:
             sort_order = "recommended"
-        projects = InteriorDesignProject.objects.select_related("company", "category").annotate(
-            average_rating=Avg("reviews__rating"),
-            review_count=Count("reviews"),
-        )
-        if search_term:
-            projects = projects.filter(
-                Q(title__icontains=search_term)
-                | Q(description__icontains=search_term)
-                | Q(style__icontains=search_term)
-                | Q(company__name__icontains=search_term)
-                | Q(category__name__icontains=search_term)
-            )
-        if category_id.isdecimal():
-            try:
-                projects = projects.filter(category_id=int(category_id))
-            except ValueError:
-                projects = projects.none()
-        if sort_order == "rating":
-            projects = projects.order_by("-average_rating", "-updated_at")
-        elif sort_order == "newest":
-            projects = projects.order_by("-created_at")
-        else:
-            projects = projects.order_by("-average_rating", "-review_count", "-updated_at")
         is_customer = account.profile.name == "Customer"
         return {
-            "projects": projects,
-            "categories": cls.get_categories(),
+            **InteriorDesignProject.discover(
+                search_term=search_term, category_id=category_id, sort_order=sort_order,
+            ),
+            "categories": IDPFormController().get_categories(),
             "q": search_term,
             "selected_category": category_id,
             "can_review": is_customer,
             "can_favourite": is_customer,
-            "favourite_project_ids": (
-                Favourite.objects.filter(user=user).values_list("project_id", flat=True)
-                if is_customer else ()
-            ),
-            "project_count": projects.count(),
+            "favourite_project_ids": Favourite.project_ids(user) if is_customer else (),
             "sort_order": sort_order,
         }
+
+
+class ProjectController:
+    """Compatibility API for existing integrations; boundaries use the specific controls."""
+    get_company = staticmethod(IDPFormController().get_company)
+    get_categories = staticmethod(IDPFormController().get_categories)
+    get_owned_project = staticmethod(ViewOwnedIDPController().get_project)
+    get_list_data = staticmethod(SearchOwnedIDPsController().get_list_data)
+    create_project = staticmethod(CreateIDPController().create_project)
+    update_project = staticmethod(UpdateIDPController().update_project)
+    delete_project = staticmethod(DeleteIDPController().delete_project)
+    get_detail_data = staticmethod(ViewIDPController().get_detail_data)
+    get_search_data = staticmethod(SearchIDPsController().get_search_data)
+
+    @staticmethod
+    def record_view(project, viewer):
+        return project.record_view(viewer)

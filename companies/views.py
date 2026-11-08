@@ -4,7 +4,13 @@ from django.views.decorators.http import require_http_methods
 
 from accounts.decorators import interior_designer_required
 
-from .controllers import CompanyController
+from .controllers import (
+    CreateCompanyController,
+    DeleteCompanyController,
+    SearchCompanyInformationController,
+    UpdateCompanyController,
+    ViewCompanyController,
+)
 
 
 def _company_fields(data):
@@ -17,20 +23,20 @@ def _company_fields(data):
 @interior_designer_required
 @require_http_methods(["GET"])
 def company_detail(request):
-    company = CompanyController.get_company(request.user)
+    company = ViewCompanyController().get_company(request.user)
     return render(request, "companies/company_detail.html", {"company": company})
 
 
 @interior_designer_required
 @require_http_methods(["GET", "POST"])
 def company_create(request):
-    if CompanyController.get_company(request.user) is not None:
+    if ViewCompanyController().get_company(request.user) is not None:
         return redirect("company_detail")
 
     if request.method == "POST":
         fields = _company_fields(request.POST)
         if fields["name"]:
-            CompanyController.create_company(request.user, **fields)
+            CreateCompanyController().create_company(request.user, **fields)
             messages.success(request, "Company information saved successfully.")
             return redirect("company_detail")
 
@@ -40,13 +46,13 @@ def company_create(request):
 @interior_designer_required
 @require_http_methods(["GET", "POST"])
 def company_update(request):
-    company = CompanyController.get_company(request.user)
+    company = ViewCompanyController().get_company(request.user)
 
     if company is None:
         return redirect("company_create")
 
     if request.method == "POST":
-        CompanyController.update_company(company, **_company_fields(request.POST))
+        UpdateCompanyController().update_company(company, **_company_fields(request.POST))
         messages.success(request, "Company information updated successfully.")
         return redirect("company_detail")
 
@@ -54,25 +60,28 @@ def company_update(request):
 
 
 @interior_designer_required
-@require_http_methods(["POST"])
+@require_http_methods(["GET", "POST"])
 def company_delete(request):
-    company = CompanyController.get_company(request.user)
-    if company is not None:
-        CompanyController.delete_company(company)
+    company = ViewCompanyController().get_company(request.user)
+    if company is None:
+        return redirect("company_detail")
+    if request.method == "POST":
+        DeleteCompanyController().delete_company(company)
         messages.success(request, "Company information deleted successfully.")
-    return redirect("company_detail")
+        return redirect("company_detail")
+    return render(request, "companies/company_confirm_delete.html", {"company": company})
 
 
 @interior_designer_required
 @require_http_methods(["GET"])
 def company_search(request):
-    company = CompanyController.get_company(request.user)
+    company = ViewCompanyController().get_company(request.user)
 
     if company is None:
         return redirect("company_create")
 
     search_term = request.GET.get("q", "").strip()
-    results = CompanyController.search_information(company, search_term)
+    results = SearchCompanyInformationController().search_information(company, search_term)
 
     return render(
         request,

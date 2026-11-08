@@ -1,80 +1,43 @@
-from django.db import transaction
-from django.db.models import Count, F, Q
-from django.db.models.functions import Greatest
-
+"""Favourite use-case controls; Favourite encapsulates collection persistence."""
 from projects.models import InteriorDesignProject
 
 from .models import Favourite
 
 
-class FavouriteController:
-    @staticmethod
-    def is_saved(user, project_id):
-        return Favourite.objects.filter(user=user, project_id=project_id).exists()
+class SaveFavouriteController:
+    """Story 34: save a project; a second click removes the saved project."""
+    def toggle(self, user, project_id):
+        return Favourite.toggle_for(user, project_id)
 
-    @staticmethod
-    @transaction.atomic
-    def toggle(user, project_id):
-        project = InteriorDesignProject.objects.select_for_update().get(pk=project_id)
-        favourite = Favourite.objects.filter(user=user, project=project).first()
-        if favourite is not None:
-            favourite.delete()
-            InteriorDesignProject.objects.filter(pk=project.pk).update(
-                shortlist_count=Greatest(F("shortlist_count") - 1, 0),
-            )
-            return False
 
-        Favourite.objects.create(user=user, project=project)
-        InteriorDesignProject.objects.filter(pk=project.pk).update(
-            shortlist_count=F("shortlist_count") + 1,
-        )
-        return True
-
-    @staticmethod
-    def get_list_data(user, *, search_term="", category_filter="", sort_order="newest"):
+class SearchFavouritesController:
+    """Story 35: search, filter and order the customer's saved projects."""
+    def get_list_data(self, user, *, search_term="", category_filter="", sort_order="newest"):
         search_term = (search_term or "").strip()
         category_filter = str(category_filter or "").strip()
         sort_order = (sort_order or "newest").strip()
         if sort_order not in {"newest", "oldest"}:
             sort_order = "newest"
-
-        favourites = Favourite.objects.filter(user=user).select_related(
-            "project", "project__company", "project__category",
+        return Favourite.search_for(
+            user, search_term=search_term, category_filter=category_filter,
+            sort_order=sort_order,
         )
-        favourite_count = favourites.count()
-        categories = list(
-            favourites.exclude(project__category__isnull=True)
-            .values("project__category_id", "project__category__name")
-            .annotate(count=Count("pk"))
-            .order_by("project__category__name", "project__category_id")
-        )
-        available_categories = {
-            str(category["project__category_id"]) for category in categories
-        }
-        if category_filter not in available_categories:
-            category_filter = ""
 
-        if search_term:
-            favourites = favourites.filter(
-                Q(project__title__icontains=search_term)
-                | Q(project__company__name__icontains=search_term)
-                | Q(project__category__name__icontains=search_term)
-                | Q(project__style__icontains=search_term)
-            )
-        if category_filter:
-            favourites = favourites.filter(project__category_id=category_filter)
 
-        if sort_order == "oldest":
-            favourites = favourites.order_by("created_at", "pk")
-        else:
-            favourites = favourites.order_by("-created_at", "-pk")
+class ViewFavouriteIDPController:
+    """Story 36: open a project that belongs to this customer's saved list."""
+    def get_detail_data(self, user, project_id):
+        from projects.controllers import ViewIDPController
 
-        return {
-            "favourites": favourites,
-            "favourite_count": favourite_count,
-            "filtered_count": favourites.count(),
-            "categories": categories,
-            "q": search_term,
-            "category_filter": category_filter,
-            "sort_order": sort_order,
-        }
+        project = Favourite.saved_project(user, project_id)
+        return ViewIDPController().get_detail_data(user, project.pk)
+
+
+class FavouriteController:
+    """Compatibility API for existing integrations."""
+    toggle = staticmethod(SaveFavouriteController().toggle)
+    get_list_data = staticmethod(SearchFavouritesController().get_list_data)
+
+    @staticmethod
+    def is_saved(user, project_id):
+        return Favourite.is_saved(user, project_id)

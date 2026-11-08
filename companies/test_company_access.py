@@ -14,6 +14,7 @@ class CompanyAccessTests(TestCase):
         ("post", "company_create"),
         ("get", "company_update"),
         ("post", "company_update"),
+        ("get", "company_delete"),
         ("post", "company_delete"),
         ("get", "company_search"),
     )
@@ -179,10 +180,12 @@ class CompanyAccessTests(TestCase):
         self.client.logout()
         self.assert_company_requests_require_login()
 
-    def test_delete_still_requires_post(self):
+    def test_delete_get_displays_confirmation_and_preserves_company(self):
         company = Company.objects.create(user=self.designer, name="Keep This Studio")
 
         response = self.client.get(reverse("company_delete"))
 
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "companies/company_confirm_delete.html")
+        self.assertContains(response, company.name)
         self.assertTrue(Company.objects.filter(pk=company.pk).exists())

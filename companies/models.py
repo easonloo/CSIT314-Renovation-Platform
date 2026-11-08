@@ -22,3 +22,59 @@ class Company(models.Model):
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def find_for_user(cls, user):
+        """Retrieve the company owned by this user."""
+        return cls.objects.filter(user=user).first()
+
+    @classmethod
+    def create_for_user(
+        cls, user, *, name, email="", phone="", website="", address="", description="",
+    ):
+        return cls.objects.create(
+            user=user,
+            name=name,
+            email=email,
+            phone=phone,
+            website=website,
+            address=address,
+            description=description,
+        )
+
+    def update_details(
+        self, *, name, email="", phone="", website="", address="", description="",
+    ):
+        self.name = name
+        self.email = email
+        self.phone = phone
+        self.website = website
+        self.address = address
+        self.description = description
+        self.save(
+            update_fields=[
+                "name", "email", "phone", "website", "address", "description", "updated_at",
+            ],
+        )
+        return self
+
+    def delete_company(self):
+        self.delete()
+
+    def search_information(self, search_term=""):
+        term = (search_term or "").strip().casefold()
+        if not term:
+            return []
+        details = [
+            ("Company name", self.name),
+            ("Description", self.description),
+            ("Email", self.email),
+            ("Phone", self.phone),
+            ("Address", self.address),
+            ("Website", self.website),
+        ]
+        return [
+            (label, value)
+            for label, value in details
+            if value and (term in label.casefold() or term in value.casefold())
+        ]

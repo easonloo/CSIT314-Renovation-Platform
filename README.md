@@ -171,8 +171,9 @@ an initial password for new accounts with `--password`. Use
 `python manage.py help generate_demo_data` for the available options. Teammates
 can generate their own local data with the same command.
 
-The command is a CLI boundary; `DemoDataController` in `accounts/demo_data.py`
-coordinates entity creation and database transactions. Generator regression
+`DemoDataController` in `accounts/demo_data.py` is an administrative seed-data
+utility. It creates records and controls transactions directly, separately from
+the 48 application user-story controllers described below. Generator regression
 tests run with `python manage.py test accounts.test_demo_data`.
 
 ## Category-matched project images
@@ -302,23 +303,72 @@ The application separates its responsibilities into three layers:
 | Layer | Files | Responsibility |
 | --- | --- | --- |
 | Boundary | `urls.py`, `views.py`, `forms.py`, and `templates/` | Receive requests, validate input, display pages and form errors, handle sessions, and return redirects or downloads |
-| Control | Each app's `controllers.py` | Coordinate use cases, enforce shared access and ownership rules, query entities, save changes, and calculate metrics |
-| Entity | Each app's `models.py` | Define persistent data, relationships, and database constraints |
+| Control | Each app's `controllers.py` | Coordinate one user-story operation and apply access and ownership rules by calling entity operations |
+| Entity | Each app's `models.py`, including custom model managers | Own persistent data, domain behaviour, database queries, saves, transactions, and constraints |
 
-For example, clicking a project's heart submits a POST to `favourite_toggle()` in
-`favourites/views.py`. The view checks access through the shared decorator and
-calls `FavouriteController.toggle()`. The controller updates the `Favourite` and
-`InteriorDesignProject` entities together in a transaction. The view then displays
-the success message and redirects back to the page.
+The user-story controls are separate classes. For example,
+`SuspendUserAccountController` has a `suspend_account()` method. Its boundary is
+the confirmation page and `account_suspend()` view:
 
-Controllers cover account/profile management and dashboard data, company
-management and search, project portfolios and discovery, favourites, reviews,
-category management, and report calculations. Access decorators and the login
-form use `AccountAccessController` so account/profile suspension rules stay shared.
-Forms retain Django's field and model validation; views pass validated values to
-controllers for persistence. PDF formatting remains in the report boundary.
+```text
+User Admin confirms the suspension
+  -> account_suspend()                         Boundary
+  -> SuspendUserAccountController.suspend_account()
+                                               Control
+  -> account.suspend()                        Entity
+  -> Django ORM -> Database
+```
 
-When adding a feature, put its business operation in the relevant controller and
-call it from the view. Keep ORM queries and persistence out of application views.
-Run `python manage.py test` to verify the user flows after changes. Record user
-stories, tests, sprint work, and review evidence for the group report.
+The controller asks the entity to perform the operation. `UserAccount.suspend()`
+updates the linked Django user's `is_active` field and saves it. Suspending a
+profile similarly calls `UserProfile.suspend()` and saves the profile's own
+status. Entity instance methods handle individual records; custom model managers
+and entity class methods handle creation, searching, counts and other collection
+operations. Controllers do not construct ORM queries or call `save()` directly.
+
+Shared login, current/past project routes and report-period routes dispatch to
+the appropriate named user-story control. The existing broad controller names
+remain as compatibility facades for older callers. The application boundaries
+use the individual controls. Access decorators use `AccountAccessController` to
+keep active-account/profile rules shared. Forms retain Django's field and model
+validation. Django's authentication/session machinery, HTTP redirects, messages
+and PDF formatting remain boundary or framework responsibilities.
+
+The four role-specific logout controls inherit the same redirect policy. The
+shared logout boundary dispatches to the relevant role control and lets Django
+invalidate the session. These role controls reuse the same infrastructure
+behaviour; they do not need different database updates for each role.
+
+The [48-story mapping](docs/bce-user-stories.json) lists each story's boundary,
+control class, public method and entity operation. It describes the implemented
+structure for review; the tutor's marking criteria and UML expectations should
+also be checked against the final submission. Reviews and reactivation have
+their own controls in addition to the 48 required stories.
+
+User Admins can also delete another user account or an unused profile from its
+detail page or list menu. `DeleteUserAccountController` and
+`DeleteUserProfileController` call the corresponding entity's `delete_account()`
+or `delete_profile()` method. Both operations require an active User Admin;
+opening a confirmation page does not delete anything, and confirmation requires
+a CSRF-protected POST. An administrator cannot delete their own account.
+Profiles with assigned accounts must have those accounts reassigned or deleted
+first. Account deletion removes its linked login and cascades to its company,
+projects, favourites, reviews and view records. Shortlist counts on surviving
+projects are adjusted in the same transaction; cumulative project view counts
+remain unchanged. Account, profile and review deletion are listed separately
+from the 48 required stories under `additional_features` in the mapping.
+
+Company, current/past IDP, category and review Delete links also open a
+confirmation page with the selected record and a Cancel link. GET only displays
+the confirmation; a CSRF-protected POST calls the existing deletion control and
+entity. Ownership and role restrictions apply to both requests. Deleting a
+category keeps its projects and clears their category; company and project
+confirmation pages explain their cascading deletions.
+
+Run `python manage.py test accounts.test_bce_architecture` to check the mapping
+and prevent application-owned ORM operations returning to the HTTP boundaries
+or `controllers.py` files. Run the full `python manage.py test` suite to verify
+the user flows. These architecture checks cover the application endpoints;
+administrative seed scripts, demo-image assignment tools, migrations and Django
+admin are separate infrastructure. Record user stories, tests, sprint work and
+review evidence for the group report.

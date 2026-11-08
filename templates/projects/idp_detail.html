@@ -11,10 +11,7 @@
     <div class="idp-page-actions">
       {% if is_project_owner %}
         <a class="btn btn-light" href="{% url 'idp_update' project.id %}">Update</a>
-        <form method="post" action="{% url 'idp_delete' project.id %}">
-          {% csrf_token %}
-          <button class="btn btn-danger" type="submit">Delete</button>
-        </form>
+        <a class="btn btn-danger" href="{% url 'idp_delete' project.id %}">Delete</a>
       {% elif request.user.account.profile.name == 'Customer' %}
         <form class="idp-favourite-form" method="post" action="{% url 'favourite_toggle' project.id %}">
           {% csrf_token %}
@@ -61,11 +58,11 @@
         </div>
         <div class="idp-detail-row">
           <dt>Views</dt>
-          <dd>{{ project.view_count|default:0 }}</dd>
+          <dd>{{ view_count|default:0 }}</dd>
         </div>
         <div class="idp-detail-row">
           <dt>Shortlisted</dt>
-          <dd>{{ project.shortlist_count|default:0 }}</dd>
+          <dd>{{ shortlist_count|default:0 }}</dd>
         </div>
       </dl>
     </section>
@@ -107,10 +104,7 @@
             {% if review.customer_id == request.user.pk %}
               <div class="idp-review-actions">
                 <a class="btn btn-light" href="{% url 'review_update' review.pk %}">Edit</a>
-                <form method="post" action="{% url 'review_delete' review.pk %}">
-                  {% csrf_token %}
-                  <button class="btn btn-danger" type="submit">Delete</button>
-                </form>
+                <a class="btn btn-danger" href="{% url 'review_delete' review.pk %}">Delete</a>
               </div>
             {% endif %}
           </div>

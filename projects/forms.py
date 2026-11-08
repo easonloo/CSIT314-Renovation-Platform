@@ -1,6 +1,6 @@
 from django import forms
 
-from .controllers import ProjectController
+from .controllers import IDPFormController
 from .models import InteriorDesignProject
 
 
@@ -30,5 +30,5 @@ class InteriorDesignProjectForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["category"].queryset = ProjectController.get_categories()
+        self.fields["category"].queryset = IDPFormController().get_categories()
         self.fields["category"].required = False

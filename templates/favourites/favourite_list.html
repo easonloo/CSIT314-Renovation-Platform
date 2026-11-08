@@ -55,7 +55,7 @@
     <div class="favourites-grid">
       {% for favourite in favourites %}
         <article class="favourite-card">
-          <a class="favourite-card-image" href="{% url 'idp_detail' favourite.project.id %}" aria-label="View {{ favourite.project.title }}">
+          <a class="favourite-card-image" href="{% url 'favourite_detail' favourite.project.id %}" aria-label="View {{ favourite.project.title }}">
             {% if favourite.project.display_image %}
               <img src="{{ favourite.project.display_image.url }}" alt="{{ favourite.project.title }}" loading="lazy">
             {% else %}
@@ -73,9 +73,9 @@
               <span>{{ favourite.project.category.name|default:"Design project" }}</span>
               <time datetime="{{ favourite.created_at|date:'Y-m-d' }}">Saved {{ favourite.created_at|date:'d M Y' }}</time>
             </div>
-            <h3><a href="{% url 'idp_detail' favourite.project.id %}">{{ favourite.project.title }}</a></h3>
+            <h3><a href="{% url 'favourite_detail' favourite.project.id %}">{{ favourite.project.title }}</a></h3>
             <p>{{ favourite.project.company.name }}</p>
-            <a class="favourite-view-link" href="{% url 'idp_detail' favourite.project.id %}">View project <span aria-hidden="true">→</span></a>
+            <a class="favourite-view-link" href="{% url 'favourite_detail' favourite.project.id %}">View project <span aria-hidden="true">→</span></a>
           </div>
         </article>
       {% endfor %}

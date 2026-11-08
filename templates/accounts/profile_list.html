@@ -92,6 +92,7 @@
                   {% else %}
                   <a href="{% url 'profile_reactivate' profile.pk %}">Reactivate profile</a>
                   {% endif %}
+                  <a href="{% url 'profile_delete' profile.pk %}">Delete profile</a>
                 </div>
               </details>
             </div>

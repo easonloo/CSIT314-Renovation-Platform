@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Review{% endblock %}
+{% block page_name %}Delete Review{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Delete Review</h1>
+    <p class="page-subtitle">Review your feedback before confirming deletion.</p>
+  </div>
+</div>
+
+<div class="card">
+  <p>Delete your review for <strong>{{ project.title }}</strong>?</p>
+  <p>Rating: <strong>{{ review.rating }} / 5</strong></p>
+  <p>{{ review.comment|default:'No comment provided.'|linebreaksbr }}</p>
+  <p>This permanently removes this review. The project remains available.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-actions">
+      <button class="btn btn-danger" type="submit">Confirm deletion</button>
+      <a class="btn btn-light" href="{% url 'idp_detail' project.pk %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

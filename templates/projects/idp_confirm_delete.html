@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete IDP{% endblock %}
+{% block page_name %}Delete IDP{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Delete IDP</h1>
+    <p class="page-subtitle">Review the project before confirming deletion.</p>
+  </div>
+</div>
+
+<div class="card">
+  <p>Delete the project <strong>{{ project.title }}</strong>?</p>
+  <p>Status: <strong>{{ project.get_status_display }}</strong></p>
+  <p>
+    This permanently removes the project and its associated favourites,
+    customer reviews and view records.
+  </p>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-actions">
+      <button class="btn btn-danger" type="submit">Confirm deletion</button>
+      <a class="btn btn-light" href="{% url 'idp_detail' project.pk %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

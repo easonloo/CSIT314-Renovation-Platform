@@ -5,7 +5,7 @@ from django.views.decorators.http import require_http_methods
 
 from accounts.decorators import platform_manager_required
 
-from .controllers import InvalidReportPeriod, ReportController
+from .controllers import InvalidReportPeriod, get_report_controller
 
 
 def _pdf_escape(value):
@@ -61,7 +61,7 @@ def _create_report_pdf(lines):
 @require_http_methods(["GET"])
 def report(request, period="daily"):
     try:
-        report_data = ReportController.get_report_data(period)
+        report_data = get_report_controller(period).get_report_data()
     except InvalidReportPeriod as error:
         raise Http404(str(error)) from error
     return render(
@@ -75,7 +75,7 @@ def report(request, period="daily"):
 @require_http_methods(["GET"])
 def report_download(request, period="daily"):
     try:
-        report_data = ReportController.get_report_data(period)
+        report_data = get_report_controller(period).get_report_data()
     except InvalidReportPeriod as error:
         raise Http404(str(error)) from error
     generated_at = timezone.localtime(timezone.now()).strftime(

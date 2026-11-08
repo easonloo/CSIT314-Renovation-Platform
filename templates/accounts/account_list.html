@@ -96,6 +96,9 @@
                   {% else %}
                   <a href="{% url 'account_reactivate' account.pk %}">Reactivate account</a>
                   {% endif %}
+                  {% if request.user.pk != account.user_id %}
+                  <a href="{% url 'account_delete' account.pk %}">Delete account</a>
+                  {% endif %}
                 </div>
               </details>
             </div>

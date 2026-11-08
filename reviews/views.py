@@ -6,7 +6,12 @@ from django.views.decorators.http import require_http_methods
 from accounts.decorators import customer_required
 from projects.models import InteriorDesignProject
 
-from .controllers import ProjectReviewController
+from .controllers import (
+    CreateProjectReviewController,
+    DeleteProjectReviewController,
+    UpdateProjectReviewController,
+    ViewProjectReviewsController,
+)
 from .forms import ProjectReviewForm
 from .models import ProjectReview
 
@@ -15,15 +20,15 @@ from .models import ProjectReview
 @require_http_methods(["GET", "POST"])
 def review_create(request, project_id):
     try:
-        project = ProjectReviewController.get_project(project_id)
+        project = ViewProjectReviewsController().get_project(project_id)
     except InteriorDesignProject.DoesNotExist as error:
         raise Http404("Project not found.") from error
-    review = ProjectReviewController.get_customer_review(request.user, project)
+    review = ViewProjectReviewsController().get_customer_review(request.user, project)
     if review is not None:
         return redirect("review_update", pk=review.pk)
     form = ProjectReviewForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        review, created = ProjectReviewController.create_review(
+        review, created = CreateProjectReviewController().create_review(
             request.user, project, **form.cleaned_data,
         )
         if not created:
@@ -39,13 +44,13 @@ def review_create(request, project_id):
 @require_http_methods(["GET", "POST"])
 def review_update(request, pk):
     try:
-        review = ProjectReviewController.get_owned_review(request.user, pk)
+        review = ViewProjectReviewsController().get_owned_review(request.user, pk)
     except ProjectReview.DoesNotExist as error:
         raise Http404("Review not found.") from error
     form = ProjectReviewForm(request.POST or None, instance=review)
     if request.method == "POST" and form.is_valid():
         try:
-            review = ProjectReviewController.update_review(request.user, pk, **form.cleaned_data)
+            review = UpdateProjectReviewController().update_review(request.user, pk, **form.cleaned_data)
         except ProjectReview.DoesNotExist as error:
             raise Http404("Review not found.") from error
         messages.success(request, "Your review was updated.")
@@ -58,10 +63,16 @@ def review_update(request, pk):
 
 
 @customer_required
-@require_http_methods(["POST"])
+@require_http_methods(["GET", "POST"])
 def review_delete(request, pk):
     try:
-        project_id = ProjectReviewController.delete_review(request.user, pk)
+        if request.method == "GET":
+            review = ViewProjectReviewsController().get_owned_review(request.user, pk)
+            return render(
+                request, "reviews/review_confirm_delete.html",
+                {"review": review, "project": review.project},
+            )
+        project_id = DeleteProjectReviewController().delete_review(request.user, pk)
     except ProjectReview.DoesNotExist as error:
         raise Http404("Review not found.") from error
     messages.success(request, "Your review was deleted.")
