@@ -48,5 +48,9 @@ class InteriorDesignProject(models.Model):
             return self.image
         return None
 
+    @property
+    def is_virtual_image(self):
+        return bool(self.image and self.image.name.startswith("demo_idp_catalog/"))
+
     def __str__(self):
         return self.title

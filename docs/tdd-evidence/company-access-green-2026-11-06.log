@@ -1,0 +1,53 @@
+Creating test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+Found 10 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: messages, staticfiles
+  Apply all migrations: accounts, admin, auth, categories, companies, contenttypes, favourites, projects, reports, reviews, sessions
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying accounts.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying categories.0001_initial... OK
+  Applying companies.0001_initial... OK
+  Applying projects.0001_initial... OK
+  Applying favourites.0001_initial... OK
+  Applying projects.0002_interiordesignproject_image... OK
+  Applying reports.0001_initial... OK
+  Applying reviews.0001_initial... OK
+  Applying reviews.0002_projectreview_review_rating_between_1_and_5... OK
+  Applying sessions.0001_initial...test_account_suspension_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_account_suspension_blocks_an_existing_session) ... ok
+test_active_designer_can_manage_own_company (companies.test_company_access.CompanyAccessTests.test_active_designer_can_manage_own_company) ... ok
+test_anonymous_requests_require_login (companies.test_company_access.CompanyAccessTests.test_anonymous_requests_require_login) ... ok
+test_delete_still_requires_post (companies.test_company_access.CompanyAccessTests.test_delete_still_requires_post) ... ok
+test_designer_cannot_target_another_designers_company (companies.test_company_access.CompanyAccessTests.test_designer_cannot_target_another_designers_company) ... ok
+test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) ... ok
+test_other_roles_cannot_create_companies (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_create_companies) ... ok
+test_profile_suspension_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_profile_suspension_blocks_an_existing_session) ... ok
+test_role_change_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_role_change_blocks_an_existing_session) ... ok
+test_user_without_an_account_is_forbidden (companies.test_company_access.CompanyAccessTests.test_user_without_an_account_is_forbidden) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.074s
+
+OK
+Destroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+ OK
+System check identified no issues (0 silenced).

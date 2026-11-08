@@ -1,0 +1,204 @@
+Found 9 test(s).
+System check identified no issues (0 silenced).
+Creating test database for alias 'default'...
+...FFFFFFFFFFFFFFF.FFF
+======================================================================
+FAIL: test_other_roles_cannot_list_legacy_favourites (favourites.test_favourite_access.FavouriteAccessTests.test_other_roles_cannot_list_legacy_favourites) (method='get', url='/favourites/', role='Interior Designer')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 67, in assert_favourite_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_list_legacy_favourites (favourites.test_favourite_access.FavouriteAccessTests.test_other_roles_cannot_list_legacy_favourites) (method='post', url='/favourites/1/add/', role='Interior Designer')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 67, in assert_favourite_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_list_legacy_favourites (favourites.test_favourite_access.FavouriteAccessTests.test_other_roles_cannot_list_legacy_favourites) (method='get', url='/favourites/', role='User Admin')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 67, in assert_favourite_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_list_legacy_favourites (favourites.test_favourite_access.FavouriteAccessTests.test_other_roles_cannot_list_legacy_favourites) (method='post', url='/favourites/1/add/', role='User Admin')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 67, in assert_favourite_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_list_legacy_favourites (favourites.test_favourite_access.FavouriteAccessTests.test_other_roles_cannot_list_legacy_favourites) (method='get', url='/favourites/', role='Platform Management')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 67, in assert_favourite_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_list_legacy_favourites (favourites.test_favourite_access.FavouriteAccessTests.test_other_roles_cannot_list_legacy_favourites) (method='post', url='/favourites/1/add/', role='Platform Management')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 67, in assert_favourite_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_save_or_increase_shortlists (favourites.test_favourite_access.FavouriteAccessTests.test_other_roles_cannot_save_or_increase_shortlists) (role='Interior Designer')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 120, in test_other_roles_cannot_save_or_increase_shortlists
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_save_or_increase_shortlists (favourites.test_favourite_access.FavouriteAccessTests.test_other_roles_cannot_save_or_increase_shortlists) (role='User Admin')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 120, in test_other_roles_cannot_save_or_increase_shortlists
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_save_or_increase_shortlists (favourites.test_favourite_access.FavouriteAccessTests.test_other_roles_cannot_save_or_increase_shortlists) (role='Platform Management')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 120, in test_other_roles_cannot_save_or_increase_shortlists
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_profile_suspension_blocks_an_existing_session (favourites.test_favourite_access.FavouriteAccessTests.test_profile_suspension_blocks_an_existing_session) (method='get', url='/favourites/')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 67, in assert_favourite_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_profile_suspension_blocks_an_existing_session (favourites.test_favourite_access.FavouriteAccessTests.test_profile_suspension_blocks_an_existing_session) (method='post', url='/favourites/1/add/')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 67, in assert_favourite_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_profile_suspension_blocks_an_existing_session (favourites.test_favourite_access.FavouriteAccessTests.test_profile_suspension_blocks_an_existing_session)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 138, in test_profile_suspension_blocks_an_existing_session
+    self.assert_favourite_requests_forbidden()
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 68, in assert_favourite_requests_forbidden
+    self.assertEqual(self.favourite_state(), before)
+AssertionError: Tuples differ: ([{'id': 1, 'user_id': 1, 'project_id': 1, [109 chars] 0)]) != ([], [(1, 0), (2, 0)])
+
+First differing element 0:
+[{'id': 1, 'user_id': 1, 'project_id': 1, [90 chars]tc)}]
+[]
+
+- ([{'created_at': datetime.datetime(2026, 11, 4, 15, 8, 42, 641617, tzinfo=datetime.timezone.utc),
+-    'id': 1,
+-    'project_id': 1,
+-    'user_id': 1}],
+-  [(1, 1), (2, 0)])
+?       ^
+
++ ([], [(1, 0), (2, 0)])
+? ++++      ^
+
+
+======================================================================
+FAIL: test_role_change_blocks_an_existing_session (favourites.test_favourite_access.FavouriteAccessTests.test_role_change_blocks_an_existing_session) (method='get', url='/favourites/')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 67, in assert_favourite_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_role_change_blocks_an_existing_session (favourites.test_favourite_access.FavouriteAccessTests.test_role_change_blocks_an_existing_session) (method='post', url='/favourites/1/add/')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 67, in assert_favourite_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_role_change_blocks_an_existing_session (favourites.test_favourite_access.FavouriteAccessTests.test_role_change_blocks_an_existing_session)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 152, in test_role_change_blocks_an_existing_session
+    self.assert_favourite_requests_forbidden()
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 68, in assert_favourite_requests_forbidden
+    self.assertEqual(self.favourite_state(), before)
+AssertionError: Tuples differ: ([{'id': 1, 'user_id': 1, 'project_id': 1, [109 chars] 0)]) != ([], [(1, 0), (2, 0)])
+
+First differing element 0:
+[{'id': 1, 'user_id': 1, 'project_id': 1, [90 chars]tc)}]
+[]
+
+- ([{'created_at': datetime.datetime(2026, 11, 4, 15, 8, 42, 646815, tzinfo=datetime.timezone.utc),
+-    'id': 1,
+-    'project_id': 1,
+-    'user_id': 1}],
+-  [(1, 1), (2, 0)])
+?       ^
+
++ ([], [(1, 0), (2, 0)])
+? ++++      ^
+
+
+======================================================================
+FAIL: test_user_without_an_account_is_forbidden (favourites.test_favourite_access.FavouriteAccessTests.test_user_without_an_account_is_forbidden) (method='get', url='/favourites/')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 67, in assert_favourite_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_user_without_an_account_is_forbidden (favourites.test_favourite_access.FavouriteAccessTests.test_user_without_an_account_is_forbidden) (method='post', url='/favourites/1/add/')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 67, in assert_favourite_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_user_without_an_account_is_forbidden (favourites.test_favourite_access.FavouriteAccessTests.test_user_without_an_account_is_forbidden)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 132, in test_user_without_an_account_is_forbidden
+    self.assert_favourite_requests_forbidden()
+  File "/Users/eason/renovation-platform/favourites/test_favourite_access.py", line 68, in assert_favourite_requests_forbidden
+    self.assertEqual(self.favourite_state(), before)
+AssertionError: Tuples differ: ([{'id': 1, 'user_id': 6, 'project_id': 1, [109 chars] 0)]) != ([], [(1, 0), (2, 0)])
+
+First differing element 0:
+[{'id': 1, 'user_id': 6, 'project_id': 1, [90 chars]tc)}]
+[]
+
+- ([{'created_at': datetime.datetime(2026, 11, 4, 15, 8, 42, 654107, tzinfo=datetime.timezone.utc),
+-    'id': 1,
+-    'project_id': 1,
+-    'user_id': 6}],
+-  [(1, 1), (2, 0)])
+?       ^
+
++ ([], [(1, 0), (2, 0)])
+? ++++      ^
+
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.064s
+
+FAILED (failures=18)
+Destroying test database for alias 'default'...

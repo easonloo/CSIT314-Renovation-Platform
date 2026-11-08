@@ -4,6 +4,8 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
 from accounts.models import UserAccount, UserProfile
+from companies.models import Company
+from projects.models import InteriorDesignProject
 
 from .models import Category
 from .views import category_create, category_detail, category_list
@@ -147,3 +149,43 @@ class PlatformManagerCategoryTests(TestCase):
 
         with self.assertRaises(PermissionDenied):
             category_list(request)
+
+    def test_deleting_a_category_keeps_its_projects_uncategorized(self):
+        company = Company.objects.create(user=self.customer, name="Category Studio")
+        project = InteriorDesignProject.objects.create(
+            company=company, category=self.category, title="Keep this project",
+        )
+
+        response = self.client.post(
+            reverse("category_delete", args=[self.category.pk]),
+        )
+
+        self.assertRedirects(response, reverse("category_list"))
+        project.refresh_from_db()
+        self.assertIsNone(project.category_id)
+        self.assertEqual(project.title, "Keep this project")
+
+    def test_updating_to_an_existing_name_shows_errors_without_saving(self):
+        Category.objects.create(name="Bedroom")
+
+        response = self.client.post(
+            reverse("category_update", args=[self.category.pk]),
+            {"name": "Bedroom", "description": "Do not save this change."},
+        )
+
+        self.assertContains(response, "already exists")
+        self.category.refresh_from_db()
+        self.assertEqual(self.category.name, "Kitchen")
+        self.assertEqual(self.category.description, "Kitchen renovation projects.")
+
+    def test_missing_category_detail_and_update_are_404_and_delete_is_safe(self):
+        missing_id = self.category.pk + 1000
+        for name in ["category_detail", "category_update"]:
+            with self.subTest(view=name):
+                response = self.client.get(reverse(name, args=[missing_id]))
+                self.assertEqual(response.status_code, 404)
+
+        response = self.client.post(reverse("category_delete", args=[missing_id]))
+
+        self.assertRedirects(response, reverse("category_list"))
+        self.assertTrue(Category.objects.filter(pk=self.category.pk).exists())

@@ -64,17 +64,18 @@
           <span class="explore-project-category">{{ project.category.name|default:"Design" }}</span>
         </a>
         {% if can_favourite %}
-          <form class="explore-favourite-form" method="post" action="{% url 'favourite_add' project.id %}">
+          <form class="explore-favourite-form" method="post" action="{% url 'favourite_toggle' project.id %}">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.get_full_path }}">
             {% if project.id in favourite_project_ids %}
-              <button class="explore-favourite is-saved" type="submit" aria-label="Save {{ project.title }} to favourites" title="Saved to favourites">♥</button>
+              <button class="explore-favourite is-saved" type="submit" aria-pressed="true" aria-label="Remove {{ project.title }} from favourites" title="Remove from favourites">♥</button>
             {% else %}
-              <button class="explore-favourite" type="submit" aria-label="Save {{ project.title }} to favourites" title="Save to favourites">♡</button>
+              <button class="explore-favourite" type="submit" aria-pressed="false" aria-label="Save {{ project.title }} to favourites" title="Save to favourites">♡</button>
             {% endif %}
           </form>
         {% endif %}
         <div class="explore-project-body">
+          {% if project.is_virtual_image %}<span class="virtual-image-label">Virtual demo render</span>{% endif %}
           <h2><a href="{% url 'idp_detail' project.id %}">{{ project.title }}</a></h2>
           <p class="explore-project-designer">by {{ project.company.name }}</p>
           <div class="explore-project-tags">

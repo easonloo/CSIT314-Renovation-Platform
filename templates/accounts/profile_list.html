@@ -8,7 +8,7 @@
 <div class="page-head profile-page-head">
   <div>
     <h1 class="page-title">User Profiles</h1>
-    <p class="page-subtitle">View and manage user profile groups.</p>
+    <p class="page-subtitle">View and manage all profile groups, including suspended groups and profiles without users.</p>
   </div>
   <a class="btn btn-primary" href="{% url 'profile_create' %}"><span aria-hidden="true">+</span> Create profile</a>
 </div>
@@ -35,12 +35,21 @@
       <span class="profile-search-icon" aria-hidden="true">⌕</span>
       <input type="search" name="q" value="{{ q }}" placeholder="Search profile name...">
     </label>
-    <div class="profile-filters" aria-label="Filter profiles by status">
-      <button class="profile-filter{% if status_filter == 'all' %} active{% endif %}" type="submit" name="status" value="all" aria-pressed="{% if status_filter == 'all' %}true{% else %}false{% endif %}">All</button>
-      <button class="profile-filter{% if status_filter == 'active' %} active{% endif %}" type="submit" name="status" value="active" aria-pressed="{% if status_filter == 'active' %}true{% else %}false{% endif %}">Active</button>
-      <button class="profile-filter{% if status_filter == 'suspended' %} active{% endif %}" type="submit" name="status" value="suspended" aria-pressed="{% if status_filter == 'suspended' %}true{% else %}false{% endif %}">Suspended</button>
-    </div>
+    <input type="hidden" name="status" value="{{ status_filter }}">
+    <button class="btn btn-light" type="submit">Search</button>
+    <nav class="profile-filters" aria-label="Filter profiles by status">
+      <a class="profile-filter{% if status_filter == 'all' and not q %} active{% endif %}" href="{% url 'profile_list' %}"{% if status_filter == 'all' and not q %} aria-current="page"{% endif %}>All</a>
+      <a class="profile-filter{% if status_filter == 'active' %} active{% endif %}" href="?q={{ q|urlencode }}&amp;status=active"{% if status_filter == 'active' %} aria-current="page"{% endif %}>Active</a>
+      <a class="profile-filter{% if status_filter == 'suspended' %} active{% endif %}" href="?q={{ q|urlencode }}&amp;status=suspended"{% if status_filter == 'suspended' %} aria-current="page"{% endif %}>Suspended</a>
+    </nav>
   </form>
+
+  {% if q or status_filter != 'all' %}
+  <p class="profile-filter-note">
+    <span>{% if q %}Search: <strong>{{ q }}</strong>. {% endif %}{% if status_filter == 'active' %}Active profiles only.{% elif status_filter == 'suspended' %}Suspended profiles only.{% endif %}</span>
+    <a href="{% url 'profile_list' %}">Show all profiles</a>
+  </p>
+  {% endif %}
 
   <div class="table-wrap profile-table-wrap">
     <table class="profile-table">
@@ -89,7 +98,7 @@
           </td>
         </tr>
         {% empty %}
-        <tr><td class="profile-empty-row" colspan="5">No profiles found.</td></tr>
+        <tr><td class="profile-empty-row" colspan="5">No profiles found.{% if q or status_filter != 'all' %}<br><a href="{% url 'profile_list' %}">Show all profiles</a>{% endif %}</td></tr>
         {% endfor %}
       </tbody>
     </table>

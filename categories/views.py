@@ -2,28 +2,25 @@ from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
-from django.db.models import Q
 
 from accounts.decorators import platform_manager_required
 
+from .controllers import CategoryController
 from .forms import CategoryForm
-from .models import Category
 
 
 @platform_manager_required
 @require_http_methods(["GET"])
 def category_list(request):
     q = (request.GET.get("q") or "").strip()
-    categories = Category.objects.all()
-    if q:
-        categories = categories.filter(Q(name__icontains=q) | Q(description__icontains=q))
+    categories = CategoryController.list_categories(q)
     return render(request, "categories/category_list.html", {"categories": categories, "q": q})
 
 
 @platform_manager_required
 @require_http_methods(["GET"])
 def category_detail(request, pk):
-    category = Category.objects.filter(pk=pk).first()
+    category = CategoryController.get_category(pk)
     if category is None:
         raise Http404("Category not found.")
     return render(request, "categories/category_detail.html", {"category": category})
@@ -34,7 +31,7 @@ def category_detail(request, pk):
 def category_create(request):
     form = CategoryForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        category = form.save()
+        category = CategoryController.create_category(**form.cleaned_data)
         messages.success(request, "Category created successfully.")
         return redirect("category_detail", pk=category.pk)
 
@@ -48,13 +45,13 @@ def category_create(request):
 @platform_manager_required
 @require_http_methods(["GET", "POST"])
 def category_update(request, pk):
-    category = Category.objects.filter(pk=pk).first()
+    category = CategoryController.get_category(pk)
     if category is None:
         raise Http404("Category not found.")
 
     form = CategoryForm(request.POST or None, instance=category)
     if request.method == "POST" and form.is_valid():
-        category = form.save()
+        category = CategoryController.update_category(category, **form.cleaned_data)
         messages.success(request, "Category updated successfully.")
         return redirect("category_detail", pk=category.pk)
 
@@ -68,8 +65,8 @@ def category_update(request, pk):
 @platform_manager_required
 @require_http_methods(["POST"])
 def category_delete(request, pk):
-    category = Category.objects.filter(pk=pk).first()
+    category = CategoryController.get_category(pk)
     if category is not None:
-        category.delete()
+        CategoryController.delete_category(category)
         messages.success(request, "Category deleted successfully.")
     return redirect("category_list")

@@ -4,7 +4,9 @@ Django group project for matching renovation customers with interior designers.
 
 Implemented so far: authentication and User Admin account/profile management;
 Interior Designer company information and project portfolio management; and
-customer project search and favourites. Interior Designers can create, view,
+customer project search, favourites, and reviews. Platform Management can manage
+categories and generate daily, weekly, and monthly reports, including PDF downloads.
+Interior Designers can create, view,
 update, delete, and search their current and past Interior Design Projects (IDPs).
 
 ## Set up your own development environment
@@ -102,6 +104,106 @@ The development server generates a private `.django-secret-key` file on first
 run. This file is ignored by Git. You can instead supply the `DJANGO_SECRET_KEY`
 environment variable. These settings are for local development.
 
+## Generate the assignment demonstration dataset
+
+After activating `.venv312` and applying migrations, run:
+
+```bash
+python manage.py generate_demo_data
+```
+
+This adds the following synthetic dataset to your configured local database:
+
+| Record type | New dataset size |
+| --- | ---: |
+| Users and their linked user accounts | 202 each |
+| Interior Designer companies | 100 |
+| Project categories | 100 |
+| Current projects | 100 |
+| Past projects | 100 |
+| Favourites | 300 |
+| Project view events | 1,000 |
+| Customer reviews | 200 |
+
+The 202 accounts comprise 100 designers, 100 customers, one User Admin and one
+Platform Management user. The four required role profiles are created if missing
+and reused otherwise. Existing custom profiles remain in place. Your database
+totals also include any records you already had.
+
+Use these application logins at <http://127.0.0.1:8000/login/>:
+
+| Role | Username |
+| --- | --- |
+| User Admin | `demo314_admin` |
+| Interior Designer | `demo314_designer_001` |
+| Customer | `demo314_customer_001` |
+| Platform Management | `demo314_pm` |
+
+The initial password for all newly generated accounts is `Demo314!Pass2026`.
+These are application roles; the command creates ordinary Django users. Every
+tenth generated designer/customer starts suspended so account status management
+can be demonstrated. The four logins above start active when newly created.
+Existing profile/account suspension states and passwords are preserved.
+
+Names and review text use seeded random data. Contact details use synthetic
+addresses and reserved `.test` domains. Projects use category-matched virtual
+room renders from `media/demo_idp_catalog/` when available. Creation and activity dates span today, the current week/month,
+and older periods; activity follows the related user/project creation dates.
+Project view and shortlist counters are calculated from their actual related
+records, including later manual activity on the generated projects.
+
+Running the command again with the same options reuses generated records.
+Usernames, category names and project titles within each company identify the
+dataset: keep these identifiers unchanged for exact repeat runs. Other edits,
+passwords and suspension statuses remain intact. Changing the count or seed can
+add more records; it does not shrink the existing dataset. A conflicting username
+stops generation and rolls back the run instead of reassigning the existing user.
+
+For a smaller, separate dataset or a different seed:
+
+```bash
+python manage.py generate_demo_data --count 10 --prefix small_demo --seed 7
+```
+
+`--count` accepts 1–1,000 and controls the number of designers, customers,
+companies and categories. Project and activity counts scale with it. You can set
+an initial password for new accounts with `--password`. Use
+`python manage.py help generate_demo_data` for the available options. Teammates
+can generate their own local data with the same command.
+
+The command is a CLI boundary; `DemoDataController` in `accounts/demo_data.py`
+coordinates entity creation and database transactions. Generator regression
+tests run with `python manage.py test accounts.test_demo_data`.
+
+## Category-matched project images
+
+The demo image catalog contains 20 AI-generated interior renders, covering the
+20 room types used by the data generator. Kitchen projects use a kitchen render,
+bathrooms use a bathroom render, and bedrooms, balconies, offices and other
+spaces have their own corresponding images. These files are shared project
+assets in `media/demo_idp_catalog/`. The prompts and generation method are
+recorded in `media/demo_idp_catalog/generation_manifest.json`.
+
+New projects created by `generate_demo_data` select images from their category.
+For existing demo projects, preview and then apply the matching images with:
+
+```bash
+python manage.py assign_demo_images --dry-run
+python manage.py assign_demo_images
+```
+
+The assignment command replaces missing images, the five original numbered
+sample placeholders, and older catalog selections that no longer match a
+project's category. Uploaded photos are preserved. It updates the image reference
+without changing project details, dates, interest counts or related records.
+Repeated assignment leaves correctly matched images in place.
+
+The app labels catalog images **Virtual demo render** on project cards and
+details so their source is clear. Generic categories such as Residential use the
+project title to identify a room, or a living room render for a whole-home
+project. If the corresponding catalog file is missing, the command reports it
+and retains the current image.
+
 ## Run tests
 
 ```bash
@@ -180,6 +282,7 @@ merging. Each developer uses their own database and credentials.
 | `favourites/` | Customer saved projects |
 | `categories/` | Project categories |
 | `reports/` | Platform reports |
+| `reviews/` | Customer project ratings and reviews |
 | `templates/` | Django HTML templates |
 | `static/` | Shared CSS and other static assets |
 | `config/` | Django settings and root routes |
@@ -192,7 +295,30 @@ date, while views and favourite saves are recorded with timestamps so reports
 show activity within the selected period. Active users are distinct active
 accounts that viewed or saved an IDP during that period.
 
-Use the assignment's Boundary–Control–Entity structure: request handling and
-templates form the boundary, controller classes coordinate operations, and models
-represent persistent entities. Record user stories, tests, sprint work, and review
-evidence for the group report.
+## Boundary–Control–Entity (BCE) structure
+
+The application separates its responsibilities into three layers:
+
+| Layer | Files | Responsibility |
+| --- | --- | --- |
+| Boundary | `urls.py`, `views.py`, `forms.py`, and `templates/` | Receive requests, validate input, display pages and form errors, handle sessions, and return redirects or downloads |
+| Control | Each app's `controllers.py` | Coordinate use cases, enforce shared access and ownership rules, query entities, save changes, and calculate metrics |
+| Entity | Each app's `models.py` | Define persistent data, relationships, and database constraints |
+
+For example, clicking a project's heart submits a POST to `favourite_toggle()` in
+`favourites/views.py`. The view checks access through the shared decorator and
+calls `FavouriteController.toggle()`. The controller updates the `Favourite` and
+`InteriorDesignProject` entities together in a transaction. The view then displays
+the success message and redirects back to the page.
+
+Controllers cover account/profile management and dashboard data, company
+management and search, project portfolios and discovery, favourites, reviews,
+category management, and report calculations. Access decorators and the login
+form use `AccountAccessController` so account/profile suspension rules stay shared.
+Forms retain Django's field and model validation; views pass validated values to
+controllers for persistence. PDF formatting remains in the report boundary.
+
+When adding a feature, put its business operation in the relevant controller and
+call it from the view. Keep ORM queries and persistence out of application views.
+Run `python manage.py test` to verify the user flows after changes. Record user
+stories, tests, sprint work, and review evidence for the group report.

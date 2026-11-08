@@ -1,69 +1,85 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
-from .models import Company
+from accounts.decorators import interior_designer_required
+
+from .controllers import CompanyController
 
 
-@login_required
+def _company_fields(data):
+    return {
+        field: (data.get(field) or "").strip()
+        for field in ("name", "email", "phone", "website", "address", "description")
+    }
+
+
+@interior_designer_required
 @require_http_methods(["GET"])
 def company_detail(request):
-    company = Company.objects.filter(user=request.user).first()
+    company = CompanyController.get_company(request.user)
     return render(request, "companies/company_detail.html", {"company": company})
 
 
-@login_required
+@interior_designer_required
 @require_http_methods(["GET", "POST"])
 def company_create(request):
-    if Company.objects.filter(user=request.user).exists():
+    if CompanyController.get_company(request.user) is not None:
         return redirect("company_detail")
 
     if request.method == "POST":
-        name = (request.POST.get("name") or "").strip()
-        if name:
-            company = Company.objects.create(
-                user=request.user,
-                name=name,
-                email=(request.POST.get("email") or "").strip(),
-                phone=(request.POST.get("phone") or "").strip(),
-                website=(request.POST.get("website") or "").strip(),
-                address=(request.POST.get("address") or "").strip(),
-                description=(request.POST.get("description") or "").strip(),
-            )
+        fields = _company_fields(request.POST)
+        if fields["name"]:
+            CompanyController.create_company(request.user, **fields)
             messages.success(request, "Company information saved successfully.")
             return redirect("company_detail")
 
     return render(request, "companies/company_form.html", {"action": "Create"})
 
 
-@login_required
+@interior_designer_required
 @require_http_methods(["GET", "POST"])
 def company_update(request):
-    company = Company.objects.filter(user=request.user).first()
+    company = CompanyController.get_company(request.user)
 
     if company is None:
         return redirect("company_create")
 
     if request.method == "POST":
-        company.name = (request.POST.get("name") or "").strip()
-        company.email = (request.POST.get("email") or "").strip()
-        company.phone = (request.POST.get("phone") or "").strip()
-        company.website = (request.POST.get("website") or "").strip()
-        company.address = (request.POST.get("address") or "").strip()
-        company.description = (request.POST.get("description") or "").strip()
-        company.save()
+        CompanyController.update_company(company, **_company_fields(request.POST))
         messages.success(request, "Company information updated successfully.")
         return redirect("company_detail")
 
     return render(request, "companies/company_form.html", {"company": company, "action": "Update"})
 
 
-@login_required
+@interior_designer_required
 @require_http_methods(["POST"])
 def company_delete(request):
-    company = Company.objects.filter(user=request.user).first()
+    company = CompanyController.get_company(request.user)
     if company is not None:
-        company.delete()
+        CompanyController.delete_company(company)
         messages.success(request, "Company information deleted successfully.")
     return redirect("company_detail")
+
+
+@interior_designer_required
+@require_http_methods(["GET"])
+def company_search(request):
+    company = CompanyController.get_company(request.user)
+
+    if company is None:
+        return redirect("company_create")
+
+    search_term = request.GET.get("q", "").strip()
+    results = CompanyController.search_information(company, search_term)
+
+    return render(
+        request,
+        "companies/company_search.html",
+        {
+            "company": company,
+            "q": search_term,
+            "results": results,
+        },
+    )

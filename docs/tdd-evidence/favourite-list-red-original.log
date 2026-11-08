@@ -1,0 +1,261 @@
+Found 16 test(s).
+System check identified no issues (0 silenced).
+Creating test database for alias 'default'...
+E.EFFEEFEEEEEEFFEFEE
+======================================================================
+ERROR: test_blank_search_behaves_like_no_search (favourites.test_favourite_list.FavouriteListTests.test_blank_search_behaves_like_no_search)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 325, in test_blank_search_behaves_like_no_search
+    self.assertEqual(response.context["q"], "")
+                     ~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/eason/renovation-platform/.venv312/lib/python3.12/site-packages/django/test/utils.py", line 84, in __getitem__
+    raise KeyError(key)
+KeyError: 'q'
+
+======================================================================
+ERROR: test_category_choices_count_only_the_customers_saved_projects (favourites.test_favourite_list.FavouriteListTests.test_category_choices_count_only_the_customers_saved_projects)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 147, in test_category_choices_count_only_the_customers_saved_projects
+    list(response.context["categories"]),
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/eason/renovation-platform/.venv312/lib/python3.12/site-packages/django/test/utils.py", line 84, in __getitem__
+    raise KeyError(key)
+KeyError: 'categories'
+
+======================================================================
+ERROR: test_default_page_shows_counts_and_newest_first (favourites.test_favourite_list.FavouriteListTests.test_default_page_shows_counts_and_newest_first)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 112, in test_default_page_shows_counts_and_newest_first
+    self.assertEqual(response.context["favourite_count"], 4)
+                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/eason/renovation-platform/.venv312/lib/python3.12/site-packages/django/test/utils.py", line 84, in __getitem__
+    raise KeyError(key)
+KeyError: 'favourite_count'
+
+======================================================================
+ERROR: test_empty_collection_shows_zero_counts_and_collection_instructions (favourites.test_favourite_list.FavouriteListTests.test_empty_collection_shows_zero_counts_and_collection_instructions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 265, in test_empty_collection_shows_zero_counts_and_collection_instructions
+    self.assertEqual(response.context["favourite_count"], 0)
+                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/eason/renovation-platform/.venv312/lib/python3.12/site-packages/django/test/utils.py", line 84, in __getitem__
+    raise KeyError(key)
+KeyError: 'favourite_count'
+
+======================================================================
+ERROR: test_invalid_or_unavailable_categories_default_to_all (favourites.test_favourite_list.FavouriteListTests.test_invalid_or_unavailable_categories_default_to_all) (category='not-a-number')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 233, in test_invalid_or_unavailable_categories_default_to_all
+    self.assertEqual(response.context["category_filter"], "")
+                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/eason/renovation-platform/.venv312/lib/python3.12/site-packages/django/test/utils.py", line 84, in __getitem__
+    raise KeyError(key)
+KeyError: 'category_filter'
+
+======================================================================
+ERROR: test_invalid_or_unavailable_categories_default_to_all (favourites.test_favourite_list.FavouriteListTests.test_invalid_or_unavailable_categories_default_to_all) (category='-1')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 233, in test_invalid_or_unavailable_categories_default_to_all
+    self.assertEqual(response.context["category_filter"], "")
+                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/eason/renovation-platform/.venv312/lib/python3.12/site-packages/django/test/utils.py", line 84, in __getitem__
+    raise KeyError(key)
+KeyError: 'category_filter'
+
+======================================================================
+ERROR: test_invalid_or_unavailable_categories_default_to_all (favourites.test_favourite_list.FavouriteListTests.test_invalid_or_unavailable_categories_default_to_all) (category='100000000000000000000000000000000000000000000000000000000000000000000000000000000')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 233, in test_invalid_or_unavailable_categories_default_to_all
+    self.assertEqual(response.context["category_filter"], "")
+                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/eason/renovation-platform/.venv312/lib/python3.12/site-packages/django/test/utils.py", line 84, in __getitem__
+    raise KeyError(key)
+KeyError: 'category_filter'
+
+======================================================================
+ERROR: test_invalid_or_unavailable_categories_default_to_all (favourites.test_favourite_list.FavouriteListTests.test_invalid_or_unavailable_categories_default_to_all) (category='3')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 233, in test_invalid_or_unavailable_categories_default_to_all
+    self.assertEqual(response.context["category_filter"], "")
+                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/eason/renovation-platform/.venv312/lib/python3.12/site-packages/django/test/utils.py", line 84, in __getitem__
+    raise KeyError(key)
+KeyError: 'category_filter'
+
+======================================================================
+ERROR: test_invalid_or_unavailable_categories_default_to_all (favourites.test_favourite_list.FavouriteListTests.test_invalid_or_unavailable_categories_default_to_all) (category='4')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 233, in test_invalid_or_unavailable_categories_default_to_all
+    self.assertEqual(response.context["category_filter"], "")
+                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/eason/renovation-platform/.venv312/lib/python3.12/site-packages/django/test/utils.py", line 84, in __getitem__
+    raise KeyError(key)
+KeyError: 'category_filter'
+
+======================================================================
+ERROR: test_no_matches_shows_the_search_empty_state_and_clear_link (favourites.test_favourite_list.FavouriteListTests.test_no_matches_shows_the_search_empty_state_and_clear_link)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 250, in test_no_matches_shows_the_search_empty_state_and_clear_link
+    self.assertEqual(response.context["favourite_count"], 4)
+                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/eason/renovation-platform/.venv312/lib/python3.12/site-packages/django/test/utils.py", line 84, in __getitem__
+    raise KeyError(key)
+KeyError: 'favourite_count'
+
+======================================================================
+ERROR: test_search_keeps_total_and_filtered_counts_distinct (favourites.test_favourite_list.FavouriteListTests.test_search_keeps_total_and_filtered_counts_distinct)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 136, in test_search_keeps_total_and_filtered_counts_distinct
+    self.assertEqual(response.context["favourite_count"], 4)
+                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/eason/renovation-platform/.venv312/lib/python3.12/site-packages/django/test/utils.py", line 84, in __getitem__
+    raise KeyError(key)
+KeyError: 'favourite_count'
+
+======================================================================
+ERROR: test_unknown_sort_defaults_to_newest (favourites.test_favourite_list.FavouriteListTests.test_unknown_sort_defaults_to_newest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 219, in test_unknown_sort_defaults_to_newest
+    self.assertEqual(response.context["sort_order"], "newest")
+                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/eason/renovation-platform/.venv312/lib/python3.12/site-packages/django/test/utils.py", line 84, in __getitem__
+    raise KeyError(key)
+KeyError: 'sort_order'
+
+======================================================================
+ERROR: test_user_id_parameter_cannot_expose_another_collection (favourites.test_favourite_list.FavouriteListTests.test_user_id_parameter_cannot_expose_another_collection)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 242, in test_user_id_parameter_cannot_expose_another_collection
+    self.assertEqual(response.context["favourite_count"], 4)
+                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/eason/renovation-platform/.venv312/lib/python3.12/site-packages/django/test/utils.py", line 84, in __getitem__
+    raise KeyError(key)
+KeyError: 'favourite_count'
+
+======================================================================
+FAIL: test_category_filter_shows_only_matching_saved_projects (favourites.test_favourite_list.FavouriteListTests.test_category_filter_shows_only_matching_saved_projects)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 167, in test_category_filter_shows_only_matching_saved_projects
+    self.assertEqual(
+AssertionError: Lists differ: [<Fav[32 chars]r -> Compact Nook>, <Favourite: favourite_filt[135 chars]oft>] != [<Fav[32 chars]r -> Loft Retreat>, <Favourite: favourite_filt[23 chars]oft>]
+
+First differing element 0:
+<Favourite: favourite_filter_customer -> Compact Nook>
+<Favourite: favourite_filter_customer -> Loft Retreat>
+
+First list contains 2 additional elements.
+First extra element 2:
+<Favourite: favourite_filter_customer -> Warm Kitchen>
+
+- [<Favourite: favourite_filter_customer -> Compact Nook>,
+-  <Favourite: favourite_filter_customer -> Loft Retreat>,
+? ^
+
++ [<Favourite: favourite_filter_customer -> Loft Retreat>,
+? ^
+
+-  <Favourite: favourite_filter_customer -> Warm Kitchen>,
+   <Favourite: favourite_filter_customer -> Sunlit Loft>]
+
+======================================================================
+FAIL: test_controls_preserve_search_category_and_sort (favourites.test_favourite_list.FavouriteListTests.test_controls_preserve_search_category_and_sort)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 285, in test_controls_preserve_search_category_and_sort
+    self.assertEqual(form["attrs"].get("action"), self.url)
+AssertionError: None != '/favourites/'
+
+======================================================================
+FAIL: test_equal_save_dates_have_a_stable_order (favourites.test_favourite_list.FavouriteListTests.test_equal_save_dates_have_a_stable_order) (sort='newest')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 189, in test_equal_save_dates_have_a_stable_order
+    self.assertEqual(
+AssertionError: Lists differ: [1, 2, 3, 4] != [4, 3, 2, 1]
+
+First differing element 0:
+1
+4
+
+- [1, 2, 3, 4]
++ [4, 3, 2, 1]
+
+======================================================================
+FAIL: test_oldest_sort_uses_the_date_saved (favourites.test_favourite_list.FavouriteListTests.test_oldest_sort_uses_the_date_saved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 178, in test_oldest_sort_uses_the_date_saved
+    self.assertEqual(list(response.context["favourites"]), self.oldest_order)
+AssertionError: Lists differ: [<Fav[32 chars]r -> Compact Nook>, <Favourite: favourite_filt[135 chars]oft>] != [<Fav[32 chars]r -> Sunlit Loft>, <Favourite: favourite_filte[135 chars]ook>]
+
+First differing element 0:
+<Favourite: favourite_filter_customer -> Compact Nook>
+<Favourite: favourite_filter_customer -> Sunlit Loft>
+
+- [<Favourite: favourite_filter_customer -> Compact Nook>,
+?                                           ^ ^^^^ -----
+
++ [<Favourite: favourite_filter_customer -> Sunlit Loft>,
+?                                           ^^^^^^^^ ^
+
++  <Favourite: favourite_filter_customer -> Warm Kitchen>,
+   <Favourite: favourite_filter_customer -> Loft Retreat>,
+-  <Favourite: favourite_filter_customer -> Warm Kitchen>,
+-  <Favourite: favourite_filter_customer -> Sunlit Loft>]
+?                                           ^^^^^  ^ ^^
+
++  <Favourite: favourite_filter_customer -> Compact Nook>]
+?                                           ^^^^^^  ^ ^^
+
+
+======================================================================
+FAIL: test_search_category_and_sort_work_together (favourites.test_favourite_list.FavouriteListTests.test_search_category_and_sort_work_together)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 200, in test_search_category_and_sort_work_together
+    self.assertEqual(
+AssertionError: Lists differ: [] != [<Favourite: favourite_filter_customer -> [64 chars]eat>]
+
+Second list contains 2 additional elements.
+First extra element 0:
+<Favourite: favourite_filter_customer -> Sunlit Loft>
+
+- []
++ [<Favourite: favourite_filter_customer -> Sunlit Loft>,
++  <Favourite: favourite_filter_customer -> Loft Retreat>]
+
+======================================================================
+FAIL: test_search_matches_title_company_category_and_style (favourites.test_favourite_list.FavouriteListTests.test_search_matches_title_company_category_and_style) (query='ScAnDiNaViAn')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/favourites/test_favourite_list.py", line 131, in test_search_matches_title_company_category_and_style
+    self.assertEqual(list(response.context["favourites"]), expected)
+AssertionError: Lists differ: [] != [<Favourite: favourite_filter_customer -> [64 chars]oft>]
+
+Second list contains 2 additional elements.
+First extra element 0:
+<Favourite: favourite_filter_customer -> Loft Retreat>
+
+- []
++ [<Favourite: favourite_filter_customer -> Loft Retreat>,
++  <Favourite: favourite_filter_customer -> Sunlit Loft>]
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.065s
+
+FAILED (failures=6, errors=13)
+Destroying test database for alias 'default'...

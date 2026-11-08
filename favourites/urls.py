@@ -4,5 +4,5 @@ from . import views
 
 urlpatterns = [
     path("favourites/", views.favourite_list, name="favourite_list"),
-    path("favourites/<int:project_id>/add/", views.favourite_add, name="favourite_add"),
+    path("favourites/<int:project_id>/toggle/", views.favourite_toggle, name="favourite_toggle"),
 ]

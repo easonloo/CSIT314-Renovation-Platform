@@ -1,12 +1,15 @@
-from django.contrib.auth.forms import AuthenticationForm
-from django.core.exceptions import ValidationError
-from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserCreationForm
-
 from django import forms
-from django.db.models import Q
-from .controllers import AccountAccessController
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.core.exceptions import ValidationError
+
+from .controllers import (
+    AccountAccessController,
+    UserAccountController,
+    UserProfileController,
+)
 from .models import UserProfile
+
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
@@ -41,9 +44,7 @@ class AccountCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
 
     profile = forms.ModelChoiceField(
-        queryset=UserProfile.objects.filter(
-            is_active=True
-        ).order_by("name"),
+        queryset=None,
         empty_label="Select a profile",
     )
 
@@ -59,17 +60,17 @@ class AccountCreationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["profile"].queryset = UserProfileController.available_for_assignment()
 
         for field in self.fields.values():
             field.widget.attrs["class"] = "input"
-
 
 
 class AccountUpdateForm(forms.ModelForm):
     email = forms.EmailField(required=True)
 
     profile = forms.ModelChoiceField(
-        queryset=UserProfile.objects.none()
+        queryset=None,
     )
 
     class Meta:
@@ -90,9 +91,7 @@ class AccountUpdateForm(forms.ModelForm):
         )
 
         self.fields["profile"].queryset = (
-            UserProfile.objects.filter(
-                Q(is_active=True) | Q(pk=account.profile_id)
-            ).order_by("name")
+            UserProfileController.available_for_assignment(account.profile_id)
         )
 
         self.initial["profile"] = account.profile_id
@@ -103,15 +102,9 @@ class AccountUpdateForm(forms.ModelForm):
     def clean_username(self):
         username = self.cleaned_data["username"]
 
-        duplicate = (
-            get_user_model().objects.filter(
-                username__iexact=username
-            )
-            .exclude(pk=self.instance.pk)
-            .exists()
-        )
-
-        if duplicate:
+        if UserAccountController.username_exists(
+            username, exclude_user_id=self.instance.pk,
+        ):
             raise forms.ValidationError(
                 "A user with that username already exists."
             )

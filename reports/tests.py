@@ -184,7 +184,7 @@ class PlatformManagerReportTests(TestCase):
             with self.subTest(period=period):
                 request = self.request_factory.get(f"/reports/{period}/")
                 request.user = self.manager
-                with patch("reports.views.timezone.localdate", return_value=today):
+                with patch("reports.controllers.timezone.localdate", return_value=today):
                     with patch("reports.views.render") as render_mock:
                         report(request, period)
                 report_context = render_mock.call_args.args[2]["report"]
@@ -197,3 +197,9 @@ class PlatformManagerReportTests(TestCase):
 
         with self.assertRaises(PermissionDenied):
             report(request, "daily")
+
+    def test_unknown_period_is_not_found_for_html_and_pdf(self):
+        for name in ["report", "report_download"]:
+            with self.subTest(view=name):
+                response = self.client.get(reverse(name, args=["yearly"]))
+                self.assertEqual(response.status_code, 404)

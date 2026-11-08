@@ -1,0 +1,230 @@
+{
+  "generated_on": "2026-11-05",
+  "generation_tool": "OpenAI built-in image_gen",
+  "image_type": "AI-generated virtual interior visualization",
+  "intended_use": "Synthetic CSIT314 renovation-platform demonstration projects",
+  "aspect_ratio": "3:2 landscape",
+  "displayed_label": "Virtual demo render",
+  "assets": [
+    {
+      "room": "living_room",
+      "filename": "living_room.png",
+      "prompt": "Use case: stylized-concept. Asset type: single landscape room photograph-style architectural visualization for a Django renovation portfolio demo. Primary request: create ONE beautiful photorealistic virtual render of a Singapore apartment LIVING ROOM. Subject: a comfortable sofa, low coffee table, large rug, built-in television console, window daylight and a few indoor plants. Style: polished contemporary interior visualization with believable material textures, warm timber and neutral upholstery; attractive and realistic, suitable as a project cover. Composition: wide landscape 3:2, eye-level architectural view, whole living area clearly legible as a living room. Constraints: no people, no text, no logos, no collage, no watermarks. This is a fictional room, not a named real property. Generate a single image.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "da85c17f5ecce795db37cf5d56894d93412c013acaa41e7f6f43c00c701ea80d",
+      "bytes": 2763519
+    },
+    {
+      "room": "kitchen",
+      "filename": "kitchen.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: KITCHEN. Scene: a Singapore apartment kitchen with a practical L-shaped layout, tall storage cabinets, integrated appliances, sink, induction hob, quartz worktops and warm oak cabinet accents.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "1c5a617b35d2818f6881e4df7aa729c3ad91c292c014c9fe4ebdfea3b1f9a537",
+      "bytes": 2086079
+    },
+    {
+      "room": "master_bedroom",
+      "filename": "master_bedroom.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: MASTER BEDROOM. Scene: a comfortable Singapore master bedroom with a queen-size bed, upholstered headboard, bedside tables, full-height wardrobe and large daylight window.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "3d4970475d4e6b804220b367ce2436b020225f1ee0bb52dd02fde8ac854254ff",
+      "bytes": 2477200
+    },
+    {
+      "room": "bathroom",
+      "filename": "bathroom.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: BATHROOM. Scene: a Singapore apartment bathroom with a walk-in glass shower, floating vanity, round mirror, visible toilet and warm beige stone-look tiles.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "75cb6a17817d0c8680836904a9c4e3c2184961d3aea800fd5baeebf5064340b8",
+      "bytes": 2523007
+    },
+    {
+      "room": "dining_room",
+      "filename": "dining_room.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: DINING ROOM. Scene: a Singapore family dining area with a six-seat timber dining table, comfortable upholstered dining chairs, pendant lights, a sideboard and soft window daylight.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "f485160e4129fe4ad83f91201b09c3f3de64fddb73de6277ef160ed5f6ffb07f",
+      "bytes": 2677201
+    },
+    {
+      "room": "home_office",
+      "filename": "home_office.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and appropriate warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: HOME OFFICE. Scene: a compact dedicated Singapore apartment home office with a proper desk, ergonomic chair, monitor, built-in shelves, a small plant and daylight window.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "06aba226d141e4ea4fb70848823e9253f8669b9d1642e6550c8f069ecfb880ae",
+      "bytes": 2427342
+    },
+    {
+      "room": "balcony",
+      "filename": "balcony.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and appropriate warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: BALCONY. Scene: a furnished Singapore condominium balcony, clearly outdoors with visible railing and city greenery beyond, compact lounge chairs, small side table, timber decking and potted tropical plants.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "2519d3b70f7e0d555951c8abf70f2f40a9d4066c8b3d9f6b6b7f6ed9de05755d",
+      "bytes": 2791018
+    },
+    {
+      "room": "entryway",
+      "filename": "entryway.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and appropriate warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: ENTRYWAY. Scene: a Singapore apartment entrance foyer with an entry door, built-in shoe cabinets, a small bench, wall mirror, hooks and warm concealed lighting.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "771051a150dad72308ac1dbd4f7e64fc22e71c1645f633bfaae49f4b56a4dcfd",
+      "bytes": 2360897
+    },
+    {
+      "room": "guest_bedroom",
+      "filename": "guest_bedroom.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and appropriate warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: GUEST BEDROOM. Scene: a welcoming modest guest bedroom in a Singapore home, neat double bed, guest luggage bench, small bedside tables, linen upholstery, a wardrobe and window.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "d9496512230e9614699e1ae4872dfdfbb840eb1924e889cd713e4d734ae2ffe8",
+      "bytes": 2613093
+    },
+    {
+      "room": "children_room",
+      "filename": "children_room.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and appropriate warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: CHILDREN'S BEDROOM. Scene: a playful yet tasteful children's bedroom with a child-size bed, playful pastel accents, toy shelves, a small study desk and plenty of clear floor space; no children or adults.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "9a694398d70c43247fe60125ceda43fffd9af2b9a1320a1218ad0646a5b92cb5",
+      "bytes": 2222015
+    },
+    {
+      "room": "laundry_room",
+      "filename": "laundry_room.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and appropriate warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: LAUNDRY ROOM. Scene: a practical Singapore home laundry utility room with clearly visible washing machine and dryer, laundry sink, overhead cabinets, a folding counter and neatly sorted baskets.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "aed23167da653834a4cb64c28a15a487a343000c9f77f56b2697f53a4cac1caa",
+      "bytes": 2611908
+    },
+    {
+      "room": "walk_in_wardrobe",
+      "filename": "walk_in_wardrobe.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and appropriate warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: WALK-IN WARDROBE. Scene: a dedicated walk-in dressing room with full-height open and glass-front wardrobes, neatly arranged clothes, shoe shelving, a large mirror and a small upholstered bench.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "be2dc6c072c94ef3d2ff8c9be6942117cd5a7f188ee30de5c1563430b61b2b4c",
+      "bytes": 2658174
+    },
+    {
+      "room": "study",
+      "filename": "study.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and appropriate warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: STUDY ROOM. Scene: a quiet dedicated study room with a writing desk, reading lamp, comfortable chair, floor-to-ceiling bookcases and warm timber finishes; no dominant screens, emphasize reading and studying.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "88a7a8bf1ed6df5487f451db72b7dcd9106f17d61aa55dbe9620ee1d44856ddb",
+      "bytes": 2715459
+    },
+    {
+      "room": "entertainment_room",
+      "filename": "entertainment_room.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and appropriate warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: ENTERTAINMENT ROOM. Scene: a dedicated home cinema entertainment room with a large blank television screen, low media console, comfortable sectional sofa, discreet speakers and cozy dimmable accent lighting.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "b6e373510b487c8d77fcf9723c4a97d96a1af95412a21c2fb80bc320968b09bd",
+      "bytes": 2574657
+    },
+    {
+      "room": "nursery",
+      "filename": "nursery.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and appropriate warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: BABY NURSERY. Scene: a serene nursery room clearly featuring a safe empty baby crib, changing dresser, comfortable nursing chair, gentle neutral colors and soft window daylight; no people, no babies, no text.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "b4de08a022d9e0f56cdf9f5150a8d08bfd8fa65ae3e9d78f28b688a3b955f4d7",
+      "bytes": 2472390
+    },
+    {
+      "room": "reading_nook",
+      "filename": "reading_nook.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and appropriate warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: READING NOOK. Scene: a cozy small reading corner with a deep window seat, cushions, a comfortable armchair, a reading lamp and a few shelves of books beside a sunlit window.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "b630ef6db90a43c131ed0c8e2fd90bc195da34f46b8c69ece2ec7636f414b32c",
+      "bytes": 2920976
+    },
+    {
+      "room": "storage_room",
+      "filename": "storage_room.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and appropriate warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: STORAGE ROOM. Scene: a compact but attractive organized household storage room with modular shelving, clearly visible neatly stacked unlabeled boxes, baskets, space for cleaning tools and practical bright ceiling lighting.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "ab20fb06930875830eb80acdcf5169b2bcaa44ef01bf1f783497fbb4cf777913",
+      "bytes": 2285729
+    },
+    {
+      "room": "patio",
+      "filename": "patio.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and appropriate warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: PATIO. Scene: a ground-level sheltered patio in a Singapore landed home, clearly outdoor garden space with paved flooring, an outdoor seating group, coffee table and lush tropical planting; no elevated balcony railing.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "cf00a5dd1f26a6f80d233b54fa83d4ad759586c523d10f7111ed05e8e9f13f02",
+      "bytes": 2982788
+    },
+    {
+      "room": "pantry",
+      "filename": "pantry.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and appropriate warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: PANTRY. Scene: a well-organized walk-in kitchen pantry with shelves of food jars and unlabeled storage containers, pull-out baskets, a small preparation counter and warm lighting; emphasize food storage rather than a full kitchen.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "bc0ff38063fc43737a5d3217c575988787c445dd6b4225f3bdf1c4c1df43cb54",
+      "bytes": 2528364
+    },
+    {
+      "room": "home_gym",
+      "filename": "home_gym.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic virtual interior render for a renovation portfolio demonstration. Create ONE polished, believable fictional room image. Wide landscape 3:2, eye-level architectural view, realistic proportions and detailed materials, balanced natural daylight and appropriate warm interior lighting. Show a usable furnished space with clear functional identity. No people, no text, no logos, no collage, no watermarks. Contemporary design suitable for a Singapore home. Primary subject: HOME GYM. Scene: a dedicated home fitness room with a yoga mat, dumbbell rack, exercise bike, wall mirror, rubber floor sections and daylight; uncluttered, no people.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "55f2b1273f4675435778d9760814511045fedc919cbc214362b01a47e9f168b9",
+      "bytes": 2685290
+    }
+  ]
+}
