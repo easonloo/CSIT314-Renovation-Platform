@@ -36,6 +36,7 @@
             <td>
               <strong>{{ project.title }}</strong>
               {% if project.display_image %}<br><img src="{{ project.display_image.url }}" alt="{{ project.title }}" style="width:80px;height:60px;object-fit:cover;border-radius:8px;margin-top:6px;">{% endif %}
+              {% if project.is_virtual_image %}<br><span class="virtual-image-label">Virtual demo render</span>{% endif %}
             </td>
             <td>{{ project.category.name|default:'-' }}</td>
             <td><span class="badge {% if project.status == 'current' %}badge-info{% else %}badge-muted{% endif %}">{{ project.get_status_display }}</span></td>
@@ -44,10 +45,7 @@
               <div style="display:flex;gap:6px;flex-wrap:wrap;">
                 <a class="btn btn-light" href="{% url 'idp_detail' project.id %}">View</a>
                 <a class="btn btn-light" href="{% url 'idp_update' project.id %}">Update</a>
-                <form method="post" action="{% url 'idp_delete' project.id %}">
-                  {% csrf_token %}
-                  <button class="btn btn-danger" type="submit">Delete</button>
-                </form>
+                <a class="btn btn-danger" href="{% url 'idp_delete' project.id %}">Delete</a>
               </div>
             </td>
           </tr>

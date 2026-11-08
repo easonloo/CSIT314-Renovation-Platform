@@ -29,6 +29,12 @@
       </a>
     {% endif %}
 
+    {% if request.user.pk != account.user_id %}
+    <a class="btn btn-danger" href="{% url 'account_delete' account.pk %}">
+      Delete
+    </a>
+    {% endif %}
+
     <a class="btn btn-light" href="{% url 'account_list' %}">
       Back to accounts
     </a>

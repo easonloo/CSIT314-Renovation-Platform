@@ -55,6 +55,7 @@
         <div class="recommended-image recommended-placeholder" aria-hidden="true">Project photo</div>
       {% endif %}
       <div class="recommended-copy">
+        {% if project.is_virtual_image %}<span class="virtual-image-label">Virtual demo render</span>{% endif %}
         <strong>{{ project.title }}</strong>
         <span>{{ project.company.name }} · {{ project.style|default:'Design' }}{% if project.location %} · {{ project.location }}{% endif %}</span>
       </div>

@@ -1,0 +1,401 @@
+Found 10 test(s).
+System check identified no issues (0 silenced).
+Creating test database for alias 'default'...
+.....FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='get', route='company_detail', role='Customer')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='get', route='company_create', role='Customer')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='post', route='company_create', role='Customer')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='get', route='company_update', role='Customer')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='post', route='company_update', role='Customer')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='post', route='company_delete', role='Customer')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (role='Customer')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 149, in test_other_roles_cannot_access_existing_company_records
+    self.assert_company_requests_forbidden()
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 71, in assert_company_requests_forbidden
+    self.assertEqual(list(Company.objects.order_by("pk").values()), before)
+AssertionError: Lists differ: [{'id[312 chars]utc)}] != [{'id[312 chars]utc)}, {'id': 2, 'user_id': 3, 'name': 'Legacy[280 chars]tc)}]
+
+Second list contains 1 additional elements.
+First extra element 1:
+{'id': 2, 'user_id': 3, 'name': 'Legacy Customer Company', 'email': '', 'phone': '', 'website': '', 'address': '', 'description': '', 'created_at': datetime.datetime(2026, 11, 4, 15, 1, 51, 955449, tzinfo=datetime.timezone.utc), 'updated_at': datetime.datetime(2026, 11, 4, 15, 1, 51, 955452, tzinfo=datetime.timezone.utc)}
+
+Diff is 726 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='get', route='company_detail', role='User Admin')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='get', route='company_create', role='User Admin')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='post', route='company_create', role='User Admin')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='get', route='company_update', role='User Admin')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='post', route='company_update', role='User Admin')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='post', route='company_delete', role='User Admin')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (role='User Admin')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 149, in test_other_roles_cannot_access_existing_company_records
+    self.assert_company_requests_forbidden()
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 71, in assert_company_requests_forbidden
+    self.assertEqual(list(Company.objects.order_by("pk").values()), before)
+AssertionError: Lists differ: [{'id[312 chars]utc)}] != [{'id[312 chars]utc)}, {'id': 3, 'user_id': 4, 'name': 'Legacy[282 chars]tc)}]
+
+Second list contains 1 additional elements.
+First extra element 1:
+{'id': 3, 'user_id': 4, 'name': 'Legacy User Admin Company', 'email': '', 'phone': '', 'website': '', 'address': '', 'description': '', 'created_at': datetime.datetime(2026, 11, 4, 15, 1, 51, 961753, tzinfo=datetime.timezone.utc), 'updated_at': datetime.datetime(2026, 11, 4, 15, 1, 51, 961757, tzinfo=datetime.timezone.utc)}
+
+Diff is 728 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='get', route='company_detail', role='Platform Management')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='get', route='company_create', role='Platform Management')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='post', route='company_create', role='Platform Management')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='get', route='company_update', role='Platform Management')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='post', route='company_update', role='Platform Management')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (method='post', route='company_delete', role='Platform Management')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_access_existing_company_records (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_access_existing_company_records) (role='Platform Management')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 149, in test_other_roles_cannot_access_existing_company_records
+    self.assert_company_requests_forbidden()
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 71, in assert_company_requests_forbidden
+    self.assertEqual(list(Company.objects.order_by("pk").values()), before)
+AssertionError: Lists differ: [{'id[312 chars]utc)}] != [{'id[312 chars]utc)}, {'id': 4, 'user_id': 5, 'name': 'Legacy[291 chars]tc)}]
+
+Second list contains 1 additional elements.
+First extra element 1:
+{'id': 4, 'user_id': 5, 'name': 'Legacy Platform Management Company', 'email': '', 'phone': '', 'website': '', 'address': '', 'description': '', 'created_at': datetime.datetime(2026, 11, 4, 15, 1, 51, 967781, tzinfo=datetime.timezone.utc), 'updated_at': datetime.datetime(2026, 11, 4, 15, 1, 51, 967784, tzinfo=datetime.timezone.utc)}
+
+Diff is 737 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_other_roles_cannot_create_companies (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_create_companies) (role='Customer')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 141, in test_other_roles_cannot_create_companies
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_create_companies (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_create_companies) (role='User Admin')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 141, in test_other_roles_cannot_create_companies
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_other_roles_cannot_create_companies (companies.test_company_access.CompanyAccessTests.test_other_roles_cannot_create_companies) (role='Platform Management')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 141, in test_other_roles_cannot_create_companies
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_profile_suspension_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_profile_suspension_blocks_an_existing_session) (method='get', route='company_detail')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_profile_suspension_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_profile_suspension_blocks_an_existing_session) (method='get', route='company_create')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_profile_suspension_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_profile_suspension_blocks_an_existing_session) (method='post', route='company_create')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_profile_suspension_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_profile_suspension_blocks_an_existing_session) (method='get', route='company_update')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_profile_suspension_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_profile_suspension_blocks_an_existing_session) (method='post', route='company_update')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_profile_suspension_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_profile_suspension_blocks_an_existing_session) (method='post', route='company_delete')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_profile_suspension_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_profile_suspension_blocks_an_existing_session)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 160, in test_profile_suspension_blocks_an_existing_session
+    self.assert_company_requests_forbidden()
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 71, in assert_company_requests_forbidden
+    self.assertEqual(list(Company.objects.order_by("pk").values()), before)
+AssertionError: Lists differ: [{'id[312 chars]utc)}] != [{'id[312 chars]utc)}, {'id': 2, 'user_id': 1, 'name': 'Suspen[281 chars]tc)}]
+
+Second list contains 1 additional elements.
+First extra element 1:
+{'id': 2, 'user_id': 1, 'name': 'Suspended Profile Studio', 'email': '', 'phone': '', 'website': '', 'address': '', 'description': '', 'created_at': datetime.datetime(2026, 11, 4, 15, 1, 51, 979393, tzinfo=datetime.timezone.utc), 'updated_at': datetime.datetime(2026, 11, 4, 15, 1, 51, 979396, tzinfo=datetime.timezone.utc)}
+
+Diff is 727 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_role_change_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_role_change_blocks_an_existing_session) (method='get', route='company_detail')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_role_change_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_role_change_blocks_an_existing_session) (method='get', route='company_create')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_role_change_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_role_change_blocks_an_existing_session) (method='post', route='company_create')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_role_change_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_role_change_blocks_an_existing_session) (method='get', route='company_update')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_role_change_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_role_change_blocks_an_existing_session) (method='post', route='company_update')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_role_change_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_role_change_blocks_an_existing_session) (method='post', route='company_delete')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_role_change_blocks_an_existing_session (companies.test_company_access.CompanyAccessTests.test_role_change_blocks_an_existing_session)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 176, in test_role_change_blocks_an_existing_session
+    self.assert_company_requests_forbidden()
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 71, in assert_company_requests_forbidden
+    self.assertEqual(list(Company.objects.order_by("pk").values()), before)
+AssertionError: Lists differ: [{'id[312 chars]utc)}] != [{'id[312 chars]utc)}, {'id': 2, 'user_id': 1, 'name': 'Former[279 chars]tc)}]
+
+Second list contains 1 additional elements.
+First extra element 1:
+{'id': 2, 'user_id': 1, 'name': 'Former Designer Studio', 'email': '', 'phone': '', 'website': '', 'address': '', 'description': '', 'created_at': datetime.datetime(2026, 11, 4, 15, 1, 51, 986872, tzinfo=datetime.timezone.utc), 'updated_at': datetime.datetime(2026, 11, 4, 15, 1, 51, 986875, tzinfo=datetime.timezone.utc)}
+
+Diff is 725 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_user_without_an_account_is_forbidden (companies.test_company_access.CompanyAccessTests.test_user_without_an_account_is_forbidden) (method='get', route='company_detail')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_user_without_an_account_is_forbidden (companies.test_company_access.CompanyAccessTests.test_user_without_an_account_is_forbidden) (method='get', route='company_create')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_user_without_an_account_is_forbidden (companies.test_company_access.CompanyAccessTests.test_user_without_an_account_is_forbidden) (method='post', route='company_create')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_user_without_an_account_is_forbidden (companies.test_company_access.CompanyAccessTests.test_user_without_an_account_is_forbidden) (method='get', route='company_update')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 200 != 403
+
+======================================================================
+FAIL: test_user_without_an_account_is_forbidden (companies.test_company_access.CompanyAccessTests.test_user_without_an_account_is_forbidden) (method='post', route='company_update')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+======================================================================
+FAIL: test_user_without_an_account_is_forbidden (companies.test_company_access.CompanyAccessTests.test_user_without_an_account_is_forbidden) (method='post', route='company_delete')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/eason/renovation-platform/companies/test_company_access.py", line 70, in assert_company_requests_forbidden
+    self.assertEqual(response.status_code, 403)
+AssertionError: 302 != 403
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.080s
+
+FAILED (failures=44)
+Destroying test database for alias 'default'...

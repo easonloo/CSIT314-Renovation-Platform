@@ -1,7 +1,9 @@
+.venv/
 .venv312/
 __pycache__/
 *.pyc
 db.sqlite3
+.backups/
 .vscode/
 .DS_Store
 .env

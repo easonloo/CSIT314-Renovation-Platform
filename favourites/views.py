@@ -1,39 +1,62 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.db.models import F, Q
+from django.core.exceptions import PermissionDenied
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
 
+from accounts.decorators import customer_required
 from projects.models import InteriorDesignProject
 
+from .controllers import (
+    SaveFavouriteController,
+    SearchFavouritesController,
+    ViewFavouriteIDPController,
+)
 from .models import Favourite
 
 
-@login_required
+@customer_required
 @require_http_methods(["GET"])
 def favourite_list(request):
-    q = (request.GET.get("q") or "").strip()
-    favourites = Favourite.objects.filter(user=request.user).select_related("project", "project__company", "project__category")
-    if q:
-        favourites = favourites.filter(
-            Q(project__title__icontains=q)
-            | Q(project__company__name__icontains=q)
-            | Q(project__category__name__icontains=q)
-        )
-    return render(request, "favourites/favourite_list.html", {"favourites": favourites})
+    context = SearchFavouritesController().get_list_data(
+        request.user,
+        search_term=request.GET.get("q", ""),
+        category_filter=request.GET.get("category", ""),
+        sort_order=request.GET.get("sort", "newest"),
+    )
+    return render(request, "favourites/favourite_list.html", context)
 
 
-@login_required
+@customer_required
 @require_http_methods(["POST"])
-def favourite_add(request, project_id):
-    project = InteriorDesignProject.objects.filter(pk=project_id).first()
-    if project is None:
+def favourite_toggle(request, project_id):
+    try:
+        is_saved = SaveFavouriteController().toggle(request.user, project_id)
+    except InteriorDesignProject.DoesNotExist:
         return redirect("customer_idp_search")
 
-    _, created = Favourite.objects.get_or_create(user=request.user, project=project)
-    if created:
-        InteriorDesignProject.objects.filter(pk=project.pk).update(
-            shortlist_count=F("shortlist_count") + 1
-        )
-    messages.success(request, "Project saved to favourites.")
-    return redirect("idp_detail", pk=project.pk)
+    messages.success(
+        request,
+        "Project saved to favourites." if is_saved else "Project removed from favourites.",
+    )
+    next_url = request.POST.get("next", "").strip()
+    if url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return HttpResponseRedirect(next_url)
+    return redirect("idp_detail", pk=project_id)
+
+
+@customer_required
+@require_http_methods(["GET"])
+def favourite_detail(request, project_id):
+    try:
+        context = ViewFavouriteIDPController().get_detail_data(request.user, project_id)
+    except (Favourite.DoesNotExist, InteriorDesignProject.DoesNotExist) as error:
+        raise Http404("Saved project not found.") from error
+    except PermissionError as error:
+        raise PermissionDenied from error
+    return render(request, "projects/idp_detail.html", context)

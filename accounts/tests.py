@@ -317,7 +317,7 @@ class ProfileTests(TestCase):
         self.assertEqual(profile.name, "Customer")
         self.assertEqual(profile.user_count, 1)
         self.assertContains(response, "Showing 1 of 2 profiles")
-        self.assertContains(response, 'value="suspended" aria-pressed="true"')
+        self.assertContains(response, 'href="?q=Customer&amp;status=suspended" aria-current="page"')
 
     def test_invalid_profile_status_filter_defaults_to_all(self):
         self.client.force_login(self.admin_user)

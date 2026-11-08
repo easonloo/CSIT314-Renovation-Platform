@@ -1,5 +1,4 @@
 import os
-import random
 import sys
 from pathlib import Path
 
@@ -14,56 +13,14 @@ import django
 
 django.setup()
 
-from PIL import Image, ImageDraw
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from accounts.models import UserAccount, UserProfile
 from categories.models import Category
 from companies.models import Company
+from projects.demo_images import DemoImageController
 from projects.models import InteriorDesignProject
-
-
-def create_sample_image(path: Path, bg_color, accent_color, label):
-    img = Image.new("RGB", (1200, 900), bg_color)
-    draw = ImageDraw.Draw(img)
-
-    for i in range(8):
-        x = 80 + i * 130
-        y = 250 + (i % 2) * 110
-        draw.rounded_rectangle(
-            [x, y, x + 90, y + 150],
-            radius=18,
-            fill=accent_color if i % 2 == 0 else (255, 255, 255),
-        )
-
-    draw.rounded_rectangle([180, 150, 1020, 700], radius=30, fill=(255, 255, 255, 90))
-    draw.rounded_rectangle([220, 220, 980, 640], radius=26, fill=(255, 255, 255, 180))
-    draw.rectangle([250, 450, 950, 560], fill=(245, 243, 239))
-
-    draw.text((360, 300), label, fill=(20, 20, 20), font=None)
-    draw.text((320, 510), "HouseDesignerz", fill=(80, 80, 80), font=None)
-    img.save(path)
-
-
-def generate_images():
-    media_dir = Path(settings.MEDIA_ROOT) / "sample_idp"
-    media_dir.mkdir(parents=True, exist_ok=True)
-
-    palette = [
-        ((245, 232, 220), (168, 116, 79), "Modern Villa"),
-        ((228, 240, 232), (73, 120, 94), "Minimal Loft"),
-        ((236, 236, 245), (109, 111, 171), "Warm Residence"),
-        ((240, 235, 225), (124, 92, 56), "Coastal Living"),
-    ]
-
-    paths = []
-    for index, (bg, accent, label) in enumerate(palette, start=1):
-        file_path = media_dir / f"sample_{index}.png"
-        create_sample_image(file_path, bg, accent, label)
-        paths.append(file_path)
-
-    return paths
 
 
 def ensure_sample_designer():
@@ -107,10 +64,11 @@ def ensure_sample_designer():
         ("HDB Smart Redesign", "HDB Renovation", "Compact space planning with elegant finishes and clever storage throughout.", "Toa Payoh"),
     ]
 
-    image_paths = generate_images()
+    image_updates = 0
+    missing_images = 0
+    preserved_uploads = 0
     for title, category_name, description, location in project_specs:
         category = Category.objects.get(name=category_name)
-        chosen_image = random.choice(image_paths)
         project, _ = InteriorDesignProject.objects.get_or_create(
             company=company,
             title=title,
@@ -127,12 +85,29 @@ def ensure_sample_designer():
         project.location = location
         project.style = "Contemporary"
         project.status = "current"
-        project.image.name = chosen_image.relative_to(settings.MEDIA_ROOT).as_posix()
+        current_image = project.image.name or ""
+        if (
+            not current_image
+            or current_image in DemoImageController.LEGACY_IMAGES
+            or current_image.startswith(f"{DemoImageController.DIRECTORY}/")
+        ):
+            chosen_image = DemoImageController.image_for(category_name, title)
+            if chosen_image:
+                project.image = chosen_image
+                image_updates += int(current_image != chosen_image)
+            else:
+                missing_images += 1
+        else:
+            preserved_uploads += 1
         project.save()
 
     print(f"Designer user: {user.username} / password: Designer123!")
     print(f"Company: {company.name}")
-    print(f"Images generated in: {settings.MEDIA_ROOT / 'sample_idp'}")
+    print(f"Virtual image catalog: {settings.MEDIA_ROOT / DemoImageController.DIRECTORY}")
+    print(f"Category-matched images updated: {image_updates}")
+    print(f"Custom uploaded photos preserved: {preserved_uploads}")
+    if missing_images:
+        print(f"Matching catalog images unavailable for {missing_images} projects; existing images retained.")
     print("Sample IDPs created.")
 
 

@@ -1,11 +1,16 @@
-from django.contrib.auth.forms import AuthenticationForm
-from django.core.exceptions import ValidationError
-from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserCreationForm
-
 from django import forms
-from django.db.models import Q
-from .models import UserAccount, UserProfile
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.core.exceptions import ValidationError
+from django.views.decorators.debug import sensitive_variables
+
+from .controllers import (
+    AssignUserProfileController,
+    LoginController,
+    UpdateUserAccountController,
+)
+from .models import UserProfile
+
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
@@ -25,17 +30,23 @@ class UserProfileForm(forms.ModelForm):
 
 
 class AccountLoginForm(AuthenticationForm):
+    @sensitive_variables()
+    def clean(self):
+        username = self.cleaned_data.get("username")
+        password = self.cleaned_data.get("password")
+        if username is not None and password:
+            self.user_cache = LoginController().authenticate(
+                request=self.request, username=username, password=password,
+            )
+            if self.user_cache is None:
+                raise self.get_invalid_login_error()
+            self.confirm_login_allowed(self.user_cache)
+        return self.cleaned_data
+
     def confirm_login_allowed(self, user):
         super().confirm_login_allowed(user)
 
-
-
-        has_active_profile = UserAccount.objects.filter(
-            user=user,
-            profile__is_active=True,
-        ).exists()
-
-        if not has_active_profile:
+        if not LoginController().can_login(user):
             raise ValidationError(
                 "Your account is unavailable. "
                 "Please contact a user administrator.",
@@ -47,9 +58,7 @@ class AccountCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
 
     profile = forms.ModelChoiceField(
-        queryset=UserProfile.objects.filter(
-            is_active=True
-        ).order_by("name"),
+        queryset=None,
         empty_label="Select a profile",
     )
 
@@ -65,17 +74,17 @@ class AccountCreationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["profile"].queryset = AssignUserProfileController().available_for_assignment()
 
         for field in self.fields.values():
             field.widget.attrs["class"] = "input"
-
 
 
 class AccountUpdateForm(forms.ModelForm):
     email = forms.EmailField(required=True)
 
     profile = forms.ModelChoiceField(
-        queryset=UserProfile.objects.none()
+        queryset=None,
     )
 
     class Meta:
@@ -96,9 +105,7 @@ class AccountUpdateForm(forms.ModelForm):
         )
 
         self.fields["profile"].queryset = (
-            UserProfile.objects.filter(
-                Q(is_active=True) | Q(pk=account.profile_id)
-            ).order_by("name")
+            AssignUserProfileController().available_for_assignment(account.profile_id)
         )
 
         self.initial["profile"] = account.profile_id
@@ -109,15 +116,9 @@ class AccountUpdateForm(forms.ModelForm):
     def clean_username(self):
         username = self.cleaned_data["username"]
 
-        duplicate = (
-            get_user_model().objects.filter(
-                username__iexact=username
-            )
-            .exclude(pk=self.instance.pk)
-            .exists()
-        )
-
-        if duplicate:
+        if UpdateUserAccountController().username_exists(
+            username, exclude_user_id=self.instance.pk,
+        ):
             raise forms.ValidationError(
                 "A user with that username already exists."
             )

@@ -1,0 +1,83 @@
+{
+  "purpose": "Preserved test-first bug-fix evidence for the CSIT314 assignment.",
+  "green_run_date": "2026-11-06",
+  "current_tests_passed": 39,
+  "provenance": [
+    "The red logs are byte-for-byte copies of original saved failing test runs from before the corresponding fixes in this coding session.",
+    "The red logs do not embed a capture timestamp; no historical timestamp has been added or inferred from this copy.",
+    "The green logs are new test executions against the current working tree on the client date above, using temporary Django test databases.",
+    "Later refactoring moved business operations into BCE controllers. The favourites save endpoint was also subsequently renamed from add to toggle; original red logs are retained unchanged.",
+    "Failure totals can include failed subtests, so they may exceed the number of test methods.",
+    "These examples show specific test-first fixes. They do not establish that every user story or the entire project was developed test-first."
+  ],
+  "examples": [
+    {
+      "feature": "User Admin account creation: duplicate username race",
+      "test": "accounts/test_account_creation_conflicts.py",
+      "implementation": [
+        "accounts/controllers.py",
+        "accounts/views.py"
+      ],
+      "test_command": "python manage.py test accounts.test_account_creation_conflicts --verbosity 2",
+      "test_methods": 4,
+      "original_red_log": "account-creation-conflicts-red-original.log",
+      "original_red_summary": "FAILED (errors=3)",
+      "current_green_log": "account-creation-conflicts-green-2026-11-06.log",
+      "current_green_summary": "Ran 4 tests; OK",
+      "original_red_sha256": "518bf2eabe243232a54391de1c38e74faa875e89c59431df626bfca751bd6908",
+      "current_green_sha256": "26ac258537529a02d3f86aacf9838621ea77bde1eda6b7f0adad3c53e77f518e"
+    },
+    {
+      "feature": "Company management role and suspension restrictions",
+      "test": "companies/test_company_access.py",
+      "implementation": [
+        "accounts/controllers.py",
+        "accounts/decorators.py",
+        "companies/views.py",
+        "companies/controllers.py"
+      ],
+      "test_command": "python manage.py test companies.test_company_access --verbosity 2",
+      "test_methods": 10,
+      "original_red_log": "company-access-red-original.log",
+      "original_red_summary": "FAILED (failures=44)",
+      "current_green_log": "company-access-green-2026-11-06.log",
+      "current_green_summary": "Ran 10 tests; OK",
+      "original_red_sha256": "672044f5b40e00eb5067ca08db91cc4b6fab167dc23db1fd52d693265830447e",
+      "current_green_sha256": "6129a06f4421f531d69ff0bbe7a32c28bba8b250e9c4fefc37a38a147b525a09"
+    },
+    {
+      "feature": "Customer-only favourites and suspended-profile restrictions",
+      "test": "favourites/test_favourite_access.py",
+      "implementation": [
+        "accounts/controllers.py",
+        "accounts/decorators.py",
+        "favourites/views.py"
+      ],
+      "test_command": "python manage.py test favourites.test_favourite_access --verbosity 2",
+      "test_methods": 9,
+      "original_red_log": "favourite-access-red-original.log",
+      "original_red_summary": "FAILED (failures=18)",
+      "current_green_log": "favourite-access-green-2026-11-06.log",
+      "current_green_summary": "Ran 9 tests; OK",
+      "original_red_sha256": "c36f27776041a8ca4ff19b89f6e73a0bf33296207bb74ca50835e13583747eaa",
+      "current_green_sha256": "6c0a2e8ef906474d4dbd34b6bba5d3728d2bed1f9c3903aa8b9a590e762bc382"
+    },
+    {
+      "feature": "Favourites search, category filters, sorting and counts",
+      "test": "favourites/test_favourite_list.py",
+      "implementation": [
+        "favourites/controllers.py",
+        "favourites/views.py",
+        "templates/favourites/favourite_list.html"
+      ],
+      "test_command": "python manage.py test favourites.test_favourite_list --verbosity 2",
+      "test_methods": 16,
+      "original_red_log": "favourite-list-red-original.log",
+      "original_red_summary": "FAILED (failures=6, errors=13)",
+      "current_green_log": "favourite-list-green-2026-11-06.log",
+      "current_green_summary": "Ran 16 tests; OK",
+      "original_red_sha256": "6bf2ef3403fd4f5e43d620fd944861131a91a7da5cbb1fb240dff487935e121c",
+      "current_green_sha256": "89f86c7d10f9dbad26520f2aea5a0f9298e08d90199db5da20293815d5adcf37"
+    }
+  ]
+}

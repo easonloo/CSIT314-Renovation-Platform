@@ -50,6 +50,7 @@
       <button class="profile-filter{% if status_filter == 'suspended' %} active{% endif %}" type="submit" name="status" value="suspended" aria-pressed="{% if status_filter == 'suspended' %}true{% else %}false{% endif %}">Suspended</button>
     </div>
     <button class="account-apply-filter" type="submit" name="status" value="{{ status_filter }}">Apply</button>
+    <a class="btn btn-light" href="{% url 'account_list' %}">Clear</a>
   </form>
 
   <div class="table-wrap profile-table-wrap">
@@ -94,6 +95,9 @@
                   <a href="{% url 'account_suspend' account.pk %}">Suspend account</a>
                   {% else %}
                   <a href="{% url 'account_reactivate' account.pk %}">Reactivate account</a>
+                  {% endif %}
+                  {% if request.user.pk != account.user_id %}
+                  <a href="{% url 'account_delete' account.pk %}">Delete account</a>
                   {% endif %}
                 </div>
               </details>

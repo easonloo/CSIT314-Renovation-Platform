@@ -3,7 +3,7 @@ from functools import wraps
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 
-from .models import UserAccount
+from .controllers import AccountAccessController
 
 
 def _require_profile(profile_name):
@@ -11,14 +11,9 @@ def _require_profile(profile_name):
         @login_required
         @wraps(view)
         def wrapped(request, *args, **kwargs):
-            allowed = UserAccount.objects.filter(
-                user=request.user,
-                user__is_active=True,
-                profile__name=profile_name,
-                profile__is_active=True,
-            ).exists()
-
-            if not allowed:
+            if not AccountAccessController.can_access_profile(
+                request.user, profile_name,
+            ):
                 raise PermissionDenied
 
             return view(request, *args, **kwargs)
@@ -29,7 +24,7 @@ def _require_profile(profile_name):
 
 
 def user_admin_required(view):
-    return _require_profile("User Admin")(view)
+    return _require_profile(AccountAccessController.USER_ADMIN_PROFILE)(view)
 
 
 def interior_designer_required(view):

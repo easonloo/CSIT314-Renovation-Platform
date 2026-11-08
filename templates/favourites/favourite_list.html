@@ -16,10 +16,13 @@
   </div>
 
   <div class="favourites-controls">
-    <form class="favourites-search" method="get">
+    <form class="favourites-search" method="get" action="{% url 'favourite_list' %}">
       <label class="visually-hidden" for="favourites-search">Search saved projects</label>
       <input id="favourites-search" class="input" type="search" name="q" value="{{ q }}" placeholder="Search projects, designers or styles">
       <button class="btn btn-dark" type="submit">Search</button>
+      {% if q or category_filter %}
+      <a class="btn btn-light" href="{% url 'favourite_list' %}">Clear filters</a>
+      {% endif %}
       <input type="hidden" name="category" value="{{ category_filter }}">
       <input type="hidden" name="sort" value="{{ sort_order }}">
     </form>
@@ -30,7 +33,7 @@
           <a class="favourite-chip{% if category_filter == category.project__category_id|stringformat:'s' %} is-selected{% endif %}" href="?q={{ q|urlencode }}&amp;sort={{ sort_order }}&amp;category={{ category.project__category_id }}">{{ category.project__category__name }} <span>{{ category.count }}</span></a>
         {% endfor %}
       </nav>
-      <form class="favourites-sort" method="get">
+      <form class="favourites-sort" method="get" action="{% url 'favourite_list' %}">
         <label for="favourites-sort">Sort by</label>
         <select id="favourites-sort" class="select" name="sort">
           <option value="newest"{% if sort_order == 'newest' %} selected{% endif %}>Recently saved</option>
@@ -44,7 +47,7 @@
   </div>
 
   <div class="favourites-results-heading">
-    <h2>{% if category_filter %}Filtered favourites{% else %}All your favourites{% endif %}</h2>
+    <h2>{% if q or category_filter %}Filtered favourites{% else %}All your favourites{% endif %}</h2>
     <span>{{ filtered_count }} {% if filtered_count == 1 %}project{% else %}projects{% endif %}</span>
   </div>
 
@@ -52,22 +55,27 @@
     <div class="favourites-grid">
       {% for favourite in favourites %}
         <article class="favourite-card">
-          <a class="favourite-card-image" href="{% url 'idp_detail' favourite.project.id %}" aria-label="View {{ favourite.project.title }}">
+          <a class="favourite-card-image" href="{% url 'favourite_detail' favourite.project.id %}" aria-label="View {{ favourite.project.title }}">
             {% if favourite.project.display_image %}
               <img src="{{ favourite.project.display_image.url }}" alt="{{ favourite.project.title }}" loading="lazy">
             {% else %}
               <span class="favourite-image-placeholder" aria-hidden="true">Project inspiration</span>
             {% endif %}
           </a>
-          <span class="favourite-heart" aria-label="Saved to favourites">♥</span>
+          <form method="post" action="{% url 'favourite_toggle' favourite.project.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button class="favourite-heart" type="submit" aria-pressed="true" aria-label="Remove {{ favourite.project.title }} from favourites" title="Remove from favourites">♥</button>
+          </form>
           <div class="favourite-card-body">
+            {% if favourite.project.is_virtual_image %}<span class="virtual-image-label">Virtual demo render</span>{% endif %}
             <div class="favourite-card-meta">
               <span>{{ favourite.project.category.name|default:"Design project" }}</span>
               <time datetime="{{ favourite.created_at|date:'Y-m-d' }}">Saved {{ favourite.created_at|date:'d M Y' }}</time>
             </div>
-            <h3><a href="{% url 'idp_detail' favourite.project.id %}">{{ favourite.project.title }}</a></h3>
+            <h3><a href="{% url 'favourite_detail' favourite.project.id %}">{{ favourite.project.title }}</a></h3>
             <p>{{ favourite.project.company.name }}</p>
-            <a class="favourite-view-link" href="{% url 'idp_detail' favourite.project.id %}">View project <span aria-hidden="true">→</span></a>
+            <a class="favourite-view-link" href="{% url 'favourite_detail' favourite.project.id %}">View project <span aria-hidden="true">→</span></a>
           </div>
         </article>
       {% endfor %}

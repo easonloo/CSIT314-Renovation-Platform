@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete User Profile{% endblock %}
+{% block page_name %}Delete User Profile{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Delete User Profile</h1>
+    <p class="page-subtitle">Review the profile before confirming deletion.</p>
+  </div>
+</div>
+
+<div class="card">
+  <p>Delete the profile <strong>{{ profile.name }}</strong>?</p>
+  <p>Accounts assigned: <strong>{{ assigned_count }}</strong></p>
+
+  {% if error %}
+  <p class="alert alert-error" role="alert">{{ error }}</p>
+  {% endif %}
+
+  {% if can_delete %}
+  <p>This permanently removes the profile.</p>
+  {% else %}
+  <p>Reassign or delete the accounts using this profile before deleting it.</p>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-actions">
+      {% if can_delete %}
+      <button class="btn btn-danger" type="submit">Confirm deletion</button>
+      {% endif %}
+      <a class="btn btn-light" href="{% url 'profile_detail' profile.pk %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

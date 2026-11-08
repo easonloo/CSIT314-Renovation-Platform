@@ -1,0 +1,754 @@
+{
+  "schema_version": 1,
+  "pattern": "HTTP Boundary -> named user-story Control -> Entity operation -> Django ORM -> database",
+  "scope": "The 48 application user stories. Django framework internals and administrative demo-data/image/setup utilities have separate infrastructure responsibilities.",
+  "notes": [
+    "Each story has a distinct named control; shared routes dispatch by user role, project status, favourite context or report period.",
+    "Entity operations include model class methods, instance methods and model managers; the existing database schema is preserved.",
+    "A control reference in a dispatcher documents route wiring; behavioural correctness is verified by the application regression tests.",
+    "This mapping records the implemented structure and does not substitute for the tutor reviewing the UML and final design."
+  ],
+  "stories": [
+    {
+      "id": 1,
+      "role": "User Admin",
+      "story": "Log in",
+      "boundary": "accounts.forms.AccountLoginForm.confirm_login_allowed",
+      "control": "accounts.controllers.UserAdminLoginController",
+      "method": "can_login",
+      "entity_operations": [
+        "accounts.models.UserAccount.authenticate_credentials",
+        "accounts.models.UserAccount.has_profile_access"
+      ],
+      "dispatchers": [
+        "accounts.controllers.LoginController"
+      ],
+      "route": "login"
+    },
+    {
+      "id": 2,
+      "role": "User Admin",
+      "story": "Log out",
+      "boundary": "accounts.views.AccountLogoutView.post",
+      "control": "accounts.controllers.UserAdminLogoutController",
+      "method": "logout_account",
+      "entity_operations": [
+        "accounts.models.UserAccount.for_user"
+      ],
+      "dispatchers": [
+        "accounts.controllers.LogoutController"
+      ],
+      "route": "logout",
+      "framework_responsibility": "The HTTP boundary delegates session cleanup to Django LogoutView."
+    },
+    {
+      "id": 3,
+      "role": "User Admin",
+      "story": "Create a user profile",
+      "boundary": "accounts.views.profile_create",
+      "control": "accounts.controllers.CreateUserProfileController",
+      "method": "create_profile",
+      "entity_operations": [
+        "accounts.models.UserProfile.create_profile"
+      ],
+      "route": "profile_create"
+    },
+    {
+      "id": 4,
+      "role": "User Admin",
+      "story": "View a user profile",
+      "boundary": "accounts.views.profile_detail",
+      "control": "accounts.controllers.ViewUserProfileController",
+      "method": "get_profile",
+      "entity_operations": [
+        "accounts.models.UserProfile.get_profile"
+      ],
+      "route": "profile_detail"
+    },
+    {
+      "id": 5,
+      "role": "User Admin",
+      "story": "Update a user profile",
+      "boundary": "accounts.views.profile_update",
+      "control": "accounts.controllers.UpdateUserProfileController",
+      "method": "update_profile",
+      "entity_operations": [
+        "accounts.models.UserProfile.update_details"
+      ],
+      "route": "profile_update"
+    },
+    {
+      "id": 6,
+      "role": "User Admin",
+      "story": "Suspend a user profile",
+      "boundary": "accounts.views.profile_suspend",
+      "control": "accounts.controllers.SuspendUserProfileController",
+      "method": "suspend_profile",
+      "entity_operations": [
+        "accounts.models.UserProfile.suspend"
+      ],
+      "route": "profile_suspend"
+    },
+    {
+      "id": 7,
+      "role": "User Admin",
+      "story": "Search user profiles",
+      "boundary": "accounts.views.profile_list",
+      "control": "accounts.controllers.SearchUserProfilesController",
+      "method": "get_list_data",
+      "entity_operations": [
+        "accounts.models.UserProfile.search_profiles"
+      ],
+      "route": "profile_list"
+    },
+    {
+      "id": 8,
+      "role": "User Admin",
+      "story": "Create a user account",
+      "boundary": "accounts.views.account_create",
+      "control": "accounts.controllers.CreateUserAccountController",
+      "method": "create_account",
+      "entity_operations": [
+        "accounts.models.UserAccount.create_account"
+      ],
+      "route": "account_create"
+    },
+    {
+      "id": 9,
+      "role": "User Admin",
+      "story": "View a user account",
+      "boundary": "accounts.views.account_detail",
+      "control": "accounts.controllers.ViewUserAccountController",
+      "method": "get_account",
+      "entity_operations": [
+        "accounts.models.UserAccount.get_account"
+      ],
+      "route": "account_detail"
+    },
+    {
+      "id": 10,
+      "role": "User Admin",
+      "story": "Update a user account",
+      "boundary": "accounts.views.account_update",
+      "control": "accounts.controllers.UpdateUserAccountController",
+      "method": "update_account",
+      "entity_operations": [
+        "accounts.models.UserAccount.update_details"
+      ],
+      "route": "account_update"
+    },
+    {
+      "id": 11,
+      "role": "User Admin",
+      "story": "Suspend a user account",
+      "boundary": "accounts.views.account_suspend",
+      "control": "accounts.controllers.SuspendUserAccountController",
+      "method": "suspend_account",
+      "entity_operations": [
+        "accounts.models.UserAccount.suspend"
+      ],
+      "route": "account_suspend"
+    },
+    {
+      "id": 12,
+      "role": "User Admin",
+      "story": "Search user accounts",
+      "boundary": "accounts.views.account_list",
+      "control": "accounts.controllers.SearchUserAccountsController",
+      "method": "get_list_data",
+      "entity_operations": [
+        "accounts.models.UserAccount.search_accounts"
+      ],
+      "route": "account_list"
+    },
+    {
+      "id": 13,
+      "role": "Interior Designer",
+      "story": "Log in",
+      "boundary": "accounts.forms.AccountLoginForm.confirm_login_allowed",
+      "control": "accounts.controllers.InteriorDesignerLoginController",
+      "method": "can_login",
+      "entity_operations": [
+        "accounts.models.UserAccount.authenticate_credentials",
+        "accounts.models.UserAccount.has_profile_access"
+      ],
+      "dispatchers": [
+        "accounts.controllers.LoginController"
+      ],
+      "route": "login"
+    },
+    {
+      "id": 14,
+      "role": "Interior Designer",
+      "story": "Log out",
+      "boundary": "accounts.views.AccountLogoutView.post",
+      "control": "accounts.controllers.InteriorDesignerLogoutController",
+      "method": "logout_account",
+      "entity_operations": [
+        "accounts.models.UserAccount.for_user"
+      ],
+      "dispatchers": [
+        "accounts.controllers.LogoutController"
+      ],
+      "route": "logout",
+      "framework_responsibility": "The HTTP boundary delegates session cleanup to Django LogoutView."
+    },
+    {
+      "id": 15,
+      "role": "Interior Designer",
+      "story": "Create company information",
+      "boundary": "companies.views.company_create",
+      "control": "companies.controllers.CreateCompanyController",
+      "method": "create_company",
+      "entity_operations": [
+        "companies.models.Company.create_for_user"
+      ],
+      "route": "company_create"
+    },
+    {
+      "id": 16,
+      "role": "Interior Designer",
+      "story": "View company information",
+      "boundary": "companies.views.company_detail",
+      "control": "companies.controllers.ViewCompanyController",
+      "method": "get_company",
+      "entity_operations": [
+        "companies.models.Company.find_for_user"
+      ],
+      "route": "company_detail"
+    },
+    {
+      "id": 17,
+      "role": "Interior Designer",
+      "story": "Update company information",
+      "boundary": "companies.views.company_update",
+      "control": "companies.controllers.UpdateCompanyController",
+      "method": "update_company",
+      "entity_operations": [
+        "companies.models.Company.update_details"
+      ],
+      "route": "company_update"
+    },
+    {
+      "id": 18,
+      "role": "Interior Designer",
+      "story": "Delete company information",
+      "boundary": "companies.views.company_delete",
+      "control": "companies.controllers.DeleteCompanyController",
+      "method": "delete_company",
+      "entity_operations": [
+        "companies.models.Company.delete_company"
+      ],
+      "route": "company_delete",
+      "confirmation_template": "companies/company_confirm_delete.html",
+      "confirmation_method": "GET",
+      "deletion_method": "POST"
+    },
+    {
+      "id": 19,
+      "role": "Interior Designer",
+      "story": "Search company information",
+      "boundary": "companies.views.company_search",
+      "control": "companies.controllers.SearchCompanyInformationController",
+      "method": "search_information",
+      "entity_operations": [
+        "companies.models.Company.search_information"
+      ],
+      "route": "company_search"
+    },
+    {
+      "id": 20,
+      "role": "Interior Designer",
+      "story": "Create current IDPs",
+      "boundary": "projects.views.idp_create",
+      "control": "projects.controllers.CreateCurrentIDPController",
+      "method": "create_project",
+      "entity_operations": [
+        "projects.models.InteriorDesignProject.create_project"
+      ],
+      "dispatchers": [
+        "projects.controllers.CreateIDPController.create_project"
+      ],
+      "route": "idp_create"
+    },
+    {
+      "id": 21,
+      "role": "Interior Designer",
+      "story": "View current IDPs",
+      "boundary": "projects.views.idp_detail",
+      "control": "projects.controllers.ViewCurrentIDPController",
+      "method": "view_project",
+      "entity_operations": [
+        "projects.models.InteriorDesignProject.find_owned"
+      ],
+      "dispatchers": [
+        "projects.controllers.ViewIDPController.get_detail_data"
+      ],
+      "route": "idp_detail"
+    },
+    {
+      "id": 22,
+      "role": "Interior Designer",
+      "story": "Update current IDPs",
+      "boundary": "projects.views.idp_update",
+      "control": "projects.controllers.UpdateCurrentIDPController",
+      "method": "update_project",
+      "entity_operations": [
+        "projects.models.InteriorDesignProject.find_owned",
+        "projects.models.InteriorDesignProject.update_details"
+      ],
+      "dispatchers": [
+        "projects.controllers.UpdateIDPController.update_project"
+      ],
+      "route": "idp_update"
+    },
+    {
+      "id": 23,
+      "role": "Interior Designer",
+      "story": "Delete current IDPs",
+      "boundary": "projects.views.idp_delete",
+      "control": "projects.controllers.DeleteCurrentIDPController",
+      "method": "delete_project",
+      "entity_operations": [
+        "projects.models.InteriorDesignProject.find_owned",
+        "projects.models.InteriorDesignProject.delete_project"
+      ],
+      "dispatchers": [
+        "projects.controllers.DeleteIDPController.delete_project"
+      ],
+      "route": "idp_delete",
+      "confirmation_template": "projects/idp_confirm_delete.html",
+      "confirmation_method": "GET",
+      "deletion_method": "POST"
+    },
+    {
+      "id": 24,
+      "role": "Interior Designer",
+      "story": "Search current IDPs",
+      "boundary": "projects.views.idp_list",
+      "control": "projects.controllers.SearchCurrentIDPsController",
+      "method": "search_projects",
+      "entity_operations": [
+        "projects.models.InteriorDesignProject.search_owned"
+      ],
+      "dispatchers": [
+        "projects.controllers.SearchOwnedIDPsController.get_list_data"
+      ],
+      "route": "idp_list"
+    },
+    {
+      "id": 25,
+      "role": "Interior Designer",
+      "story": "Create past IDPs",
+      "boundary": "projects.views.idp_create",
+      "control": "projects.controllers.CreatePastIDPController",
+      "method": "create_project",
+      "entity_operations": [
+        "projects.models.InteriorDesignProject.create_project"
+      ],
+      "dispatchers": [
+        "projects.controllers.CreateIDPController.create_project"
+      ],
+      "route": "idp_create"
+    },
+    {
+      "id": 26,
+      "role": "Interior Designer",
+      "story": "View past IDPs",
+      "boundary": "projects.views.idp_detail",
+      "control": "projects.controllers.ViewPastIDPController",
+      "method": "view_project",
+      "entity_operations": [
+        "projects.models.InteriorDesignProject.find_owned"
+      ],
+      "dispatchers": [
+        "projects.controllers.ViewIDPController.get_detail_data"
+      ],
+      "route": "idp_detail"
+    },
+    {
+      "id": 27,
+      "role": "Interior Designer",
+      "story": "Update past IDPs",
+      "boundary": "projects.views.idp_update",
+      "control": "projects.controllers.UpdatePastIDPController",
+      "method": "update_project",
+      "entity_operations": [
+        "projects.models.InteriorDesignProject.find_owned",
+        "projects.models.InteriorDesignProject.update_details"
+      ],
+      "dispatchers": [
+        "projects.controllers.UpdateIDPController.update_project"
+      ],
+      "route": "idp_update"
+    },
+    {
+      "id": 28,
+      "role": "Interior Designer",
+      "story": "Delete past IDPs",
+      "boundary": "projects.views.idp_delete",
+      "control": "projects.controllers.DeletePastIDPController",
+      "method": "delete_project",
+      "entity_operations": [
+        "projects.models.InteriorDesignProject.find_owned",
+        "projects.models.InteriorDesignProject.delete_project"
+      ],
+      "dispatchers": [
+        "projects.controllers.DeleteIDPController.delete_project"
+      ],
+      "route": "idp_delete",
+      "confirmation_template": "projects/idp_confirm_delete.html",
+      "confirmation_method": "GET",
+      "deletion_method": "POST"
+    },
+    {
+      "id": 29,
+      "role": "Interior Designer",
+      "story": "Search past IDPs",
+      "boundary": "projects.views.idp_list",
+      "control": "projects.controllers.SearchPastIDPsController",
+      "method": "search_projects",
+      "entity_operations": [
+        "projects.models.InteriorDesignProject.search_owned"
+      ],
+      "dispatchers": [
+        "projects.controllers.SearchOwnedIDPsController.get_list_data"
+      ],
+      "route": "idp_list"
+    },
+    {
+      "id": 30,
+      "role": "Customer",
+      "story": "Log in",
+      "boundary": "accounts.forms.AccountLoginForm.confirm_login_allowed",
+      "control": "accounts.controllers.CustomerLoginController",
+      "method": "can_login",
+      "entity_operations": [
+        "accounts.models.UserAccount.authenticate_credentials",
+        "accounts.models.UserAccount.has_profile_access"
+      ],
+      "dispatchers": [
+        "accounts.controllers.LoginController"
+      ],
+      "route": "login"
+    },
+    {
+      "id": 31,
+      "role": "Customer",
+      "story": "Log out",
+      "boundary": "accounts.views.AccountLogoutView.post",
+      "control": "accounts.controllers.CustomerLogoutController",
+      "method": "logout_account",
+      "entity_operations": [
+        "accounts.models.UserAccount.for_user"
+      ],
+      "dispatchers": [
+        "accounts.controllers.LogoutController"
+      ],
+      "route": "logout",
+      "framework_responsibility": "The HTTP boundary delegates session cleanup to Django LogoutView."
+    },
+    {
+      "id": 32,
+      "role": "Customer",
+      "story": "Search IDPs",
+      "boundary": "projects.views.customer_idp_search",
+      "control": "projects.controllers.SearchIDPsController",
+      "method": "get_search_data",
+      "entity_operations": [
+        "projects.models.InteriorDesignProject.discover"
+      ],
+      "route": "customer_idp_search"
+    },
+    {
+      "id": 33,
+      "role": "Customer",
+      "story": "View IDP details",
+      "boundary": "projects.views.idp_detail",
+      "control": "projects.controllers.ViewIDPController",
+      "method": "get_detail_data",
+      "entity_operations": [
+        "projects.models.InteriorDesignProject.find",
+        "projects.models.InteriorDesignProject.record_view"
+      ],
+      "route": "idp_detail"
+    },
+    {
+      "id": 34,
+      "role": "Customer",
+      "story": "Save or remove an IDP favourite",
+      "boundary": "favourites.views.favourite_toggle",
+      "control": "favourites.controllers.SaveFavouriteController",
+      "method": "toggle",
+      "entity_operations": [
+        "favourites.models.Favourite.toggle_for"
+      ],
+      "route": "favourite_toggle"
+    },
+    {
+      "id": 35,
+      "role": "Customer",
+      "story": "Search favourites",
+      "boundary": "favourites.views.favourite_list",
+      "control": "favourites.controllers.SearchFavouritesController",
+      "method": "get_list_data",
+      "entity_operations": [
+        "favourites.models.Favourite.search_for"
+      ],
+      "route": "favourite_list"
+    },
+    {
+      "id": 36,
+      "role": "Customer",
+      "story": "View a saved IDP",
+      "boundary": "favourites.views.favourite_detail",
+      "control": "favourites.controllers.ViewFavouriteIDPController",
+      "method": "get_detail_data",
+      "entity_operations": [
+        "favourites.models.Favourite.saved_project"
+      ],
+      "route": "favourite_detail"
+    },
+    {
+      "id": 37,
+      "role": "Interior Designer",
+      "story": "View project view counts",
+      "boundary": "projects.views.idp_detail",
+      "control": "projects.controllers.ViewIDPViewsController",
+      "method": "view_views",
+      "entity_operations": [
+        "projects.models.InteriorDesignProject.number_of_views"
+      ],
+      "dispatchers": [
+        "projects.controllers.ViewIDPController.get_detail_data"
+      ],
+      "route": "idp_detail"
+    },
+    {
+      "id": 38,
+      "role": "Interior Designer",
+      "story": "View project shortlist counts",
+      "boundary": "projects.views.idp_detail",
+      "control": "projects.controllers.ViewIDPShortlistsController",
+      "method": "view_shortlists",
+      "entity_operations": [
+        "projects.models.InteriorDesignProject.number_of_shortlists"
+      ],
+      "dispatchers": [
+        "projects.controllers.ViewIDPController.get_detail_data"
+      ],
+      "route": "idp_detail"
+    },
+    {
+      "id": 39,
+      "role": "Platform Management",
+      "story": "Log in",
+      "boundary": "accounts.forms.AccountLoginForm.confirm_login_allowed",
+      "control": "accounts.controllers.PlatformManagerLoginController",
+      "method": "can_login",
+      "entity_operations": [
+        "accounts.models.UserAccount.authenticate_credentials",
+        "accounts.models.UserAccount.has_profile_access"
+      ],
+      "dispatchers": [
+        "accounts.controllers.LoginController"
+      ],
+      "route": "login"
+    },
+    {
+      "id": 40,
+      "role": "Platform Management",
+      "story": "Log out",
+      "boundary": "accounts.views.AccountLogoutView.post",
+      "control": "accounts.controllers.PlatformManagerLogoutController",
+      "method": "logout_account",
+      "entity_operations": [
+        "accounts.models.UserAccount.for_user"
+      ],
+      "dispatchers": [
+        "accounts.controllers.LogoutController"
+      ],
+      "route": "logout",
+      "framework_responsibility": "The HTTP boundary delegates session cleanup to Django LogoutView."
+    },
+    {
+      "id": 41,
+      "role": "Platform Management",
+      "story": "Create an IDP category",
+      "boundary": "categories.views.category_create",
+      "control": "categories.controllers.CreateIDPCategoryController",
+      "method": "create_category",
+      "entity_operations": [
+        "categories.models.Category.create_category"
+      ],
+      "route": "category_create"
+    },
+    {
+      "id": 42,
+      "role": "Platform Management",
+      "story": "View an IDP category",
+      "boundary": "categories.views.category_detail",
+      "control": "categories.controllers.ViewIDPCategoryController",
+      "method": "get_category",
+      "entity_operations": [
+        "categories.models.Category.find_category"
+      ],
+      "route": "category_detail"
+    },
+    {
+      "id": 43,
+      "role": "Platform Management",
+      "story": "Update an IDP category",
+      "boundary": "categories.views.category_update",
+      "control": "categories.controllers.UpdateIDPCategoryController",
+      "method": "update_category",
+      "entity_operations": [
+        "categories.models.Category.update_details"
+      ],
+      "route": "category_update"
+    },
+    {
+      "id": 44,
+      "role": "Platform Management",
+      "story": "Delete an IDP category",
+      "boundary": "categories.views.category_delete",
+      "control": "categories.controllers.DeleteIDPCategoryController",
+      "method": "delete_category",
+      "entity_operations": [
+        "categories.models.Category.delete_category"
+      ],
+      "route": "category_delete",
+      "confirmation_template": "categories/category_confirm_delete.html",
+      "confirmation_method": "GET",
+      "deletion_method": "POST"
+    },
+    {
+      "id": 45,
+      "role": "Platform Management",
+      "story": "Search IDP categories",
+      "boundary": "categories.views.category_list",
+      "control": "categories.controllers.SearchIDPCategoriesController",
+      "method": "list_categories",
+      "entity_operations": [
+        "categories.models.Category.search_categories"
+      ],
+      "route": "category_list"
+    },
+    {
+      "id": 46,
+      "role": "Platform Management",
+      "story": "Generate a daily report",
+      "boundary": "reports.views.report",
+      "control": "reports.controllers.GenerateDailyReportController",
+      "method": "get_report_data",
+      "entity_operations": [
+        "reports.models.ProjectView.platform_metrics"
+      ],
+      "dispatchers": [
+        "reports.controllers.get_report_controller"
+      ],
+      "route": "report",
+      "additional_boundary": "reports.views.report_download",
+      "period": "daily"
+    },
+    {
+      "id": 47,
+      "role": "Platform Management",
+      "story": "Generate a weekly report",
+      "boundary": "reports.views.report",
+      "control": "reports.controllers.GenerateWeeklyReportController",
+      "method": "get_report_data",
+      "entity_operations": [
+        "reports.models.ProjectView.platform_metrics"
+      ],
+      "dispatchers": [
+        "reports.controllers.get_report_controller"
+      ],
+      "route": "report",
+      "additional_boundary": "reports.views.report_download",
+      "period": "weekly"
+    },
+    {
+      "id": 48,
+      "role": "Platform Management",
+      "story": "Generate a monthly report",
+      "boundary": "reports.views.report",
+      "control": "reports.controllers.GenerateMonthlyReportController",
+      "method": "get_report_data",
+      "entity_operations": [
+        "reports.models.ProjectView.platform_metrics"
+      ],
+      "dispatchers": [
+        "reports.controllers.get_report_controller"
+      ],
+      "route": "report",
+      "additional_boundary": "reports.views.report_download",
+      "period": "monthly"
+    }
+  ],
+  "additional_features": [
+    {
+      "id": "delete_user_account",
+      "role": "User Admin",
+      "feature": "Delete another user account",
+      "boundary": "accounts.views.account_delete",
+      "control": "accounts.controllers.DeleteUserAccountController",
+      "method": "delete_account",
+      "entity_operations": [
+        "accounts.models.UserAccount.delete_account"
+      ],
+      "route": "account_delete",
+      "rules": [
+        "Only an active User Admin may confirm deletion.",
+        "The acting administrator cannot delete their own account.",
+        "A CSRF-protected POST deletes the linked login and cascading records.",
+        "Surviving shortlist counters are adjusted atomically."
+      ],
+      "confirmation_template": "accounts/account_confirm_delete.html",
+      "confirmation_method": "GET",
+      "deletion_method": "POST"
+    },
+    {
+      "id": "delete_user_profile",
+      "role": "User Admin",
+      "feature": "Delete an unused user profile",
+      "boundary": "accounts.views.profile_delete",
+      "control": "accounts.controllers.DeleteUserProfileController",
+      "method": "delete_profile",
+      "entity_operations": [
+        "accounts.models.UserProfile.assigned_account_count",
+        "accounts.models.UserProfile.delete_profile"
+      ],
+      "route": "profile_delete",
+      "rules": [
+        "Only an active User Admin may confirm deletion.",
+        "Assigned profiles are protected until accounts are reassigned or deleted.",
+        "A CSRF-protected POST deletes an unused profile."
+      ],
+      "confirmation_template": "accounts/profile_confirm_delete.html",
+      "confirmation_method": "GET",
+      "deletion_method": "POST"
+    },
+    {
+      "id": "delete_project_review",
+      "role": "Customer",
+      "feature": "Delete an owned project review",
+      "boundary": "reviews.views.review_delete",
+      "control": "reviews.controllers.DeleteProjectReviewController",
+      "method": "delete_review",
+      "entity_operations": [
+        "reviews.models.ProjectReview.find_owned",
+        "reviews.models.ProjectReview.delete_review"
+      ],
+      "route": "review_delete",
+      "confirmation_template": "reviews/review_confirm_delete.html",
+      "confirmation_method": "GET",
+      "deletion_method": "POST",
+      "rules": [
+        "An active Customer may delete only their own review.",
+        "GET displays confirmation and a CSRF-protected POST deletes the review.",
+        "The project and other reviews remain intact."
+      ]
+    }
+  ]
+}

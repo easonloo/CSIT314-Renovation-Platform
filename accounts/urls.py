@@ -1,4 +1,4 @@
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView
 from django.urls import path
 
 from . import views
@@ -16,7 +16,7 @@ urlpatterns = [
     ),
     path(
         "logout/",
-        LogoutView.as_view(
+        views.AccountLogoutView.as_view(
             http_method_names=["post", "options"],
         ),
         name="logout",
@@ -51,6 +51,11 @@ urlpatterns = [
         "profiles/<int:pk>/reactivate/",
         views.profile_reactivate,
         name="profile_reactivate",
+    ),
+    path(
+        "profiles/<int:pk>/delete/",
+        views.profile_delete,
+        name="profile_delete",
     ),
 
 
@@ -88,5 +93,10 @@ urlpatterns = [
         "accounts/<int:pk>/reactivate/",
         views.account_reactivate,
         name="account_reactivate",
+    ),
+    path(
+        "accounts/<int:pk>/delete/",
+        views.account_delete,
+        name="account_delete",
     ),
 ]
