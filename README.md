@@ -61,7 +61,7 @@ Open <http://127.0.0.1:8000/login/> and use your local administrator credentials
 The Django admin interface is at <http://127.0.0.1:8000/admin/>.
 
 If you already have a local administrator account, reuse it. You do not need to
-create another one. `setup_profiles` can be run again without duplicating profiles
+create another one. Command `setup_profiles` can be run again without duplicating profiles
 or accounts, and it preserves existing suspension statuses and descriptions.
 
 Your SQLite database, virtual environment, and passwords belong to your local
